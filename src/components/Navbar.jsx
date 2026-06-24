@@ -1,20 +1,142 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import DarkModeToggle from './DarkModeToggle'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+	DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+ } from "@/components/ui/dropdown-menu"
+import { Bell, LogOutIcon, LockIcon } from "lucide-react"
+import { useNavigate, } from 'react-router-dom'
+
+const notifications = [
+	{
+		id: 1,
+		title: "New user registered",
+		message: "Alice Reyes joined the system.",
+	},
+	{ id: 2, title: "Role updated", message: "Ben Santos is now an Editor." },
+	{ id: 3, title: "Report generated", message: "Q3 audit report is ready." },
+	{ id: 4, title: "Login detected", message: "New login from 192.168.1.1." },
+]
 
 const Navbar = () => {
 	const user = JSON.parse(window.localStorage.getItem("user") || "{}")
+	const navigate = useNavigate()
+	const [isDarkMode, setIsDarkMode] = useState(false)
+
+	const getInitials = (name) => {
+		return name
+			.split(" ")
+			.map((word) => word[0])
+			.join("")
+			.toUpperCase()
+			.slice(0, 2)
+	}
+
+	const logoutHandler = () => {
+		try {
+			localStorage.removeItem("user")
+			navigate("/")
+		} catch (error) {
+			console.log("error: ", error.response)
+		}
+	}
 
   return (
-		<div className="flex h-16 items-center gap-3 px-4 sm:px-6">
-			<div className="ml-auto flex items-center gap-2">
-				<button></button>
-				<div className="hidden lg:block">
-					<button className="flex items-center gap-3 rounded-full p-1 pr-3 transition-colors hover:bg-muted">
-						<span>/</span>
-						<div>
-							<p className="text-xs font-semibold">{user.username}</p>
-							<p className="text-[10px] text-muted-foreground">{user.role}</p>
+		<div className="flex h-16 items-center gap-3 px-4 sm:px-6 border">
+			<div className="ml-auto flex items-center gap-4">
+				<div className="relative flex items-center">
+					<DarkModeToggle />
+				</div>
+
+				<DropdownMenu>
+					<DropdownMenuTrigger className="border-2 rounded-2xl" asChild>
+						<Button size="icon-lg" variant="outline">
+							<Bell />
+						</Button>
+					</DropdownMenuTrigger>
+
+					<DropdownMenuContent className="w-72 rounded-xl" align="end">
+						<div className="max-h-50">
+							{notifications.map((notif, index) => (
+								<React.Fragment key={notif.id}>
+									<div className="p-3">
+										<h5 className="text-sm font-medium">{notif.title}</h5>
+										<p className="text-xs text-muted-foreground">
+											{notif.message}
+										</p>
+									</div>
+									{index < notifications.length - 1 && (
+										<DropdownMenuSeparator />
+									)}
+								</React.Fragment>
+							))}
 						</div>
-					</button>
+					</DropdownMenuContent>
+				</DropdownMenu>
+
+				<div className="hidden lg:block">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								className="min-h-10 h-auto min-w-26 w-auto border-2 rounded-xl"
+								variant="outline"
+							>
+								<span>
+									<Avatar>
+										<AvatarFallback>
+											{getInitials(user.username)}
+										</AvatarFallback>
+									</Avatar>
+								</span>
+								<div>
+									<p className="text-[14px] font-semibold">{user.name}</p>
+									<p className="text-[14px] text-muted-foreground">
+										{user.role}
+									</p>
+								</div>
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent className="w-45" align="end">
+							<DropdownMenuGroup>
+								<DropdownMenuLabel>My account</DropdownMenuLabel>
+								<DropdownMenuItem>
+									<LockIcon />
+									Change Password
+								</DropdownMenuItem>
+							</DropdownMenuGroup>
+
+							{/* <DropdownMenuSeparator /> */}
+
+							{/* <DropdownMenuGroup>
+								<DropdownMenuLabel>Preference</DropdownMenuLabel>
+								<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+									Dark Mode
+									<DarkModeToggle />
+								</DropdownMenuItem>
+							</DropdownMenuGroup> */}
+
+							<DropdownMenuSeparator />
+
+							<DropdownMenuGroup>
+								<DropdownMenuItem variant="destructive" onClick={logoutHandler}>
+									<LogOutIcon />
+									Log out
+								</DropdownMenuItem>
+							</DropdownMenuGroup>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</div>
 		</div>

@@ -1,12 +1,11 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
-import { SidebarProvider } from './ui/sidebar'
-import SidebarWrapper from './SidebarWrapper'
 import { TooltipProvider } from "@/components/ui/tooltip"
-import Navbar from './Navbar'
+import { Outlet } from "react-router-dom"
+import Navbar from "./Navbar"
+import SidebarWrapper from "./sidebar/SidebarWrapper"
+import { SidebarProvider } from "./ui/sidebar"
 
 const Layout = () => {
-  return (
+	return (
 		<TooltipProvider>
 			<SidebarProvider>
 				<SidebarWrapper />
@@ -14,7 +13,7 @@ const Layout = () => {
 					<header className="sticky top-0 z-30 border-b border-sidebar-border bg-sidebar/95 backdrop-blur-md pt-safe">
 						<Navbar />
 					</header>
-					<main className="min-h-0 flex-1 overflow-y-auto p-6 lg:p-8 lg:pb-safe pb-safe">
+					<main className="min-h-0 flex-1 overflow-y-auto p-6 lg:p-8 lg:pb-safe pb-safe bg-background">
 						<Outlet />
 					</main>
 				</div>

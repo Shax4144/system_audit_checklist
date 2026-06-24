@@ -3,14 +3,24 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+	Alert,
+	AlertAction,
+	AlertDescription,
+	AlertTitle,
+} from "@/components/ui/alert"
+
 import { users } from "../dummydata"
 import { useNavigate } from "react-router-dom"
+import { AlertCircleIcon } from "lucide-react"
 
 export function Landing() {
 	const [username, setUsername] = useState("")
 	const [password, setPassword] = useState("")
 	const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
+	const [loading, setLoading] = useState(false)
+	const [showError, setShowError] = useState(false)
+	const [error, setError] = useState("")
   
   const navigate = useNavigate()
 
@@ -22,9 +32,12 @@ export function Landing() {
     )
 
     if (match) {
-      localStorage.setItem("user", JSON.stringify(match))
-      navigate("/dashboard")
-    } else {
+			localStorage.setItem("user", JSON.stringify(match))
+			navigate("/dashboard")
+			setLoading(false)
+		} else {
+			setLoading(false)
+			setShowError(true)
       setError("Invalid username or password")
     }
 	}
@@ -42,7 +55,7 @@ export function Landing() {
 
 				{/* Logo mark */}
 				<div className="relative z-10 flex flex-col items-center gap-6 text-center">
-					<div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600">
+					<div className="flex items-center justify-center w-24 h-24 rounded-2xl bg-primary">
 						<svg
 							width="32"
 							height="32"
@@ -90,11 +103,11 @@ export function Landing() {
 			</div>
 
 			{/* ── Right panel: form ── */}
-			<div className="flex w-full lg:w-1/2 items-center justify-center bg-white px-8">
+			<div className="flex w-full lg:w-1/2 items-center justify-center px-8">
 				<div className="w-full max-w-sm">
 					{/* Mobile logo (shown only on small screens) */}
 					<div className="flex lg:hidden items-center gap-2 mb-8">
-						<div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-600">
+						<div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary">
 							<svg width="16" height="16" viewBox="0 0 32 32" fill="none">
 								<circle cx="16" cy="16" r="3" fill="white" />
 								<path
@@ -104,14 +117,14 @@ export function Landing() {
 								/>
 							</svg>
 						</div>
-						<span className="font-semibold text-slate-900">System Audit Checklist</span>
+						<span className="font-semibold">
+							System Audit Checklist
+						</span>
 					</div>
 
 					{/* Heading */}
 					<div className="flex justify-center mb-8">
-						<h2 className="text-2xl font-semibold text-slate-900">
-							LOGIN
-						</h2>
+						<h2 className="text-2xl font-semibold">LOGIN</h2>
 					</div>
 
 					{/* Form */}
@@ -119,7 +132,7 @@ export function Landing() {
 						<div className="flex flex-col gap-1.5">
 							<Label
 								htmlFor="email"
-								className="text-sm font-medium text-slate-700"
+								className="text-sm font-medium"
 							>
 								Username
 							</Label>
@@ -130,7 +143,7 @@ export function Landing() {
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
 								required
-								className="h-10 border-slate-200 focus-visible:ring-indigo-500"
+								className="h-10"
 							/>
 						</div>
 
@@ -165,10 +178,19 @@ export function Landing() {
 							</div>
 						</div>
 
+						{Boolean(showError) && (
+							<Alert variant="destructive" className="max-w-md bg-chart-1">
+								<AlertCircleIcon />
+								<AlertTitle>Invalid Credentials</AlertTitle>
+								<AlertDescription>
+									Username and/or password is invalid.
+								</AlertDescription>
+							</Alert>
+						)}
 						<Button
 							type="submit"
 							disabled={loading}
-							className="h-10 bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-colors"
+							className="h-10 font-medium transition-colors"
 						>
 							{loading ? "Signing in…" : "Sign in"}
 						</Button>
