@@ -16,8 +16,7 @@ import TableWrapper from "../../../components/TableWrapper"
 const data = [
 	{
 		id: 1,
-		name: "admin-mis",
-		permissions: ["masterlist", "checklist"],
+		name: "Document",
 		status: "active",
 		created_at: "2026-03-18T01:59:34.000000Z",
 		updated_at: "2026-05-15T08:36:52.000000Z",
@@ -25,8 +24,7 @@ const data = [
 	},
 	{
 		id: 2,
-		name: "admin-audit",
-		permissions: ["masterlist", "checklist"],
+		name: "Structures",
 		status: "active",
 		created_at: "2026-03-18T01:59:34.000000Z",
 		updated_at: "2026-05-15T08:36:52.000000Z",
@@ -34,8 +32,15 @@ const data = [
 	},
 	{
 		id: 3,
-		name: "audit",
-		permissions: ["checklist-build"],
+		name: "Process",
+		status: "active",
+		created_at: "2026-03-18T01:59:34.000000Z",
+		updated_at: "2026-05-15T08:36:52.000000Z",
+		deleted_at: null,
+	},
+	{
+		id: 3,
+		name: "Product",
 		status: "inactive",
 		created_at: "2026-03-18T01:59:34.000000Z",
 		updated_at: "2026-05-15T08:36:52.000000Z",
@@ -48,7 +53,7 @@ const tabs = [
 	{ label: "Archived", value: "archived" },
 ]
 
-const RolesTable = () => {
+const CategoryTable = () => {
 	const [showArchived, setShowArchived] = useState(false)
 
 	const filteredData = useMemo(
@@ -61,26 +66,6 @@ const RolesTable = () => {
 			{
 				accessorKey: "name",
 				header: "Name",
-			},
-			{
-				accessorKey: "permissions",
-				header: "Permission",
-				cell: ({ row }) => {
-					const permissions = row.getValue("permissions")
-					return (
-						<div className="flex flex-wrap gap-1">
-							{permissions.map((permission) => (
-								<Badge
-									key={permission}
-									variant="outline"
-									className="capitalize"
-								>
-									{permission}
-								</Badge>
-							))}
-						</div>
-					)
-				},
 			},
 			{
 				accessorKey: "status",
@@ -129,7 +114,7 @@ const RolesTable = () => {
 	)
 
 	return (
-    <TableWrapper
+		<TableWrapper
 			columns={columns}
 			data={filteredData}
 			searchKey="name"
@@ -143,4 +128,4 @@ const RolesTable = () => {
 	)
 }
 
-export default RolesTable
+export default CategoryTable

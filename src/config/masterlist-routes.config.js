@@ -12,6 +12,14 @@ const masterlistConfig = [
 		path: "roles",
 		component: lazy(() => import("../routes/masterlist/Roles/Roles")),
 	},
+	{
+		path: "supplier",
+		component: lazy(() => import("../routes/masterlist/Supplier/Supplier")),
+	},
+	{
+		path: "category",
+		component: lazy(() => import("../routes/masterlist/Category/Category")),
+	},
 ]
 
 export default masterlistConfig

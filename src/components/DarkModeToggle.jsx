@@ -11,14 +11,14 @@ const DarkModeToggle = () => {
   }
 
   return (
-		<div className="relative flex items-center border-2 rounded-2xl">
+		<div className="relative flex items-center border rounded-xl">
 			<Switch
 				className="[&>span]:bg-primary"
 				checked={isDarkMode}
 				onCheckedChange={handleToggle}
 			/>
 			{isDarkMode ? (
-				<div className="pointer-events-none absolute inset-0 flex items-center    justify-end px-1">
+				<div className="pointer-events-none absolute inset-0 flex items-center justify-end px-1">
 					<Moon className="h-4 w-4 text-secondary" />
 				</div>
 			) : (

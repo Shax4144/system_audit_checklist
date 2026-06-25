@@ -1,5 +1,6 @@
 import { useLocation, Link } from "react-router-dom"
-
+import SidebarMasterlistDropdown from "./SidebarMasterlistDropdown"
+import SidebarWorkspaceDropdown from "./SidebarWorkspaceDropdown"
 import {
 	Sidebar,
 	SidebarContent,
@@ -7,24 +8,28 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	SidebarGroup,
+	SidebarGroupLabel,
+	SidebarGroupContent,
 } from "../ui/sidebar"
-
 import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "../ui/collapsible"
-
 import {
 	ChevronDown,
 	LayoutDashboard,
 	ClipboardList,
 	UserRoundCog,
 	ShieldUser,
+	Truck,
+	Tags,
 } from "lucide-react"
 
 const SidebarWrapper = () => {
 	const { pathname } = useLocation()
+
 	return (
 		<Sidebar>
 			<SidebarHeader className="flex flex-row h-16">
@@ -49,66 +54,21 @@ const SidebarWrapper = () => {
 						<circle cx="16" cy="16" r="3" fill="white" />
 					</svg>
 				</div>
-
 				<div className="py-2.5">
-					<h1 className="text-3 font-semibold tracking-tight text-foreground">
+					<h1 className="text-sm font-semibold tracking-tight text-foreground">
 						System Audit Checklist
 					</h1>
 				</div>
 			</SidebarHeader>
 
 			<SidebarContent>
-				<SidebarMenu className="w-3xs">
-					<SidebarMenuItem>
-						<SidebarMenuButton
-							asChild
-							isActive={pathname === "/dashboard"}
-						>
-							<Link to="/dashboard">
-								<LayoutDashboard />
-								Dashboard
-							</Link>
-						</SidebarMenuButton>
-					</SidebarMenuItem>
+				{/* Workspace */}
+				<SidebarWorkspaceDropdown />
+				{/* end of workspace */}
 
-					<Collapsible>
-						<SidebarMenuItem>
-							<CollapsibleTrigger asChild>
-								<SidebarMenuButton>
-									<ClipboardList />
-									Masterlist
-									<ChevronDown className="ml-auto h-4 w-4" />
-								</SidebarMenuButton>
-							</CollapsibleTrigger>
-						</SidebarMenuItem>
-						{/* CHILDREN (this is what you want) */}
-						<CollapsibleContent className="pl-6 space-y-1">
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									asChild
-									isActive={pathname === "/masterlist/user-accounts"}
-								>
-									<Link to="/masterlist/user-accounts">
-										<UserRoundCog />
-										User Accounts
-									</Link>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									asChild
-									isActive={pathname === "/masterlist/roles"}
-								>
-									<Link to="/masterlist/roles">
-										<ShieldUser />
-										Roles
-									</Link>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-						</CollapsibleContent>
-					</Collapsible>
-				</SidebarMenu>
+				{/* Masterlist — collapsible */}
+				<SidebarMasterlistDropdown />
+				{/* end of masterlist */}
 			</SidebarContent>
 		</Sidebar>
 	)

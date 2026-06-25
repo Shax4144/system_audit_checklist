@@ -14,24 +14,29 @@ import {
 } from "@/components/ui/collapsible"
 import {
 	ChevronDown,
-	UserRoundCog,
-	ShieldUser,
-	Truck,
-	Tags,
+	LayoutDashboard,
 } from "lucide-react"
 
-const masterlistItems = [
+const workspaceItems = [
 	{
-		label: "User Accounts",
-		to: "/masterlist/user-accounts",
-		icon: UserRoundCog,
+		label: "Dashboard",
+		to: "/dashboard",
+		icon: LayoutDashboard,
 	},
-	{ label: "Roles", to: "/masterlist/roles", icon: ShieldUser },
-	{ label: "Supplier", to: "/masterlist/supplier", icon: Truck },
-	{ label: "Category", to: "/masterlist/category", icon: Tags },
+	{
+		label: "Checklist Form",
+		to: "/workspace/checklist",
+		icon: LayoutDashboard,
+	},
+	{
+		label: "My Submissions",
+		to: "/workspace/submission",
+		icon: LayoutDashboard,
+	},
+	{ label: "Reports", to: "/workspace/reports", icon: LayoutDashboard },
 ]
 
-const SidebarMasterlistDropdown = () => {
+const SidebarWorkspaceDropdown = () => {
 	const { pathname } = useLocation()
 
 	return (
@@ -42,7 +47,7 @@ const SidebarMasterlistDropdown = () => {
 					asChild
 				>
 					<CollapsibleTrigger className="flex w-full items-center">
-						Masterlist
+						My Workspace
 						<ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
 					</CollapsibleTrigger>
 				</SidebarGroupLabel>
@@ -50,7 +55,7 @@ const SidebarMasterlistDropdown = () => {
 				<CollapsibleContent>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							{masterlistItems.map(({ label, to, icon: Icon }) => (
+							{workspaceItems.map(({ label, to, icon: Icon }) => (
 								<SidebarMenuItem key={to}>
 									<SidebarMenuButton asChild isActive={pathname === to}>
 										<Link to={to}>
@@ -67,4 +72,4 @@ const SidebarMasterlistDropdown = () => {
 	)
 }
 
-export default SidebarMasterlistDropdown
+export default SidebarWorkspaceDropdown

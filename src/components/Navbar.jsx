@@ -67,7 +67,7 @@ const Navbar = () => {
 						</Button>
 					</DropdownMenuTrigger>
 
-					<DropdownMenuContent className="w-72 rounded-xl" align="end">
+					<DropdownMenuContent className="w-72 rounded-[0.35rem]" align="end">
 						<div className="max-h-50">
 							{notifications.map((notif, index) => (
 								<React.Fragment key={notif.id}>
@@ -90,7 +90,7 @@ const Navbar = () => {
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button
-								className="min-h-10 h-auto min-w-26 w-auto border-2 rounded-xl"
+								className="min-h-8.5 min-w-24 pl-0 pt-0 pb-0 pr-2  justify-between border-0 bg-sidebar/95"
 								variant="outline"
 							>
 								<span>

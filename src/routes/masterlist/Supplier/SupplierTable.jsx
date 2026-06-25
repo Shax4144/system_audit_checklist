@@ -16,8 +16,8 @@ import TableWrapper from "../../../components/TableWrapper"
 const data = [
 	{
 		id: 1,
-		name: "admin-mis",
-		permissions: ["masterlist", "checklist"],
+		name: "Jollibee",
+		address: "13th Street. 47 W 13th St, New York, NY 10011, USA",
 		status: "active",
 		created_at: "2026-03-18T01:59:34.000000Z",
 		updated_at: "2026-05-15T08:36:52.000000Z",
@@ -25,8 +25,8 @@ const data = [
 	},
 	{
 		id: 2,
-		name: "admin-audit",
-		permissions: ["masterlist", "checklist"],
+		name: "McDonalds",
+		address: "14th Street. 47 W 13th St, New York, NY 10011, USA",
 		status: "active",
 		created_at: "2026-03-18T01:59:34.000000Z",
 		updated_at: "2026-05-15T08:36:52.000000Z",
@@ -34,8 +34,8 @@ const data = [
 	},
 	{
 		id: 3,
-		name: "audit",
-		permissions: ["checklist-build"],
+		name: "KFC",
+		address: "14th Street. 47 W 13th St, New York, NY 10011, USA",
 		status: "inactive",
 		created_at: "2026-03-18T01:59:34.000000Z",
 		updated_at: "2026-05-15T08:36:52.000000Z",
@@ -48,7 +48,7 @@ const tabs = [
 	{ label: "Archived", value: "archived" },
 ]
 
-const RolesTable = () => {
+const SupplierTable = () => {
 	const [showArchived, setShowArchived] = useState(false)
 
 	const filteredData = useMemo(
@@ -63,24 +63,8 @@ const RolesTable = () => {
 				header: "Name",
 			},
 			{
-				accessorKey: "permissions",
-				header: "Permission",
-				cell: ({ row }) => {
-					const permissions = row.getValue("permissions")
-					return (
-						<div className="flex flex-wrap gap-1">
-							{permissions.map((permission) => (
-								<Badge
-									key={permission}
-									variant="outline"
-									className="capitalize"
-								>
-									{permission}
-								</Badge>
-							))}
-						</div>
-					)
-				},
+				accessorKey: "address",
+        header: "Address",
 			},
 			{
 				accessorKey: "status",
@@ -129,7 +113,7 @@ const RolesTable = () => {
 	)
 
 	return (
-    <TableWrapper
+		<TableWrapper
 			columns={columns}
 			data={filteredData}
 			searchKey="name"
@@ -143,4 +127,4 @@ const RolesTable = () => {
 	)
 }
 
-export default RolesTable
+export default SupplierTable

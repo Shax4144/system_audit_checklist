@@ -57,10 +57,9 @@ const TableWrapper = ({
 	return (
 		<div className="flex flex-col gap-0 rounded-xl border overflow-hidden">
 			{/* Toolbar */}
-			<div className="flex items-center justify-between px-4 py-3 border-b">
-				
-        {/* filterSlot */}
-        {filterSlot && <div>{filterSlot}</div>}
+			<div className="flex items-center justify-between px-4 py-3 border-b bg-card">
+				{/* filterSlot */}
+				{filterSlot && <div>{filterSlot}</div>}
 
 				{/* Search */}
 				{searchKey && (
@@ -80,13 +79,13 @@ const TableWrapper = ({
 
 			{/* Table */}
 			<Table>
-				<TableHeader className="bg-muted/40">
+				<TableHeader className="bg-muted/30">
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} className="border-b">
 							{headerGroup.headers.map((header) => (
 								<TableHead
 									key={header.id}
-									className="text-muted-foreground font-medium text-sm"
+									className="text-muted-foreground font-medium text-sm px-4 py-2"
 								>
 									{flexRender(
 										header.column.columnDef.header,
@@ -98,15 +97,15 @@ const TableWrapper = ({
 					))}
 				</TableHeader>
 
-				<TableBody>
+				<TableBody className="bg-card">
 					{table.getRowModel().rows.length ? (
 						table.getRowModel().rows.map((row) => (
 							<TableRow
 								key={row.id}
-								className="border-b last:border-0 hover:bg-muted/30"
+								className="border-b last:border-0 hover:bg-muted"
 							>
 								{row.getVisibleCells().map((cell) => (
-									<TableCell key={cell.id}>
+									<TableCell key={cell.id} className="px-4 py-2">
 										{flexRender(cell.column.columnDef.cell, cell.getContext())}
 									</TableCell>
 								))}
@@ -126,7 +125,7 @@ const TableWrapper = ({
 			</Table>
 
 			{/* Pagination */}
-			<div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
+			<div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground bg-card">
 				<div className="flex items-center gap-2">
 					<span>Show</span>
 					<Select

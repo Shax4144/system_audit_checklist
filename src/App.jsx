@@ -5,6 +5,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute"
 import SuspenseWrapper from "./components/SuspenseWrapper"
 
 import masterlistConfig from "./config/masterlist-routes.config"
+import workspaceConfig from "./config/workspace-routes.config"
 
 const Landing = lazy(() => import("./Landing"))
 const Dashboard = lazy(() => import("./routes/Dashboard"))
@@ -27,24 +28,34 @@ export default function App() {
 							}
 						/>
 					</Route>
-					<Route exact path="/masterlist" element={<ProtectedRoute />}>
-						{masterlistConfig.map(
-							({ path, component: Component }) => (
-								<Route
-									key={path}
-									exact
-									path={path}
-									element={
-										<SuspenseWrapper>
-											<Component />
-										</SuspenseWrapper>
-									}
-								>
-
-								</Route>
+					<Route exact path="/workspace" element={<ProtectedRoute />}>
+						{workspaceConfig.map(({ path, component: Component }) => (
+							<Route
+								key={path}
+								exact
+								path={path}
+								element={
+									<SuspenseWrapper>
+										<Component />
+									</SuspenseWrapper>
+								}
+							></Route>
 						))}
 					</Route>
-					
+					<Route exact path="/masterlist" element={<ProtectedRoute />}>
+						{masterlistConfig.map(({ path, component: Component }) => (
+							<Route
+								key={path}
+								exact
+								path={path}
+								element={
+									<SuspenseWrapper>
+										<Component />
+									</SuspenseWrapper>
+								}
+							></Route>
+						))}
+					</Route>
 				</Routes>
 			</Router>
 		</QueryClientProvider>
