@@ -3,12 +3,29 @@ import UserAccountsTable from "./UserAccountsTable"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import AddUserDialog from "../../../components/AddUserDialog"
+import DeleteConfirm from "../../../components/DeleteConfirm"
 
 const UserAccounts = () => {
 	const [openAdd, setOpenAdd] = useState(false)
+	const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false)
+	const [selectedUser, setSelectedUser] = useState(null)
 
 	const handleOpenAdd = () => {
 		setOpenAdd(true)
+	}
+
+	const handleOpenDeleteConfirm = (user) => {
+		console.log("handleOpenDeleteConfirm called with:", user)
+		setSelectedUser(user)
+		setTimeout(() => {
+			setOpenDeleteConfirm(true)
+		}, 100)
+	}
+
+	const handleDeleteConfirm = () => {
+		console.log("archiving: ", selectedUser)
+		setOpenDeleteConfirm(false)
+		setSelectedUser(null)
 	}
 
 	return (
@@ -28,7 +45,7 @@ const UserAccounts = () => {
 				</div>
 			</div>
 			<div>
-				<UserAccountsTable />
+				<UserAccountsTable onArchive={handleOpenDeleteConfirm} />
 			</div>
 			<AddUserDialog
 				open={openAdd}
@@ -38,6 +55,14 @@ const UserAccounts = () => {
 				onConfirm={() => {
 					setOpenAdd(false)
 				}}
+			/>
+			<DeleteConfirm
+				open={openDeleteConfirm}
+				onClose={() => {
+					setOpenDeleteConfirm(false)
+					setSelectedUser(null)
+				}}
+				onConfirm={handleDeleteConfirm}
 			/>
 		</div>
 	)

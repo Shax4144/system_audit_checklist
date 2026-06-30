@@ -1,4 +1,4 @@
-import { React, useState } from "react"
+import { React, useState, useEffect } from "react"
 import {
 	Dialog,
 	DialogContent,
@@ -8,12 +8,20 @@ import {
 	DialogFooter,
 	DialogClose,
 } from "@/components/ui/dialog"
+import {
+	Popover,
+	PopoverTrigger,
+	PopoverContent,
+} from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Field, FieldGroup, FieldLegend } from "@/components/ui/field"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { Search } from "lucide-react"
+
+import OneChargingDropdown from "./OneChargingDropdown"
 
 const dummyUserData = [
 	{
@@ -90,6 +98,17 @@ const dummyRoleData = [
 
 const AddUserDialog = ({ open, onClose, onConfirm }) => {
 	const [selectedRole, setSelectedRole] = useState("")
+	const [selectedCharging, setSelectedCharging] = useState("")
+	useEffect(() => {
+		if (!open) {
+			setSelectedCharging("")
+			setSelectedRole("")
+		}
+	}, [open])
+
+	const handleSearch = () => {
+		return
+	}
 
 	return (
 		<Dialog
@@ -109,24 +128,37 @@ const AddUserDialog = ({ open, onClose, onConfirm }) => {
 				<Separator />
 				<form className="flex flex-col gap-4">
 					{/* identity group */}
-					<div className="flex flex-col gap-4">
+					<div className="flex flex-col gap-3">
 						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
 							Information
 						</p>
 
-						<div className="grid grid-cols-2 gap-4">
-							<div className="flex flex-col gap-1.5">
+						<div className="grid grid-cols-12 gap-4 items-end">
+							{/* ID Prefix */}
+							<div className="col-span-4 flex flex-col gap-1.5">
 								<Label htmlFor="id-prefix">
 									ID Prefix <span className="text-destructive">*</span>
 								</Label>
 								<Input id="id-prefix" defaultValue="RDFFLFI" required />
 							</div>
 
-							<div className="flex flex-col gap-1.5">
+							{/* ID Number */}
+							<div className="col-span-4 flex flex-col gap-1.5">
 								<Label htmlFor="id-number">
 									ID Number <span className="text-destructive">*</span>
 								</Label>
 								<Input id="id-number" required />
+							</div>
+
+							{/* Button (auto width ONLY) */}
+							<div className="col-span-4 flex items-end justify-end">
+								<Button
+									onClick={handleSearch}
+									size="icon"
+									className="h-9 w-9 shrink-0"
+								>
+									<Search className="h-4 w-4" />
+								</Button>
 							</div>
 						</div>
 
@@ -159,20 +191,37 @@ const AddUserDialog = ({ open, onClose, onConfirm }) => {
 					{/* end of identity group */}
 
 					{/*  */}
-					{/* <div className="flex flex-col gap-4">
+					{/* <div className="flex flex-col gap-3">
 						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-							asdasd
+							Contact
 						</p>
+						<div className="grid grid-cols-2 gap-2">
+							<div className="flex flex-col gap-1.5">
+								<Label htmlFor="contactNumber">
+									Contact Number
+									<span className="text-destructive">*</span>
+								</Label>
+								<Input id="contactNumber" />
+							</div>
+
+							<div className="flex flex-col gap-1.5">
+								<Label htmlFor="email">
+									Email
+									<span className="text-destructive">*</span>
+								</Label>
+								<Input id="email" required />
+							</div>
+						</div>
 					</div> */}
 					{/*  end of */}
 
 					{/* account group */}
-					<div className="flex flex-col gap-4">
+					<div className="flex flex-col gap-3">
 						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
 							ACCOUNT
 						</p>
 
-						<div className="grid grid-cols-2 gap-4">
+						<div className="grid grid-cols-2 gap-2">
 							<div className="flex flex-col gap-1.5">
 								<Label htmlFor="username">Username</Label>
 								<Input id="username" defaultValue="" />
@@ -204,7 +253,11 @@ const AddUserDialog = ({ open, onClose, onConfirm }) => {
 								<Label htmlFor="one-charging">
 									One Charging <span className="text-destructive">*</span>
 								</Label>
-								<Input id="one-charging" defaultValue="" required />
+								<OneChargingDropdown
+									value={selectedCharging}
+									onChange={setSelectedCharging}
+									open={open}
+								/>
 							</div>
 						</div>
 					</div>

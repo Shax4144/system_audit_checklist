@@ -171,7 +171,7 @@ const tabs = [
 	{ label: "Archived", value: "archived" },
 ]
 
-const UserAccountsTable = () => {
+const UserAccountsTable = ({onArchive}) => {
   const [showArchived, setShowArchived] = useState(false)
 
 	const filteredData = useMemo(
@@ -241,7 +241,13 @@ const UserAccountsTable = () => {
 
 							<DropdownMenuSeparator />
 
-							<DropdownMenuItem variant="destructive">
+							<DropdownMenuItem
+								variant="destructive"
+								onSelect={() => {
+									 console.log("Archive clicked, row:", row.original)
+									onArchive(row.original)
+								}}
+							>
 								<ArchiveX className="h-4 w-4" /> Archive
 							</DropdownMenuItem>
 						</DropdownMenuContent>
@@ -249,7 +255,7 @@ const UserAccountsTable = () => {
 				),
 			},
 		],
-		[],
+		[onArchive],
 	)
 
 	return (
