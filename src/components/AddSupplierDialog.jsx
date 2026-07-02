@@ -22,6 +22,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Search, Loader2 } from "lucide-react"
 
 import { useSelectedRow } from "../context/EditContext"
+import { appToast } from "./Toast"
 
 const initialForm = {
 	name: "",
@@ -65,9 +66,14 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
   }
 
   const handleChange = (field) => (e) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }))
+  let value = e.target.value;
+
+  if (field === "contact_no") {
+    value = value.replace(/[^0-9, ]/g, "");
   }
 
+  setFormData((prev) => ({ ...prev, [field]: value }));
+};
 	const splitToArray = (str) => {
 		return (str || "")
 			.split(",")
@@ -75,13 +81,39 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 			.filter(Boolean)
 	}
 
-  const handleSubmit = () => {
+	const splitNumbersToArray = (str) => {
+		return (str || "")
+			.split(",")
+			.map((s) => s.trim())
+			.filter(Boolean)
+			.map((num) => num.replace(/\D/g, "")) // remove non-numbers
+			.filter((num) => num.length === 11) // enforce 11 digits only
+	}
+
+	const validateContactNo = () => {
+		const numbers = (formData.contact_no || "")
+			.split(",")
+			.map((s) => s.trim())
+			.filter(Boolean)
+
+		return numbers.every((num) => num.replace(/\D/g, "").length === 11)
+	}
+
+	const handleSubmit = () => {
+		if (!validateContactNo()) {
+			appToast.warning(
+				"Contact number is invalid.",
+				"Each contact number must be exactly 11 digits.",
+			)
+			return
+		}
+
     const payload = {
 			name: formData.name,
 			contact_person: splitToArray(formData.contact_person),
 			address: formData.address,
 			tin_no: formData.tin_no,
-			contact_no: splitToArray(formData.contact_no),
+			contact_no: splitNumbersToArray(formData.contact_no),
 			products_offered: splitToArray(formData.products_offered),
 			email: formData.email,
 			remarks: formData.remarks,
