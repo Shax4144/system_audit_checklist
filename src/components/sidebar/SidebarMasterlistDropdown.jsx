@@ -18,6 +18,7 @@ import {
 	ShieldUser,
 	Truck,
 	Tags,
+	// MapPin
 } from "lucide-react"
 
 const masterlistItems = [
@@ -29,6 +30,7 @@ const masterlistItems = [
 	{ label: "Roles", to: "/masterlist/roles", icon: ShieldUser },
 	{ label: "Supplier", to: "/masterlist/supplier", icon: Truck },
 	{ label: "Category", to: "/masterlist/category", icon: Tags },
+	// { label: "Address", to: "/masterlist/address", icon: MapPin },
 ]
 
 const SidebarMasterlistDropdown = () => {

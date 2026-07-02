@@ -19,36 +19,63 @@ import {
 	PopoverTrigger,
 	PopoverContent,
 } from "@/components/ui/popover"
-import { ChevronDown, X } from "lucide-react"
+import { ChevronDown, X, Loader2} from "lucide-react"
+
+import { useSelectedRow } from "../context/EditContext"
+
+import { appToast } from "./Toast"
 
 const dummyPermissionData = [
 	{
 		id: 1,
-		name: "masterlist",
-		created_at: "2026-03-18T01:59:34.000000Z",
-		updated_at: "2026-05-15T08:36:52.000000Z",
-		deleted_at: null,
+		name: "Masterlist",
 	},
 	{
 		id: 2,
-		name: "checklist",
-		permissions: ["checklist", "checklist-build"],
-		created_at: "2026-04-13T04:00:17.000000Z",
-		updated_at: "2026-04-21T02:25:38.000000Z",
-		deleted_at: null,
+		name: "Checklist",
 	},
 	{
 		id: 3,
-		name: "checklist-build",
-		created_at: "2026-04-13T04:00:23.000000Z",
-		updated_at: "2026-04-21T02:25:31.000000Z",
-		deleted_at: null,
+		name: "Checklist-build",
+	},
+	{
+		id: 4,
+		name: "Report",
 	},
 ]
 
-const AddRoleDialog = ({ open, onClose, onConfirm }) => {
+const initialForm = {
+	name: "",
+	permissions: [],
+}
+
+const AddRoleDialog = ({ open, onClose, onConfirm, isLoading}) => {
 	const [selectedPermissions, setSelectedPermissions] = useState([])
 	const [popoverOpen, setPopoverOpen] = useState(false)
+	const [formData, setFormData] = useState(initialForm)
+	const { selectedRow } = useSelectedRow()
+	const isEditMode = Boolean(selectedRow)
+
+	useEffect(() => {
+		if (open) {
+			if (selectedRow) {
+				setFormData({
+					name: selectedRow.name,
+				})
+				setSelectedPermissions(selectedRow.permissions || [])
+			} else {
+				setFormData(initialForm)
+				setSelectedPermissions([])
+			}
+		}
+	}, [open, selectedRow])
+
+	useEffect(() => {
+		if (!open) {
+			setSelectedPermissions([])
+			setPopoverOpen(false)
+		}
+	}, [open])
 
 	const togglePermission = (name) => {
 		setSelectedPermissions((prev) =>
@@ -60,38 +87,61 @@ const AddRoleDialog = ({ open, onClose, onConfirm }) => {
 		setSelectedPermissions((prev) => prev.filter((p) => p !== name))
   }
   
-  useEffect(() => {
-		if (!open) {
-			setSelectedPermissions([])
-			setPopoverOpen(false)
-		}
-	}, [open])
+	const handleChange = (field) => (e) => {
+		setFormData((prev) => ({
+			...prev,
+			[field]: e.target.value,
+		}))
+	}
 
-	const handleClose = () => {
-		setSelectedPermissions([])
-		setPopoverOpen(false)
-		onClose()
+	const handleSubmit = () => {
+		if (!selectedPermissions.length) {
+			appToast.warning(
+				"No selected permission",
+				"Please select at least one permission"
+			)
+			return
+		}
+
+		const payload = {
+			name: formData.name,
+			permissions: selectedPermissions,
+		}
+		onConfirm(payload)
 	}
 
 	return (
 		<Dialog
 			open={open}
 			onOpenChange={(isOpen) => {
-				if (!isOpen) handleClose()
+				if (isLoading) return
+
+				if (!isOpen) {
+					onClose()
+				}
 			}}
 		>
 			<DialogContent
 				className="min-w-[35%]"
 				onPointerDownOutside={(e) => {
-					if (popoverOpen) e.preventDefault()
+					if (isLoading || popoverOpen) {
+						e.preventDefault()
+					}
 				}}
 				onInteractOutside={(e) => {
-					if (popoverOpen) e.preventDefault()
+					if (isLoading || popoverOpen) {
+						e.preventDefault()
+					}
+				}}
+				onEscapeKeyDown={(e) => {
+					if (isLoading) {
+						e.preventDefault()
+					}
 				}}
 			>
 				<DialogHeader>
 					<DialogTitle className="font-semibold text-xl">
-						Create Form
+						{isEditMode ? "Edit Form" : "Create Form"}
 					</DialogTitle>
 				</DialogHeader>
 				<Separator />
@@ -106,7 +156,14 @@ const AddRoleDialog = ({ open, onClose, onConfirm }) => {
 								<Label className="font-semibold" htmlFor="role-name">
 									Role Name <span className="text-destructive">*</span>
 								</Label>
-								<Input className="min-h-9.5" id="role-name" required />
+								<Input
+									className="min-h-9.5"
+									id="role-name"
+									required
+									value={formData.name}
+									onChange={handleChange("name")}
+									disabled={isLoading}
+								/>
 							</div>
 						</div>
 						<div className="">
@@ -121,6 +178,7 @@ const AddRoleDialog = ({ open, onClose, onConfirm }) => {
 										<Button
 											variant="outline"
 											className="w-full justify-between items-center font-normal h-auto"
+											disabled={isLoading}
 										>
 											<div className="flex flex-wrap gap-1 flex-1 text-left p-2">
 												{selectedPermissions.length > 0 ? (
@@ -150,14 +208,23 @@ const AddRoleDialog = ({ open, onClose, onConfirm }) => {
 										</Button>
 									</PopoverTrigger>
 
-									<PopoverContent className="w-full p-2" align="start">
+									<PopoverContent
+										side="bottom" // Preferred side
+										align="start" // start | center | end
+										sideOffset={4} // Gap between trigger and content
+										avoidCollisions // true by default
+										collisionPadding={0}
+										className="w-(--radix-popover-trigger-width) p-1"
+									>
 										{dummyPermissionData.map((permission) => (
 											<div
 												key={permission.id}
-												className="flex items-center gap-2 px-2 py-1.5 rounded-[0.35rem] hover:bg-muted cursor-pointer"
+												className="group flex items-center gap-2 px-2 py-1.5 rounded-[0.35rem] hover:bg-muted cursor-pointer"
 												onClick={() => togglePermission(permission.name)}
 											>
 												<Checkbox
+													className="data-[state=unchecked]:bg-muted
+  													data-[state=unchecked]:group-hover:bg-background"
 													checked={selectedPermissions.includes(
 														permission.name,
 													)}
@@ -181,17 +248,29 @@ const AddRoleDialog = ({ open, onClose, onConfirm }) => {
 								className="uppercase font-bold"
 								type="button"
 								variant="outline"
-								onClick={handleClose}
+								onClick={onClose}
+								size="lg"
+								disabled={isLoading}
 							>
 								cancel
 							</Button>
 						</DialogClose>
 						<Button
 							type="button"
-							onClick={() => onConfirm(selectedPermissions)}
+							onClick={handleSubmit}
 							className="uppercase font-bold"
+							size="lg"
+							disabled={isLoading}
 						>
-							create
+							{isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+
+							{isLoading
+								? isEditMode
+									? "Updating..."
+									: "Creating..."
+								: isEditMode
+									? "Update"
+									: "Create"}
 						</Button>
 					</DialogFooter>
 				</form>

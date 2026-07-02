@@ -3,12 +3,120 @@ import RolesTable from './RolesTable'
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import AddRoleDialog from '../../../components/AddRoleDialog'
+import DeleteConfirm from '../../../components/DeleteConfirm'
+import Confirm from '../../../components/Confirm'
+import {
+	useFetchRolesQuery,
+	useLazyFetchRolesQuery,
+	usePostRoleMutation,
+	useUpdateRoleMutation,
+	useArchiveRoleMutation,
+} from '../../../features/roles/roles.api'
+import { appToast } from '../../../components/Toast'
+import { useSelectedRow } from '../../../context/EditContext'
+
 const Roles = () => {
+	const [showArchived, setShowArchived] = useState(false)
+
+	const { data: rolesData,
+		isFetching,
+		isError,
+		error,
+	} = useFetchRolesQuery({
+		status: showArchived ? 0 : 1,
+		refetchOnMountOrArgChange: true,
+	})
+
+	const [createRole, { isLoading: isCreating }] = usePostRoleMutation()
+	const [updateRole, { isLoading: isUpdating }] = useUpdateRoleMutation()
+	const [archiveRole, { isLoading: isArchiving }] = useArchiveRoleMutation()
 	const [openAddRoleDialog, setOpenAddRoleDialog] = useState(false)
+	const [openArchiveDialog, setOpenArchiveDialog] = useState(false)
+	const [openRestoreDialog, setOpenRestoreDialog] = useState(false)
+	const { selectedRow, setSelectedRow, clearSelectedRow } = useSelectedRow()
 
 	const handleOpenRoleDialog = () => {
+		clearSelectedRow()
 		setOpenAddRoleDialog(true)
 	}
+
+	const handleOpenEdit = (role) => {
+		setSelectedRow(role)
+		setOpenAddRoleDialog(true)
+	}
+
+	const handleOpenArchive = (role) => {
+		setSelectedRow(role)
+		setOpenArchiveDialog(true)
+	}
+
+	const handleOpenRestore = (role) => {
+		setSelectedRow(role)
+		setOpenRestoreDialog(true)
+	}
+
+	const handleCreateOrUpdate = async (roleData) => {
+		try {
+			if (selectedRow) {
+				const response = await updateRole({ id: selectedRow.id, ...roleData }).unwrap()
+				appToast.success(
+					"Role updated",
+					response?.message ?? "The role has been updated successfully."
+				);
+			} else {
+				const response = await createRole(roleData).unwrap()
+				appToast.success(
+					"Role created",
+					response?.message ?? "The role has been created successfully.",
+				)
+			}
+			setOpenAddRoleDialog(false)
+			clearSelectedRow()
+		} catch (error) {
+			appToast.error(
+				"Error",
+				error?.data?.message ?? "An error occurred while processing the role."
+			);
+			console.error("Failed to create/update role:", error)
+		}
+	}
+
+	const handleConfirmArchive = async () => {
+		try {
+			await archiveRole(selectedRow.id).unwrap()
+			appToast.success(
+				"Role archived",
+				"The role has been archived successfully."
+			);
+			setOpenArchiveDialog(false)
+			clearSelectedRow()
+		} catch (error) {
+			appToast.error(
+				"Error",
+				error?.data?.message ?? "An error occurred while archiving the role."
+			);
+			console.error("Failed to archive role:", error)
+		}
+	}
+
+	const handleConfirmRestore = async () => {
+		try {
+			await archiveRole(selectedRow.id).unwrap()
+			appToast.success(
+				"Role restored",
+				"The role has been restored successfully.",
+			)
+			setOpenRestoreDialog(false)
+			clearSelectedRow()
+		} catch (error) {
+			appToast.error(
+				"Error",
+				error?.data?.message ?? "An error occurred while archiving the role.",
+			)
+			console.error("Failed to restore role:", error)
+		}
+	}
+
   return (
 		<div className="flex flex-col gap-6 h-full xl:mr-50 xl:ml-50">
 			<div className="flex flex-row justify-between items-center">
@@ -25,17 +133,44 @@ const Roles = () => {
 					</Button>
 				</div>
 			</div>
-			<div className="">
-				<RolesTable />
+			<div>
+				<RolesTable
+					data={rolesData}
+					isFetching={isFetching}
+					isError={isError}
+					error={error}
+					onEdit={handleOpenEdit}
+					onArchive={handleOpenArchive}
+					onRestore={handleOpenRestore}
+					showArchived={showArchived}
+					onToggleArchived={setShowArchived}
+				/>
 			</div>
 			<AddRoleDialog
 				open={openAddRoleDialog}
 				onClose={() => {
 					setOpenAddRoleDialog(false)
 				}}
-				onConfirm={() => {
-					setOpenAddRoleDialog(false)
+				onConfirm={handleCreateOrUpdate}
+				isLoading={isCreating || isUpdating}
+			/>
+			<DeleteConfirm
+				open={openArchiveDialog}
+				onClose={() => {
+					setOpenArchiveDialog(false)
+					clearSelectedRow()
 				}}
+				onConfirm={handleConfirmArchive}
+				isLoading={isArchiving}
+			/>
+			<Confirm
+				open={openRestoreDialog}
+				onClose={() => {
+					setOpenRestoreDialog(false)
+					clearSelectedRow()
+				}}
+				onConfirm={handleConfirmRestore}
+				isLoading={isArchiving}
 			/>
 		</div>
 	)

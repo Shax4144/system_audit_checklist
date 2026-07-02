@@ -1,10 +1,27 @@
 import { configureStore } from "@reduxjs/toolkit"
+import { setupListeners } from "@reduxjs/toolkit/query"
+import authReducer from "../features/auth/auth.slice"
+
+
+import { baseApi } from "../features/users/base.api"
+import { authApi } from "../api/authApi"
 import { oneChargingBaseApi } from "../features/dropdown/one-charging-option"
 
+
 export const store = configureStore({
-	reducer: {
+  reducer: {
+    auth: authReducer,
+
+    [baseApi.reducerPath]: baseApi.reducer,
+    [authApi.reducerPath]: authApi.reducer,
 		[oneChargingBaseApi.reducerPath]: oneChargingBaseApi.reducer,
 	},
 	middleware: (getDefaultMiddleware) =>
-		getDefaultMiddleware().concat(oneChargingBaseApi.middleware),
+    getDefaultMiddleware()
+      .concat(baseApi.middleware)
+      .concat(authApi.middleware)
+      .concat(oneChargingBaseApi.middleware)
+      
 })
+
+setupListeners(store.dispatch)

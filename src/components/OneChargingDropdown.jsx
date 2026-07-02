@@ -13,15 +13,15 @@ import {
 import { cn } from "@/lib/utils"
 import { useFetchOneChargingQuery } from "../features/dropdown/one-charging-option"
 
-const OneChargingDropdown = ({ value, onChange, open }) => {
+const OneChargingDropdown = ({ value, onChange, open, isLoading }) => {
 	const [comboOpen, setComboOpen] = useState(false)
 
-	const { data: chargingData, isLoading } = useFetchOneChargingQuery(
+	const { data: chargingData, isFetching } = useFetchOneChargingQuery(
 		{ pagination: "none" },
 		{ skip: !open },
 	)
 
-	const selectedCharge = chargingData?.find((c) => String(c.id) === value)
+	const selectedCharge = chargingData?.find((c) => String(c.code) === value)
 
 	return (
 		<Popover modal={false} open={comboOpen} onOpenChange={setComboOpen}>
@@ -29,9 +29,10 @@ const OneChargingDropdown = ({ value, onChange, open }) => {
 				<Input
 					readOnly
 					autoComplete="off"
-					placeholder={isLoading ? "Loading..." : "Select Charging"}
+					placeholder={isFetching ? "Loading..." : "Select Charging"}
 					value={selectedCharge?.name ?? ""}
 					onClick={() => setComboOpen(true)}
+					disabled={isLoading}
 				/>
 			</PopoverAnchor>
 
@@ -57,14 +58,14 @@ const OneChargingDropdown = ({ value, onChange, open }) => {
 										charge.name,
 									].join(" ")}
 									onSelect={() => {
-										onChange(String(charge.id))
+										onChange(charge)
 										setComboOpen(false)
 									}}
 								>
 									<Check
 										className={cn(
 											"mr-2 h-4 w-4 shrink-0",
-											value === String(charge.id) ? "opacity-100" : "opacity-0",
+											value === String(charge.code) ? "opacity-100" : "opacity-0",
 										)}
 									/>
 

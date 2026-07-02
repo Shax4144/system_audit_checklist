@@ -55,8 +55,8 @@ const SidebarWrapper = () => {
 					</svg>
 				</div>
 				<div className="py-2.5">
-					<h1 className="text-sm font-semibold tracking-tight text-foreground">
-						System Audit Checklist
+					<h1 className="text-xl font-semibold text-foreground">
+						Eros
 					</h1>
 				</div>
 			</SidebarHeader>

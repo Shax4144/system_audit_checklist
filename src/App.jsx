@@ -10,54 +10,60 @@ import workspaceConfig from "./config/workspace-routes.config"
 const Landing = lazy(() => import("./Landing"))
 const Dashboard = lazy(() => import("./routes/Dashboard"))
 
+import { Toaster } from "@/components/ui/sonner"
+import { SelectedRowProvider } from "./context/EditContext"
+
 const queryClient = new QueryClient()
 export default function App() {
   return (
 		<QueryClientProvider client={queryClient}>
-			<Router>
-				<Routes>
-					<Route exact path="/" element={<Landing />} />
-					<Route path="/dashboard" element={<ProtectedRoute />}>
-						<Route
-							index
-							exac
-							element={
-								<SuspenseWrapper>
-									<Dashboard />
-								</SuspenseWrapper>
-							}
-						/>
-					</Route>
-					<Route exact path="/workspace" element={<ProtectedRoute />}>
-						{workspaceConfig.map(({ path, component: Component }) => (
+			<SelectedRowProvider>
+				<Router>
+					<Routes>
+						<Route exact path="/" element={<Landing />} />
+						<Route path="/dashboard" element={<ProtectedRoute />}>
 							<Route
-								key={path}
-								exact
-								path={path}
+								index
+								exac
 								element={
 									<SuspenseWrapper>
-										<Component />
+										<Dashboard />
 									</SuspenseWrapper>
 								}
-							></Route>
-						))}
-					</Route>
-					<Route exact path="/masterlist" element={<ProtectedRoute />}>
-						{masterlistConfig.map(({ path, component: Component }) => (
-							<Route
-								key={path}
-								exact
-								path={path}
-								element={
-									<SuspenseWrapper>
-										<Component />
-									</SuspenseWrapper>
-								}
-							></Route>
-						))}
-					</Route>
-				</Routes>
-			</Router>
+							/>
+						</Route>
+						<Route exact path="/workspace" element={<ProtectedRoute />}>
+							{workspaceConfig.map(({ path, component: Component }) => (
+								<Route
+									key={path}
+									exact
+									path={path}
+									element={
+										<SuspenseWrapper>
+											<Component />
+										</SuspenseWrapper>
+									}
+								></Route>
+							))}
+						</Route>
+						<Route exact path="/masterlist" element={<ProtectedRoute />}>
+							{masterlistConfig.map(({ path, component: Component }) => (
+								<Route
+									key={path}
+									exact
+									path={path}
+									element={
+										<SuspenseWrapper>
+											<Component />
+										</SuspenseWrapper>
+									}
+								></Route>
+							))}
+						</Route>
+					</Routes>
+				</Router>
+				<Toaster richColors position="top-right" />
+			</SelectedRowProvider>
 		</QueryClientProvider>
 	)
 }

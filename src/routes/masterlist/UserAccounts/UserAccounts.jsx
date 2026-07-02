@@ -1,31 +1,141 @@
-import { React, useState } from "react"
-import UserAccountsTable from "./UserAccountsTable"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import { useState } from "react"
 import AddUserDialog from "../../../components/AddUserDialog"
 import DeleteConfirm from "../../../components/DeleteConfirm"
+import Confirm from "../../../components/Confirm"
+import {
+	useArchiveUserAccountMutation,
+	useFetchUserAccountsQuery,
+	usePostUserAccountMutation,
+	useUpdateUserAccountMutation
+} from "../../../features/user-accounts/users.api"
+import UserAccountsTable from "./UserAccountsTable"
+
+// import useMasterlistParams from "../../../hooks/useMasterlistParams"
+import { appToast } from "../../../components/Toast"
+import { useSelectedRow } from "../../../context/EditContext"
 
 const UserAccounts = () => {
-	const [openAdd, setOpenAdd] = useState(false)
-	const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false)
-	const [selectedUser, setSelectedUser] = useState(null)
+	// const {
+	// 	params,
+	// } = useMasterlistParams()
+	const [showArchived, setShowArchived] = useState(false)
 
-	const handleOpenAdd = () => {
-		setOpenAdd(true)
+	const { data: userAccountsData,
+		isFetching,
+		isError,
+		error,
+	} = useFetchUserAccountsQuery({
+		status: showArchived ? 0 : 1,
+		refetchOnMountOrArgChange: true,
+	})
+	
+	const [createUserAccount, { isLoading: isCreating }] = usePostUserAccountMutation()
+	const [updateUserAccount, { isLoading: isUpdating }] = useUpdateUserAccountMutation()
+	const [archiveUserAccount, { isLoading: isArchiving }] = useArchiveUserAccountMutation()
+
+	const [openCreate, setOpenCreate] = useState(false)
+	const [openArchive, setOpenArchive] = useState(false)
+	const [openRestore, setOpenRestore] = useState(false)
+	const { selectedRow, setSelectedRow, clearSelectedRow } = useSelectedRow()
+
+	const handleOpenCreate = () => {
+		clearSelectedRow()
+		setOpenCreate(true)
 	}
 
-	const handleOpenDeleteConfirm = (user) => {
-		console.log("handleOpenDeleteConfirm called with:", user)
-		setSelectedUser(user)
+	const handleOpenEdit = (user) => {
+		setOpenCreate(true)
+		setSelectedRow(user)
+	}
+
+	const handleOpenArchive = (user) => {
+		setSelectedRow(user)
 		setTimeout(() => {
-			setOpenDeleteConfirm(true)
+			setOpenArchive(true)
 		}, 100)
 	}
 
-	const handleDeleteConfirm = () => {
-		console.log("archiving: ", selectedUser)
-		setOpenDeleteConfirm(false)
-		setSelectedUser(null)
+	const handleOpenRestore = (user) => {
+		setSelectedRow(user)
+		// setTimeout(() => {
+		// 	setOpenRestore(true)
+		// }, 100)
+		setOpenRestore(true)
+	}
+
+	const handleCreateOrUpdate = async (userData) => {
+		try {
+			if (selectedRow) {
+				const response = await updateUserAccount({ id: selectedRow.id, ...userData }).unwrap()
+				appToast.success(
+					"User updated",
+					response?.message ?? "The user account has been updated successfully.",
+				)
+			} else {
+				const response = await createUserAccount(userData).unwrap()
+				appToast.success(
+					"User created",
+					response?.message ?? "The user account has been created successfully.",
+				)
+			}
+			setOpenCreate(false)
+			clearSelectedRow()
+		} catch (error) {
+			appToast.error(
+				"Error",
+				error?.data?.message ??
+					"An error occurred while processing the user account.",
+			)
+			console.error("Failed to create/update user:", error)
+		}
+	}
+
+	const handleConfirmArchive = async () => {
+		if (!selectedRow) return
+
+		try {
+			if (selectedRow) {
+				const response = await archiveUserAccount(selectedRow.id).unwrap()
+				appToast.success(
+					"User archived",
+					response?.message ?? "The user account has been archived successfully."
+				);
+			}
+			setOpenArchive(false)
+			clearSelectedRow()
+		} catch (error) {
+			appToast.error(
+				"Error",
+				error?.data?.message ?? "An error occurred while archiving the user account."
+			);
+			console.error("Failed to archive user:", error)
+		}
+	}
+
+	const handleConfirmRestore = async () => {
+		if (!selectedRow) return
+
+		try {
+			if (selectedRow) {
+				const response = await archiveUserAccount(selectedRow.id).unwrap()
+				appToast.success(
+					"User restored",
+					response?.message ??
+						"The user account has been restored successfully.",
+				)
+			}
+			setOpenRestore(false)
+			clearSelectedRow()
+		} catch (error) {
+			appToast.error(
+				"Error",
+				error?.data?.message ??
+					"An error occurred while restoring the user account.",
+			)
+			console.error("Failed to restore user:", error)
+		}
 	}
 
 	return (
@@ -38,31 +148,51 @@ const UserAccounts = () => {
 					</p>
 				</div>
 				<div>
-					<Button className="w-32" onClick={handleOpenAdd}>
+					<Button className="w-32" onClick={handleOpenCreate}>
 						<Plus />
 						Create
 					</Button>
 				</div>
 			</div>
 			<div>
-				<UserAccountsTable onArchive={handleOpenDeleteConfirm} />
+				<UserAccountsTable
+					data={userAccountsData}
+					isFetching={isFetching}
+					isError={isError}
+					error={error}
+					onEdit={handleOpenEdit}
+					onArchive={handleOpenArchive}
+					onRestore={handleOpenRestore}
+					showArchived={showArchived}
+					onToggleArchived={setShowArchived}
+				/>
 			</div>
 			<AddUserDialog
-				open={openAdd}
+				open={openCreate}
 				onClose={() => {
-					setOpenAdd(false)
+					setOpenCreate(false)
+					clearSelectedRow()
 				}}
-				onConfirm={() => {
-					setOpenAdd(false)
-				}}
+				onConfirm={handleCreateOrUpdate}
+				isLoading={isCreating || isUpdating}
 			/>
 			<DeleteConfirm
-				open={openDeleteConfirm}
+				open={openArchive}
 				onClose={() => {
-					setOpenDeleteConfirm(false)
-					setSelectedUser(null)
+					setOpenArchive(false)
+					clearSelectedRow()
 				}}
-				onConfirm={handleDeleteConfirm}
+				onConfirm={handleConfirmArchive}
+				isLoading={isArchiving}
+			/>
+			<Confirm
+				open={openRestore}
+				onClose={() => {
+					setOpenRestore(false)
+					clearSelectedRow()
+				}}
+				onConfirm={handleConfirmRestore}
+				isLoading={isArchiving}
 			/>
 		</div>
 	)

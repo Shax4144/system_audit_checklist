@@ -35,7 +35,12 @@ const Navbar = () => {
 	const navigate = useNavigate()
 	const [isDarkMode, setIsDarkMode] = useState(false)
 
+	const fullName = [user.last_name, user.first_name, user.middle_name ]
+		.filter(Boolean)
+		.join(" ")
+	
 	const getInitials = (name) => {
+		if (!name) return
 		return name
 			.split(" ")
 			.map((word) => word[0])
@@ -47,6 +52,7 @@ const Navbar = () => {
 	const logoutHandler = () => {
 		try {
 			localStorage.removeItem("user")
+			localStorage.removeItem("token")
 			navigate("/")
 		} catch (error) {
 			console.log("error: ", error.response)
@@ -101,8 +107,8 @@ const Navbar = () => {
 									</Avatar>
 								</span>
 								<div>
-									<p className="text-[14px] font-semibold">{user.name}</p>
-									<p className="text-[14px] text-muted-foreground">
+									<p className="text-[14px] font-semibold">{fullName}</p>
+									<p className="text-[12px] text-muted-foreground">
 										{user.role}
 									</p>
 								</div>

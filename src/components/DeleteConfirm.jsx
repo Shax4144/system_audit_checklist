@@ -1,4 +1,4 @@
-import { Trash2Icon } from "lucide-react"
+import { Trash2Icon, Loader2 } from "lucide-react"
 import {
 	AlertDialog,
 	AlertDialogContent,
@@ -10,7 +10,7 @@ import {
 	AlertDialogAction,
 } from "@/components/ui/alert-dialog"
 
-const DeleteConfirm = ({ open, onClose, onConfirm }) => {
+const DeleteConfirm = ({ open, onClose, onConfirm, isLoading }) => {
 	return (
 		<AlertDialog
 			open={open}
@@ -28,11 +28,31 @@ const DeleteConfirm = ({ open, onClose, onConfirm }) => {
 					</AlertDialogTitle>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel variant="outline" onClick={onClose}>
+					<AlertDialogCancel
+						className="rounded-[0.35rem]"
+						variant="outline"
+						onClick={onClose}
+						disabled={isLoading}
+					>
 						Cancel
 					</AlertDialogCancel>
-					<AlertDialogAction variant="destructive" onClick={onConfirm}>
-						Delete
+					<AlertDialogAction
+						className="rounded-[0.35rem]"
+						variant="destructive"
+						onClick={async (e) => {
+							e.preventDefault()
+							await onConfirm()
+						}}
+						disabled={isLoading}
+					>
+						{isLoading ? (
+							<>
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								Archiving...
+							</>
+						) : (
+							"Archive"
+						)}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>

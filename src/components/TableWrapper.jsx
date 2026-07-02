@@ -25,12 +25,16 @@ import {
 	SelectValue,
 } from "@/components/ui/select"
 import { Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const TableWrapper = ({
 	columns,
 	data,
 	searchKey,
 	filterSlot,
+	isFetching,
+	isError,
+	error,
 }) => {
 	const [sorting, setSorting] = useState([])
 	const [columnFilters, setColumnFilters] = useState([])
@@ -53,6 +57,20 @@ const TableWrapper = ({
 	const totalRows = table.getFilteredRowModel().rows.length
 	const from = pageIndex * pageSize + 1
 	const to = Math.min(from + pageSize - 1, totalRows)
+
+	const apiError = error?.data?.errors?.[0]
+	const status = error?.status;
+
+	const errorMessages = {
+		400: "Invalid request.",
+		401: "Unauthorized.",
+		403: "You don't have permission to view this data.",
+		404: "No records found.",
+		500: "Something went wrong. Please try again later.",
+	}
+
+	const errorMessage =
+		apiError?.detail || errorMessages[status] || "Failed to load data."
 
 	return (
 		<div className="flex flex-col gap-0 rounded-xl border overflow-hidden">
@@ -98,7 +116,27 @@ const TableWrapper = ({
 				</TableHeader>
 
 				<TableBody className="bg-card">
-					{table.getRowModel().rows.length ? (
+					{isError ? (
+						<TableRow>
+							<TableCell
+								colSpan={columns.length}
+								className="text-center text-destructive py-10"
+							>
+								{errorMessage}
+							</TableCell>
+						</TableRow>
+					) : isFetching ? (
+            // Skeleton rows while fetching
+            Array.from({ length: 5 }).map((_, i) => (
+              <TableRow key={`skeleton-${i}`}>
+                {columns.map((col, j) => (
+                  <TableCell key={j}>
+                    <Skeleton className="h-4 w-full max-w-40" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : table.getRowModel().rows.length ? (
 						table.getRowModel().rows.map((row) => (
 							<TableRow
 								key={row.id}
