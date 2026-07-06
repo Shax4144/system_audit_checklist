@@ -36,7 +36,8 @@ export const baseApi = createApi({
 	tagTypes: [
 		"Users",
 		"Roles",
-		"Suppliers"
+		"Suppliers",
+		"Categories"
 	],
 	baseQuery: baseQueryWithAuthCheck,
 	endpoints: () => ({}),

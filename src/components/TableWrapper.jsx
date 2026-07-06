@@ -1,7 +1,6 @@
 import {
 	flexRender,
 	getCoreRowModel,
-	getPaginationRowModel,
 	getSortedRowModel,
 	getFilteredRowModel,
 	useReactTable,
@@ -30,33 +29,41 @@ import { Skeleton } from "@/components/ui/skeleton"
 const TableWrapper = ({
 	columns,
 	data,
+	paginationData,
 	searchKey,
 	filterSlot,
 	isFetching,
 	isError,
 	error,
+	page,
+	onPageChange,
+	pageSize,
+	onPageSizeChange,
 }) => {
 	const [sorting, setSorting] = useState([])
 	const [columnFilters, setColumnFilters] = useState([])
-	const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
 
 	const table = useReactTable({
 		data,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
-		onPaginationChange: setPagination,
-		state: { sorting, columnFilters, pagination },
+		state: { sorting, columnFilters },
 	})
 
-	const { pageIndex, pageSize } = table.getState().pagination
-	const totalRows = table.getFilteredRowModel().rows.length
-	const from = pageIndex * pageSize + 1
-	const to = Math.min(from + pageSize - 1, totalRows)
+	// const { pageIndex, pageSize } = table.getState().pagination
+	// const totalRows = table.getFilteredRowModel().rows.length
+	// const from = pageIndex * pageSize + 1
+	// const to = Math.min(from + pageSize - 1, totalRows)
+
+	const currentPage = paginationData?.currentPage || page || 1;
+	const lastPage = paginationData?.last_page || 1;
+	const from = paginationData?.from || 0;
+	const to = paginationData?.to || 0;
+	const totalRows = paginationData?.total || 0;
 
 	const apiError = error?.data?.errors?.[0]
 	const status = error?.status;
@@ -71,11 +78,44 @@ const TableWrapper = ({
 
 	const errorMessage =
 		apiError?.detail || errorMessages[status] || "Failed to load data."
+	
+	
+	const getPageNumbers = (currentPage, lastPage) => {
+		const delta = 1
+		const pages = []
+
+		for (let i = 1; i <= lastPage; i++) {
+			const isFirst = i === 1
+			const isLast = i === lastPage
+			const isNearCurrent = i >= currentPage - delta && i <= currentPage + delta
+
+			if (isFirst || isLast || isNearCurrent) {
+				pages.push(i)
+			}
+		}
+
+		const result = []
+
+		for (let i = 0; i < pages.length; i++) {
+			const page = pages[i]
+			const previousPage = pages[i - 1]
+
+			if (previousPage && page - previousPage > 1) {
+				result.push("ellipsis")
+			}
+
+			result.push(page)
+		}
+
+		return result
+	}
+
+	const pageNumbers = getPageNumbers(currentPage, lastPage);
 
 	return (
-		<div className="flex flex-col gap-0 rounded-xl border overflow-hidden">
+		<div className="flex flex-col gap-0 rounded-xl border overflow-hidden shadow-sm">
 			{/* Toolbar */}
-			<div className="flex items-center justify-between px-4 py-3 border-b bg-card">
+			<div className="flex items-center justify-between px-4 py-3 border-b">
 				{/* filterSlot */}
 				{filterSlot && <div>{filterSlot}</div>}
 
@@ -89,7 +129,7 @@ const TableWrapper = ({
 							onChange={(e) =>
 								table.getColumn(searchKey)?.setFilterValue(e.target.value)
 							}
-							className="pl-9 w-64"
+							className="pl-9 w-64 shadow-sm"
 						/>
 					</div>
 				)}
@@ -97,7 +137,7 @@ const TableWrapper = ({
 
 			{/* Table */}
 			<Table>
-				<TableHeader className="bg-muted/30">
+				<TableHeader className="bg-muted">
 					{table.getHeaderGroups().map((headerGroup) => (
 						<TableRow key={headerGroup.id} className="border-b">
 							{headerGroup.headers.map((header) => (
@@ -115,7 +155,7 @@ const TableWrapper = ({
 					))}
 				</TableHeader>
 
-				<TableBody className="bg-card">
+				<TableBody>
 					{isError ? (
 						<TableRow>
 							<TableCell
@@ -126,17 +166,17 @@ const TableWrapper = ({
 							</TableCell>
 						</TableRow>
 					) : isFetching ? (
-            // Skeleton rows while fetching
-            Array.from({ length: 5 }).map((_, i) => (
-              <TableRow key={`skeleton-${i}`}>
-                {columns.map((col, j) => (
-                  <TableCell key={j}>
-                    <Skeleton className="h-4 w-full max-w-40" />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : table.getRowModel().rows.length ? (
+						// Skeleton rows while fetching
+						Array.from({ length: 5 }).map((_, i) => (
+							<TableRow key={`skeleton-${i}`}>
+								{columns.map((col, j) => (
+									<TableCell key={j}>
+										<Skeleton className="h-4 w-full max-w-40" />
+									</TableCell>
+								))}
+							</TableRow>
+						))
+					) : table.getRowModel().rows.length ? (
 						table.getRowModel().rows.map((row) => (
 							<TableRow
 								key={row.id}
@@ -163,12 +203,15 @@ const TableWrapper = ({
 			</Table>
 
 			{/* Pagination */}
-			<div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground bg-card">
+			<div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
 				<div className="flex items-center gap-2">
 					<span>Show</span>
 					<Select
 						value={String(pageSize)}
-						onValueChange={(val) => table.setPageSize(Number(val))}
+						onValueChange={(val) => {
+							onPageSizeChange(Number(val))
+							onPageChange(1)
+						}}
 					>
 						<SelectTrigger className="w-16 h-8">
 							<SelectValue />
@@ -193,30 +236,43 @@ const TableWrapper = ({
 					<Button
 						variant="ghost"
 						size="sm"
-						onClick={() => table.previousPage()}
-						disabled={!table.getCanPreviousPage()}
+						onClick={() => onPageChange(currentPage - 1)}
+						disabled={!paginationData?.prev_page_url}
 						className="gap-1"
 					>
 						<ChevronLeft className="h-4 w-4" /> Previous
 					</Button>
 
-					{Array.from({ length: table.getPageCount() }, (_, i) => (
-						<Button
-							key={i}
-							variant={pageIndex === i ? "outline" : "ghost"}
-							size="sm"
-							className="w-8 h-8 p-0"
-							onClick={() => table.setPageIndex(i)}
-						>
-							{i + 1}
-						</Button>
-					))}
+					{pageNumbers.map((item, index) => {
+						if (item === "ellipsis") {
+							return (
+								<span
+									key={`ellipsis-${index}`}
+									className="px-2 text-muted-foreground"
+								>
+									...
+								</span>
+							)
+						}
+
+						return (
+							<Button
+								key={item}
+								variant={currentPage === item ? "outline" : "ghost"}
+								size="sm"
+								className="w-8 h-8 p-0"
+								onClick={() => onPageChange(item)}
+							>
+								{item}
+							</Button>
+						)
+					})}
 
 					<Button
 						variant="ghost"
 						size="sm"
-						onClick={() => table.nextPage()}
-						disabled={!table.getCanNextPage()}
+						onClick={() => onPageChange(currentPage + 1)}
+						disabled={!paginationData?.next_page_url}
 						className="gap-1"
 					>
 						Next <ChevronRight className="h-4 w-4" />

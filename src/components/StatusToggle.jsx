@@ -25,7 +25,7 @@ const StatusToggle = ({ checked, onCheckedChange }) => {
 		// </div>
 		<button
 			onClick={() => onCheckedChange(!checked)}
-			className={`top-1 relative w-22.5 h-6 rounded-full transition-colors ${checked ? "bg-slate-500" : "bg-emerald-500"}`}
+			className={`top-1 relative w-22.5 h-6 rounded-full transition-colors ${checked ? "bg-input" : "bg-primary"}`}
 		>
 			<div
 				className={`absolute top-0.5 h-5 w-15.5 flex items-center justify-center rounded-full bg-background text-[11px] font-bold text-foreground transition-all duration-300 ${checked ? "left-0.5" : "left-6.5"}`}

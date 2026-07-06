@@ -17,15 +17,23 @@ import { useSelectedRow } from '../../../context/EditContext'
 
 const Roles = () => {
 	const [showArchived, setShowArchived] = useState(false)
+	const [page, setPage] = useState(1)
+	const [pageSize, setPageSize] = useState(10);
 
 	const { data: rolesData,
 		isFetching,
 		isError,
 		error,
-	} = useFetchRolesQuery({
-		status: showArchived ? 0 : 1,
+	} = useFetchRolesQuery(
+		{
+			status: showArchived ? 0 : 1,
+			page,
+			per_page: pageSize,
+		},
+		{
 		refetchOnMountOrArgChange: true,
-	})
+		}
+	)
 
 	const [createRole, { isLoading: isCreating }] = usePostRoleMutation()
 	const [updateRole, { isLoading: isUpdating }] = useUpdateRoleMutation()
@@ -127,7 +135,10 @@ const Roles = () => {
 					</p>
 				</div>
 				<div>
-					<Button className="w-32" onClick={handleOpenRoleDialog}>
+					<Button
+						className="w-32 h-10 font-semibold"
+						onClick={handleOpenRoleDialog}
+					>
 						<Plus />
 						Create
 					</Button>
@@ -144,6 +155,10 @@ const Roles = () => {
 					onRestore={handleOpenRestore}
 					showArchived={showArchived}
 					onToggleArchived={setShowArchived}
+					page={page}
+					onPageChange={setPage}
+					pageSize={pageSize}
+					onPageSizeChange={setPageSize}
 				/>
 			</div>
 			<AddRoleDialog

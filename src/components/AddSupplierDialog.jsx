@@ -118,7 +118,6 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 			email: formData.email,
 			remarks: formData.remarks,
 		}
-		console.log("payload:", payload)
     onConfirm(payload);
   }
 
@@ -127,7 +126,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 			open={open}
 			onOpenChange={(isOpen) => {
 				if (isLoading) return
-				
+
 				if (!isOpen) {
 					onClose()
 				}
@@ -249,11 +248,11 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 								/>
 							</div>
 							<div className="flex flex-col gap-1.5">
-								<Label htmlFor="remarks">
-									Remarks <span className="text-destructive">*</span>
+								<Label htmlFor="supplier-type">
+									Supplier Type <span className="text-destructive">*</span>
 								</Label>
 								<Input
-									id="remarks"
+									id="supplier-type"
 									value={formData.remarks}
 									onChange={handleChange("remarks")}
 									required

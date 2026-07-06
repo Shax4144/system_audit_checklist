@@ -21,15 +21,24 @@ const UserAccounts = () => {
 	// 	params,
 	// } = useMasterlistParams()
 	const [showArchived, setShowArchived] = useState(false)
+	const [page, setPage] = useState(1)
+	const [pageSize, setPageSize] = useState(10);
 
-	const { data: userAccountsData,
+	const {
+		data: userAccountsData,
 		isFetching,
 		isError,
 		error,
-	} = useFetchUserAccountsQuery({
-		status: showArchived ? 0 : 1,
-		refetchOnMountOrArgChange: true,
-	})
+	} = useFetchUserAccountsQuery(
+		{
+			status: showArchived ? 0 : 1,
+			page,
+			per_page: pageSize,
+		},
+		{
+			refetchOnMountOrArgChange: true,
+		},
+	)
 	
 	const [createUserAccount, { isLoading: isCreating }] = usePostUserAccountMutation()
 	const [updateUserAccount, { isLoading: isUpdating }] = useUpdateUserAccountMutation()
@@ -148,7 +157,10 @@ const UserAccounts = () => {
 					</p>
 				</div>
 				<div>
-					<Button className="w-32" onClick={handleOpenCreate}>
+					<Button
+						className="w-32 h-10 font-semibold"
+						onClick={handleOpenCreate}
+					>
 						<Plus />
 						Create
 					</Button>
@@ -165,6 +177,10 @@ const UserAccounts = () => {
 					onRestore={handleOpenRestore}
 					showArchived={showArchived}
 					onToggleArchived={setShowArchived}
+					page={page}
+					onPageChange={setPage}
+					pageSize={pageSize}
+					onPageSizeChange={setPageSize}
 				/>
 			</div>
 			<AddUserDialog

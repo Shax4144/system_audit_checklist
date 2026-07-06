@@ -35,7 +35,21 @@ const tabs = [
 	{ label: "Archived", value: "archived" },
 ]
 
-const SupplierTable = ({ data, isFetching, isError, error, onArchive, onRestore, onEdit, showArchived, onToggleArchived }) => {
+const SupplierTable = ({
+	data,
+	isFetching,
+	isError,
+	error,
+	onArchive,
+	onRestore,
+	onEdit,
+	showArchived,
+	onToggleArchived,
+	page,
+	onPageChange,
+	pageSize,
+	onPageSizeChange,
+}) => {
 	
 	const columns = useMemo(
 		() => [
@@ -46,12 +60,20 @@ const SupplierTable = ({ data, isFetching, isError, error, onArchive, onRestore,
 			{
 				accessorKey: "contact_person",
 				header: "Contact Person",
-				cell: ({ row }) => row.original.contact_person?.join(", ") || "-",
+				cell: ({ row }) => {
+					const data = row.original.contact_person
+
+					return Array.isArray(data) && data.length ? data.join(", ") : "-"
+				},
 			},
 			{
 				accessorKey: "address",
 				header: "Address",
-				cell: ({ row }) => row.original.contact_person?.join(", "),
+				cell: ({ row }) => {
+					const address = row.original.address
+
+					return typeof address === "string" && address.trim() ? address : "-"
+				},
 			},
 			{
 				accessorKey: "tin_no",
@@ -60,12 +82,20 @@ const SupplierTable = ({ data, isFetching, isError, error, onArchive, onRestore,
 			{
 				accessorKey: "contact_no",
 				header: "Contact No.",
-				cell: ({ row }) => row.original.contact_person?.join(", "),
+				cell: ({ row }) => {
+					const data = row.original.contact_no
+
+					return Array.isArray(data) && data.length ? data.join(", ") : "-"
+				},
 			},
 			{
 				accessorKey: "products_offered",
 				header: "Products Offered",
-				cell: ({ row }) => row.original.contact_person?.join(", "),
+				cell: ({ row }) => {
+					const data = row.original.products_offered
+
+					return Array.isArray(data) && data.length ? data.join(", ") : "-"
+				},
 			},
 			{
 				accessorKey: "email",
@@ -83,8 +113,8 @@ const SupplierTable = ({ data, isFetching, isError, error, onArchive, onRestore,
 						<Badge
 							className={
 								showArchived
-									? "bg-slate-100 text-slate-500"
-									: "bg-green-100 text-green-700"
+									? "bg-secondary text-secondary-foreground border"
+									: "bg-active-status-bg text-success-foreground border border-success/40"
 							}
 						>
 							{showArchived ? "Archived" : "Active"}
@@ -141,11 +171,16 @@ const SupplierTable = ({ data, isFetching, isError, error, onArchive, onRestore,
 	return (
 		<TableWrapper
 			columns={columns}
-			data={data?.data?.data || []}
+			data={data?.data || []}
+			paginationData={data}
 			isFetching={isFetching}
 			isError={isError}
 			error={error}
 			searchKey="name"
+			page={page}
+			onPageChange={onPageChange}
+			pageSize={pageSize}
+			onPageSizeChange={onPageSizeChange}
 			filterSlot={
 				<StatusToggle
 					checked={showArchived}

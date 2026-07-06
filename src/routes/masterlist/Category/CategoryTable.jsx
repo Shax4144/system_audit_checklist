@@ -7,60 +7,67 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ArchiveX, MoreHorizontal, Pencil } from "lucide-react"
+import { ArchiveX, ArchiveRestore, MoreHorizontal, Pencil } from "lucide-react"
 import { useMemo, useState } from "react"
 import StatusToggle from "../../../components/StatusToggle"
 import TableWrapper from "../../../components/TableWrapper"
 
 // dummy data — replace with useQuery/fetch
-const data = [
-	{
-		id: 1,
-		name: "Document",
-		status: "active",
-		created_at: "2026-03-18T01:59:34.000000Z",
-		updated_at: "2026-05-15T08:36:52.000000Z",
-		deleted_at: null,
-	},
-	{
-		id: 2,
-		name: "Structures",
-		status: "active",
-		created_at: "2026-03-18T01:59:34.000000Z",
-		updated_at: "2026-05-15T08:36:52.000000Z",
-		deleted_at: null,
-	},
-	{
-		id: 3,
-		name: "Process",
-		status: "active",
-		created_at: "2026-03-18T01:59:34.000000Z",
-		updated_at: "2026-05-15T08:36:52.000000Z",
-		deleted_at: null,
-	},
-	{
-		id: 3,
-		name: "Product",
-		status: "inactive",
-		created_at: "2026-03-18T01:59:34.000000Z",
-		updated_at: "2026-05-15T08:36:52.000000Z",
-		deleted_at: "2026-05-15T08:36:52.000000Z",
-	},
-]
+// const data = [
+// 	{
+// 		id: 1,
+// 		name: "Document",
+// 		status: "active",
+// 		created_at: "2026-03-18T01:59:34.000000Z",
+// 		updated_at: "2026-05-15T08:36:52.000000Z",
+// 		deleted_at: null,
+// 	},
+// 	{
+// 		id: 2,
+// 		name: "Structures",
+// 		status: "active",
+// 		created_at: "2026-03-18T01:59:34.000000Z",
+// 		updated_at: "2026-05-15T08:36:52.000000Z",
+// 		deleted_at: null,
+// 	},
+// 	{
+// 		id: 3,
+// 		name: "Process",
+// 		status: "active",
+// 		created_at: "2026-03-18T01:59:34.000000Z",
+// 		updated_at: "2026-05-15T08:36:52.000000Z",
+// 		deleted_at: null,
+// 	},
+// 	{
+// 		id: 3,
+// 		name: "Product",
+// 		status: "inactive",
+// 		created_at: "2026-03-18T01:59:34.000000Z",
+// 		updated_at: "2026-05-15T08:36:52.000000Z",
+// 		deleted_at: "2026-05-15T08:36:52.000000Z",
+// 	},
+// ]
 
 const tabs = [
 	{ label: "Active", value: "active" },
 	{ label: "Archived", value: "archived" },
 ]
 
-const CategoryTable = () => {
-	const [showArchived, setShowArchived] = useState(false)
-
-	const filteredData = useMemo(
-		() =>
-			data.filter((u) => u.status === (showArchived ? "inactive" : "active")),
-		[showArchived],
-	)
+const CategoryTable = ({
+	data,
+	isFetching,
+	isError,
+	error,
+	onArchive,
+	onRestore,
+	onEdit,
+	showArchived,
+	onToggleArchived,
+	page,
+	onPageChange,
+	pageSize,
+	onPageSizeChange,
+}) => {
 	const columns = useMemo(
 		() => [
 			{
@@ -71,16 +78,15 @@ const CategoryTable = () => {
 				accessorKey: "status",
 				header: "Status",
 				cell: ({ row }) => {
-					const status = row.getValue("status")
 					return (
 						<Badge
 							className={
-								status === "active"
-									? "bg-green-100 text-green-700"
-									: "bg-slate-100 text-slate-500"
+								showArchived
+									? "bg-secondary text-secondary-foreground border"
+									: "bg-active-status-bg text-success-foreground border border-success/40"
 							}
 						>
-							{status}
+							{showArchived ? "Archived" : "Active"}
 						</Badge>
 					)
 				},
@@ -89,39 +95,65 @@ const CategoryTable = () => {
 				id: "actions",
 				header: "Actions",
 				cell: ({ row }) => (
-          <DropdownMenu>
-            {/* button */}
+					<DropdownMenu>
+						{/* button */}
 						<DropdownMenuTrigger asChild>
 							<Button variant="ghost" size="icon" className="h-8 w-8">
 								<MoreHorizontal className="h-4 w-4" />
 							</Button>
-            </DropdownMenuTrigger>
-            {/* content */}
+						</DropdownMenuTrigger>
+						{/* content */}
 						<DropdownMenuContent align="end" className="w-40 rounded-xl">
-							<DropdownMenuItem>
-								<Pencil className="h-4 w-4" /> Edit
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem variant="destructive">
-								<ArchiveX className="h-4 w-4" /> Archive
-							</DropdownMenuItem>
+							{showArchived ? (
+								<DropdownMenuItem
+									className="text-green-600 focus:text-green-700"
+									onSelect={() => {
+										onRestore(row.original)
+									}}
+								>
+									<ArchiveRestore className="h-4 w-4" /> Restore
+								</DropdownMenuItem>
+							) : (
+								<>
+									<DropdownMenuItem onSelect={() => onEdit(row.original)}>
+										<Pencil className="h-4 w-4" /> Edit
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem
+										variant="destructive"
+										onSelect={() => {
+											onArchive(row.original)
+										}}
+									>
+										<ArchiveX className="h-4 w-4" /> Archive
+									</DropdownMenuItem>
+								</>
+							)}
 						</DropdownMenuContent>
 					</DropdownMenu>
 				),
 			},
 		],
-		[],
+		[onEdit, onArchive, onRestore],
 	)
 
 	return (
 		<TableWrapper
 			columns={columns}
-			data={filteredData}
+			data={data?.data || []}
+			paginationData={data}
+			isFetching={isFetching}
+			isError={isError}
+			error={error}
 			searchKey="name"
+			page={page}
+			onPageChange={onPageChange}
+			pageSize={pageSize}
+			onPageSizeChange={onPageSizeChange}
 			filterSlot={
 				<StatusToggle
 					checked={showArchived}
-					onCheckedChange={setShowArchived}
+					onCheckedChange={onToggleArchived}
 				/>
 			}
 		/>

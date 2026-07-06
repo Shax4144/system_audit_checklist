@@ -17,8 +17,21 @@ const tabs = [
 	{ label: "Archived", value: "archived" },
 ]
 
-const RolesTable = ({data, isFetching, isError, error, onEdit, onArchive, onRestore, showArchived, onToggleArchived}) => {
-
+const RolesTable = ({
+	data,
+	isFetching,
+	isError,
+	error,
+	onEdit,
+	onArchive,
+	onRestore,
+	showArchived,
+	onToggleArchived,
+	page,
+	onPageChange,
+	pageSize,
+	onPageSizeChange,
+}) => {
 	const columns = useMemo(
 		() => [
 			{
@@ -53,8 +66,8 @@ const RolesTable = ({data, isFetching, isError, error, onEdit, onArchive, onRest
 						<Badge
 							className={
 								showArchived
-									? "bg-slate-100 text-slate-500"
-									: "bg-green-100 text-green-700"
+									? "bg-secondary text-secondary-foreground border"
+									: "bg-active-status-bg text-success-foreground border border-success/40"
 							}
 						>
 							{showArchived ? "Archived" : "Active"}
@@ -109,13 +122,18 @@ const RolesTable = ({data, isFetching, isError, error, onEdit, onArchive, onRest
 	)
 
 	return (
-    <TableWrapper
+		<TableWrapper
 			columns={columns}
 			data={data?.data || []}
+			paginationData={data}
 			isFetching={isFetching}
 			isError={isError}
 			error={error}
 			searchKey="name"
+			page={page}
+			onPageChange={onPageChange}
+			pageSize={pageSize}
+			onPageSizeChange={onPageSizeChange}
 			filterSlot={
 				<StatusToggle
 					checked={showArchived}
