@@ -18,6 +18,8 @@ import {
  } from "@/components/ui/dropdown-menu"
 import { Bell, LogOutIcon, LockIcon } from "lucide-react"
 import { useNavigate, } from 'react-router-dom'
+import { useDispatch, useSelector } from "react-redux"
+
 
 const notifications = [
 	{
@@ -31,7 +33,8 @@ const notifications = [
 ]
 
 const Navbar = () => {
-	const user = JSON.parse(window.localStorage.getItem("user") || "{}")
+	// const user = JSON.parse(window.localStorage.getItem("user") || "{}")
+	const user = useSelector((state) => state.user)
 	const navigate = useNavigate()
 	const [isDarkMode, setIsDarkMode] = useState(false)
 

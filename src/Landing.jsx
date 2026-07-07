@@ -17,6 +17,7 @@ import { users } from "../dummydata"
 import { useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { authenticate } from "./features/auth/auth.slice"
+import { setUserDetails } from "./features/users/users.slice"
 
 import { useLoginMutation } from "./api/authApi"
 import { AlertCircleIcon, Loader2} from "lucide-react"
@@ -53,6 +54,10 @@ export function Landing() {
 
 			localStorage.setItem("token", token)
 			localStorage.setItem("user", JSON.stringify(user))
+			localStorage.setItem("token", token)
+			localStorage.setItem("user", JSON.stringify(user))
+
+			dispatch(setUserDetails(user))
 			dispatch(authenticate())
 
 			navigate("/dashboard")

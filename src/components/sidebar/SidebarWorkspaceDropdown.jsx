@@ -15,6 +15,7 @@ import {
 import {
 	ChevronDown,
 	LayoutDashboard,
+	ClipboardEdit
 } from "lucide-react"
 
 const workspaceItems = [
@@ -26,7 +27,7 @@ const workspaceItems = [
 	{
 		label: "Checklist Form",
 		to: "/workspace/checklist",
-		icon: LayoutDashboard,
+		icon: ClipboardEdit,
 	},
 	{
 		label: "My Submissions",
