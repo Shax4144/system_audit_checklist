@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux"
+import FormDashboard from "../../../components/checklist-forms/FormDashboard"
 import FormBuilder from "../../../components/checklist-forms/FormBuilder"
 import HeadAuditorFormView from "./HeadAuditorFormView"
 import UserFormView from "./UserFormView"
@@ -9,7 +10,7 @@ const Checklist = () => {
 	const renderByRole = () => {
 		switch (user?.role) {
 			case "Admin":
-				return <FormBuilder />
+				return <FormDashboard />
 			case "Auditor":
 				return <HeadAuditorFormView />
 			case "User":

@@ -6,20 +6,21 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { QUESTION_TYPES } from "../../features/checklist/formBuilder.helpers"
+import { QUESTION_TYPES, generateId } from "../../features/checklist/formBuilder.helpers"
 
 const OPTION_TYPES = ["dropdown", "radio", "checkbox"]
+import CategoryDropdown from "../dropdown/CategoryDropdown"
 
 const QuestionCard = ({ question, onUpdate, onDelete }) => {
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: question.id })
 	const style = { transform: CSS.Transform.toString(transform), transition }
 
-	const typeLabel = QUESTION_TYPES.find((t) => t.value === question.type)?.label
-
+  const typeLabel = QUESTION_TYPES.find((t) => t.value === question.type)?.label
+  
 	const handleAddOption = () => {
 		const newOption = {
-			id: crypto.randomUUID(),
+			id: generateId(),
 			label: `Option ${question.options.length + 1}`,
 			value: `option_${question.options.length + 1}`,
 		}
@@ -60,6 +61,17 @@ const QuestionCard = ({ question, onUpdate, onDelete }) => {
 						<span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
 							{typeLabel}
 						</span>
+					</div>
+
+					<div className="flex items-center gap-2 mt-1">
+						<Label className="text-xs text-muted-foreground shrink-0">
+							Category
+						</Label>
+						<CategoryDropdown
+							value={question.category}
+							onChange={(val) => onUpdate({ category: val })}
+							open={true} // always allow fetching once builder is mounted
+						/>
 					</div>
 
 					<Input

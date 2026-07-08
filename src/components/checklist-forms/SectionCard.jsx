@@ -1,7 +1,12 @@
-// features/forms/components/SectionCard.jsx
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { GripVertical, Trash2, Plus, ChevronDown } from "lucide-react"
+import {
+	GripVertical,
+	Trash2,
+	Plus,
+	ChevronDown,
+	FolderPlus,
+} from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -19,7 +24,12 @@ import {
 } from "@/components/ui/collapsible"
 import { useState } from "react"
 import QuestionList from "./QuestionList"
-import { createEmptyQuestion, QUESTION_TYPES } from "../../features/checklist/formBuilder.helpers"
+import SubsectionList from "./SubsectionList"
+import {
+	createEmptyQuestion,
+	createEmptySubsection,
+	QUESTION_TYPES,
+} from "../../features/checklist/formBuilder.helpers"
 
 const SectionCard = ({ section, onUpdate, onDelete }) => {
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -29,6 +39,9 @@ const SectionCard = ({ section, onUpdate, onDelete }) => {
 
 	const style = { transform: CSS.Transform.toString(transform), transition }
 
+	const hasSubsections = section.subsections.length > 0
+
+	// Direct questions on the section (only shown when no subsections exist)
 	const handleAddQuestion = () => {
 		const newQuestion = createEmptyQuestion(
 			newQuestionType,
@@ -54,6 +67,36 @@ const SectionCard = ({ section, onUpdate, onDelete }) => {
 	const handleReorderQuestions = (reordered) => {
 		onUpdate({
 			questions: reordered.map((q, i) => ({ ...q, display_order: i })),
+		})
+	}
+
+	// Subsections
+	const handleAddSubsection = () => {
+		onUpdate({
+			subsections: [
+				...section.subsections,
+				createEmptySubsection(section.subsections.length),
+			],
+		})
+	}
+
+	const handleUpdateSubsection = (subsectionId, updates) => {
+		onUpdate({
+			subsections: section.subsections.map((sub) =>
+				sub.id === subsectionId ? { ...sub, ...updates } : sub,
+			),
+		})
+	}
+
+	const handleDeleteSubsection = (subsectionId) => {
+		onUpdate({
+			subsections: section.subsections.filter((sub) => sub.id !== subsectionId),
+		})
+	}
+
+	const handleReorderSubsections = (reordered) => {
+		onUpdate({
+			subsections: reordered.map((sub, i) => ({ ...sub, display_order: i })),
 		})
 	}
 
@@ -107,31 +150,59 @@ const SectionCard = ({ section, onUpdate, onDelete }) => {
 					</Button>
 				</div>
 
-				<CollapsibleContent className="flex flex-col gap-3 pl-6">
-					<QuestionList
-						questions={section.questions}
-						onUpdateQuestion={handleUpdateQuestion}
-						onDeleteQuestion={handleDeleteQuestion}
-						onReorderQuestions={handleReorderQuestions}
-					/>
+				<CollapsibleContent className="flex flex-col gap-4 pl-6">
+					{/* Subsections, if any */}
+					{hasSubsections && (
+						<SubsectionList
+							subsections={section.subsections}
+							onUpdateSubsection={handleUpdateSubsection}
+							onDeleteSubsection={handleDeleteSubsection}
+							onReorderSubsections={handleReorderSubsections}
+						/>
+					)}
 
-					<div className="flex gap-2 items-center pt-2 border-t">
-						<Select value={newQuestionType} onValueChange={setNewQuestionType}>
-							<SelectTrigger className="w-48">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{QUESTION_TYPES.map((t) => (
-									<SelectItem key={t.value} value={t.value}>
-										{t.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-						<Button variant="outline" size="sm" onClick={handleAddQuestion}>
-							<Plus className="h-4 w-4" /> Add Question
-						</Button>
-					</div>
+					{/* Direct questions — only shown/addable when there are no subsections */}
+					{!hasSubsections && (
+						<>
+							<QuestionList
+								questions={section.questions}
+								onUpdateQuestion={handleUpdateQuestion}
+								onDeleteQuestion={handleDeleteQuestion}
+								onReorderQuestions={handleReorderQuestions}
+							/>
+
+							<div className="flex gap-2 items-center pt-2 border-t">
+								<Select
+									value={newQuestionType}
+									onValueChange={setNewQuestionType}
+								>
+									<SelectTrigger className="w-48">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{QUESTION_TYPES.map((t) => (
+											<SelectItem key={t.value} value={t.value}>
+												{t.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<Button variant="outline" size="sm" onClick={handleAddQuestion}>
+									<Plus className="h-4 w-4" /> Add Question
+								</Button>
+							</div>
+						</>
+					)}
+
+					{/* Add Subsection — always available, converts section into a subsection-based one */}
+					<Button
+						variant="ghost"
+						size="sm"
+						onClick={handleAddSubsection}
+						className="self-start text-muted-foreground"
+					>
+						<FolderPlus className="h-4 w-4" /> Add Subsection
+					</Button>
 				</CollapsibleContent>
 			</Collapsible>
 		</div>

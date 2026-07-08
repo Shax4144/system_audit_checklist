@@ -1,24 +1,50 @@
+// formBuilder.helpers.js
+export const generateId = () => {
+	if (
+		typeof crypto !== "undefined" &&
+		typeof crypto.randomUUID === "function"
+	) {
+		return crypto.randomUUID()
+	}
+	return (
+		"id-" +
+		Date.now().toString(36) +
+		"-" +
+		Math.random().toString(36).slice(2, 10)
+	)
+}
+
 export const createEmptySection = (order) => ({
-	id: `temp-section-${crypto.randomUUID()}`,
+	id: `temp-section-${generateId()}`,
 	title: "Untitled Section",
 	description: "",
 	assigned_roles: [],
 	assigned_users: [],
 	display_order: order,
+	questions: [], // direct questions live here
+	subsections: [], // optional nested subsections
+})
+
+export const createEmptySubsection = (order) => ({
+	id: `temp-subsection-${generateId()}`,
+	title: "Untitled Subsection",
+	description: "",
+	display_order: order,
 	questions: [],
 })
 
 export const createEmptyQuestion = (type, order) => ({
-	id: `temp-question-${crypto.randomUUID()}`,
+	id: `temp-question-${generateId()}`,
 	type,
 	label: "Untitled Question",
 	description: "",
 	placeholder: "",
 	help_text: "",
 	required: false,
+	category: "",
 	display_order: order,
 	options: ["dropdown", "radio", "checkbox"].includes(type)
-		? [{ id: crypto.randomUUID(), label: "Option 1", value: "option_1" }]
+		? [{ id: generateId(), label: "Option 1", value: "option_1" }]
 		: [],
 	validation: {},
 	conditional_visibility: null,
