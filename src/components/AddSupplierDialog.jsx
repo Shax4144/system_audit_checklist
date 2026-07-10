@@ -23,6 +23,7 @@ import { Search, Loader2 } from "lucide-react"
 
 import { useSelectedRow } from "../context/EditContext"
 import { appToast } from "./Toast"
+import SupplierTypeDropdown from "../components/dropdown/SupplierTypeDropdown"
 
 const initialForm = {
 	name: "",
@@ -251,13 +252,14 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 								<Label htmlFor="supplier-type">
 									Supplier Type <span className="text-destructive">*</span>
 								</Label>
-								<Input
+								{/* <Input
 									id="supplier-type"
 									value={formData.remarks}
 									onChange={handleChange("remarks")}
 									required
 									disabled={isLoading}
-								/>
+								/> */}
+								<SupplierTypeDropdown />
 							</div>
 						</div>
 					</div>

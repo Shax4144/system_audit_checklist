@@ -32,15 +32,15 @@ const FormBuilder = () => {
 		{ skip: isNew },
 	)
 
-	console.log("formId from URL:", formId)
-	console.log("checklistsResponse:", checklistsResponse)
+	// console.log("formId from URL:", formId)
+	// console.log("checklistsResponse:", checklistsResponse)
 
 	// find the matching checklist by id from the fetched list
 	const checklistData = checklistsResponse?.data?.find(
 		(c) => String(c.id) === String(formId),
 	)
 
-	console.log("checklistData found:", checklistData)
+	// console.log("checklistData found:", checklistData)
 
 	const [postChecklist, { isLoading: isCreating }] = usePostChecklistMutation()
 	const [updateChecklist, { isLoading: isUpdating }] =
@@ -72,7 +72,7 @@ const FormBuilder = () => {
 								placeholder: "",
 								help_text: "",
 								required: false,
-								category: q.remarks ?? "",
+								category: q.category ?? "",
 								display_order: qIndex,
 								options: [],
 								validation: {},
@@ -86,13 +86,13 @@ const FormBuilder = () => {
 								display_order: subIndex,
 								questions: (sub["sub-items"] ?? []).map((q, qIndex) => ({
 									id: `question-${sIndex}-${subIndex}-${qIndex}`,
-									type: "short_text",
+									type: "rating",
 									label: q.name,
 									description: "",
 									placeholder: "",
 									help_text: "",
 									required: false,
-									category: q.remarks ?? "",
+									category: q.category ?? "",
 									display_order: qIndex,
 									options: [],
 									validation: {},
@@ -157,7 +157,7 @@ const FormBuilder = () => {
 						item: sub.title,
 						"sub-items": sub.questions.map((q) => ({
 							name: q.label,
-							remarks: q.category,
+							category: q.category,
 						})),
 					})),
 				}
@@ -167,7 +167,7 @@ const FormBuilder = () => {
 				section: section.title,
 				item: section.questions.map((q) => ({
 					name: q.label,
-					remarks: q.category,
+					category: q.category,
 				})),
 			}
 		}),
@@ -204,8 +204,9 @@ const FormBuilder = () => {
 		<div className="flex flex-col gap-6 max-w-4xl mx-auto pb-20">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-3">
-					<Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-						<ChevronLeft className="h-4 w-4" />
+					<Button
+						variant="ghost" size="xl" onClick={() => navigate(-1)}>
+						<ChevronLeft className="size-full" />
 					</Button>
 					<div>
 						<h1 className="text-2xl font-semibold">Form Builder</h1>

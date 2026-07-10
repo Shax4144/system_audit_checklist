@@ -8,17 +8,17 @@ import {
 } from "@/components/ui/select"
 import { useFetchCategoriesQuery } from "../../features/category/category.api"
 
-const CategoryDropdown = ({ value, onChange, open }) => {
+const CategoryDropdown = ({ value, onChange, open, triggerClassName }) => {
 	const { data: categoriesResponse, isFetching } = useFetchCategoriesQuery(
 		{ pagination: "none" },
-		{ skip: !open },
+		{ skip: !open},
 	)
 
 	const categoriesData = categoriesResponse?.data ?? []
 
 	return (
 		<Select value={value} onValueChange={onChange} disabled={isFetching}>
-			<SelectTrigger className="w-48 h-8 text-sm">
+			<SelectTrigger className={triggerClassName}>
 				<SelectValue placeholder={isFetching ? "Loading..." : "Category"} />
 			</SelectTrigger>
 			<SelectContent position="popper">

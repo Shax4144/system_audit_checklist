@@ -9,51 +9,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ArchiveRestore, ArchiveX, MoreHorizontal, Pencil } from "lucide-react"
 import { useMemo } from "react"
-import StatusToggle from "../../../components/StatusToggle"
-import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
-
-// dummy data — replace with useQuery/fetch
-// const data = [
-// 	{
-// 		id: 1,
-// 		name: "Document",
-// 		status: "active",
-// 		created_at: "2026-03-18T01:59:34.000000Z",
-// 		updated_at: "2026-05-15T08:36:52.000000Z",
-// 		deleted_at: null,
-// 	},
-// 	{
-// 		id: 2,
-// 		name: "Structures",
-// 		status: "active",
-// 		created_at: "2026-03-18T01:59:34.000000Z",
-// 		updated_at: "2026-05-15T08:36:52.000000Z",
-// 		deleted_at: null,
-// 	},
-// 	{
-// 		id: 3,
-// 		name: "Process",
-// 		status: "active",
-// 		created_at: "2026-03-18T01:59:34.000000Z",
-// 		updated_at: "2026-05-15T08:36:52.000000Z",
-// 		deleted_at: null,
-// 	},
-// 	{
-// 		id: 3,
-// 		name: "Product",
-// 		status: "inactive",
-// 		created_at: "2026-03-18T01:59:34.000000Z",
-// 		updated_at: "2026-05-15T08:36:52.000000Z",
-// 		deleted_at: "2026-05-15T08:36:52.000000Z",
-// 	},
-// ]
+import DashboardTableWrapper from "../../components/tables/DashboardTableWrapper"
 
 const tabs = [
 	{ label: "Active", value: "active" },
 	{ label: "Archived", value: "archived" },
 ]
 
-const CategoryTable = ({
+const DashboardTable = ({
 	data,
 	isFetching,
 	isError,
@@ -67,12 +30,44 @@ const CategoryTable = ({
 	onPageChange,
 	pageSize,
 	onPageSizeChange,
+	activeTab,
+	onTabChange,
 }) => {
 	const columns = useMemo(
 		() => [
 			{
 				accessorKey: "name",
-				header: "Name",
+				header: "Supplier's Name",
+				cell: ({ row }) => {
+					const { first_name, middle_name, last_name, suffix } = row.original
+					return [first_name, middle_name, last_name, suffix]
+						.filter(Boolean)
+						.join(" ")
+				},
+			},
+			{
+				accessorKey: "business_address",
+				header: "Business address",
+			},
+			{
+				accessorKey: "tin_no",
+				header: "TIN #",
+			},
+			{
+				accessorKey: "contact_person",
+				header: "Contact Person",
+			},
+			{
+				accessorKey: "contact_no",
+				header: "Contact #",
+			},
+			{
+				accessorKey: "email",
+				header: "Email",
+			},
+			{
+				accessorKey: "products_offered",
+				header: "Products Offered",
 			},
 			{
 				accessorKey: "status",
@@ -90,6 +85,10 @@ const CategoryTable = ({
 						</Badge>
 					)
 				},
+			},
+			{
+				accessorKey: "remarks",
+				header: "Remarks",
 			},
 			{
 				id: "actions",
@@ -138,7 +137,7 @@ const CategoryTable = ({
 	)
 
 	return (
-		<MasterlistTableWrapper
+		<DashboardTableWrapper
 			columns={columns}
 			data={data?.data || []}
 			paginationData={data}
@@ -150,14 +149,10 @@ const CategoryTable = ({
 			onPageChange={onPageChange}
 			pageSize={pageSize}
 			onPageSizeChange={onPageSizeChange}
-			filterSlot={
-				<StatusToggle
-					checked={showArchived}
-					onCheckedChange={onToggleArchived}
-				/>
-			}
+			activeTab={activeTab}
+			onTabChange={onTabChange}
 		/>
 	)
 }
 
-export default CategoryTable
+export default DashboardTable

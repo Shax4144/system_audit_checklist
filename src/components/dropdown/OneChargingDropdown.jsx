@@ -11,7 +11,7 @@ import {
 	CommandList,
 } from "@/components/ui/command"
 import { cn } from "@/lib/utils"
-import { useFetchOneChargingQuery } from "../features/dropdown/one-charging-option"
+import { useFetchOneChargingQuery } from "../../features/dropdown/one-charging-option"
 
 const OneChargingDropdown = ({ value, onChange, open, isLoading }) => {
 	const [comboOpen, setComboOpen] = useState(false)

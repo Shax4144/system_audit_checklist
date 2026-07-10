@@ -1,19 +1,16 @@
-import { useMemo, useState } from "react"
 import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import {
 	DropdownMenu,
-	DropdownMenuTrigger,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
+	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Pencil, ArchiveX, MoreHorizontal, Eye, ArchiveRestore} from "lucide-react"
-import TableWrapper from "../../../components/TableWrapper"
+import { ArchiveRestore, ArchiveX, MoreHorizontal, Pencil } from "lucide-react"
+import { useMemo } from "react"
 import StatusToggle from "../../../components/StatusToggle"
-
+import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
 
 const tabs = [
 	{ label: "Active", value: "active" },
@@ -124,7 +121,7 @@ const UserAccountsTable = ({
 	)
 
 	return (
-		<TableWrapper
+		<MasterlistTableWrapper
 			columns={columns}
 			data={data?.data || []}
 			paginationData={data}

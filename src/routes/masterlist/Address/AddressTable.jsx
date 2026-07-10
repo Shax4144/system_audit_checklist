@@ -10,7 +10,7 @@ import {
 import { ArchiveX, MoreHorizontal, Pencil } from "lucide-react"
 import { useMemo, useState } from "react"
 import StatusToggle from "../../../components/StatusToggle"
-import TableWrapper from "../../../components/TableWrapper"
+import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
 
 // dummy data — replace with useQuery/fetch
 const data = [
@@ -106,7 +106,7 @@ const AddressTable = () => {
 	)
 
 	return (
-		<TableWrapper
+		<MasterlistTableWrapper
 			columns={columns}
 			data={filteredData}
 			searchKey="name"

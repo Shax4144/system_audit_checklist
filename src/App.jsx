@@ -8,7 +8,7 @@ import masterlistConfig from "./config/masterlist-routes.config"
 import workspaceConfig from "./config/workspace-routes.config"
 
 const Landing = lazy(() => import("./Landing"))
-const Dashboard = lazy(() => import("./routes/Dashboard"))
+const Dashboard = lazy(() => import("./routes/dashboard/Dashboard"))
 
 import { Toaster } from "@/components/ui/sonner"
 import { SelectedRowProvider } from "./context/EditContext"

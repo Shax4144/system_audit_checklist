@@ -21,7 +21,7 @@ import { Separator } from "@/components/ui/separator"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Search, Loader2 } from "lucide-react"
 
-import OneChargingDropdown from "./OneChargingDropdown"
+import OneChargingDropdown from "../components/dropdown/OneChargingDropdown"
 import RolesDropdown from "./RolesDropdown"
 import { useFetchRolesQuery } from "../features/roles/roles.api"
 import { useSelectedRow } from "../context/EditContext"

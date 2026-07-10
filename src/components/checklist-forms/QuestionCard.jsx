@@ -68,6 +68,7 @@ const QuestionCard = ({ question, onUpdate, onDelete }) => {
 							Category
 						</Label>
 						<CategoryDropdown
+							triggerClassName="w-48 h-8 text-sm"
 							value={question.category}
 							onChange={(val) => onUpdate({ category: val })}
 							open={true} // always allow fetching once builder is mounted

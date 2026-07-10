@@ -7,10 +7,10 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ArchiveX, MoreHorizontal, Pencil, ArchiveRestore} from "lucide-react"
-import { useMemo, useState } from "react"
+import { ArchiveRestore, ArchiveX, MoreHorizontal, Pencil } from "lucide-react"
+import { useMemo } from "react"
 import StatusToggle from "../../../components/StatusToggle"
-import TableWrapper from "../../../components/TableWrapper"
+import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
 
 // dummy data — replace with useQuery/fetch
 // const data = [
@@ -50,7 +50,6 @@ const SupplierTable = ({
 	pageSize,
 	onPageSizeChange,
 }) => {
-	
 	const columns = useMemo(
 		() => [
 			{
@@ -169,7 +168,7 @@ const SupplierTable = ({
 	)
 
 	return (
-		<TableWrapper
+		<MasterlistTableWrapper
 			columns={columns}
 			data={data?.data || []}
 			paginationData={data}

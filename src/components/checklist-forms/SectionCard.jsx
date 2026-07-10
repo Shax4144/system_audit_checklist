@@ -34,7 +34,7 @@ import {
 const SectionCard = ({ section, onUpdate, onDelete }) => {
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: section.id })
-	const [newQuestionType, setNewQuestionType] = useState("short_text")
+	const [newQuestionType, setNewQuestionType] = useState("rating")
 	const [expanded, setExpanded] = useState(true)
 
 	const style = { transform: CSS.Transform.toString(transform), transition }

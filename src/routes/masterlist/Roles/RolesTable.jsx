@@ -7,10 +7,10 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ArchiveX, MoreHorizontal, Pencil, ArchiveRestore } from "lucide-react"
-import { useMemo, useState } from "react"
+import { ArchiveRestore, ArchiveX, MoreHorizontal, Pencil } from "lucide-react"
+import { useMemo } from "react"
 import StatusToggle from "../../../components/StatusToggle"
-import TableWrapper from "../../../components/TableWrapper"
+import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
 
 const tabs = [
 	{ label: "Active", value: "active" },
@@ -122,7 +122,7 @@ const RolesTable = ({
 	)
 
 	return (
-		<TableWrapper
+		<MasterlistTableWrapper
 			columns={columns}
 			data={data?.data || []}
 			paginationData={data}

@@ -26,7 +26,7 @@ import {
 import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 
-const TableWrapper = ({
+const MasterlistTableWrapper = ({
 	columns,
 	data,
 	paginationData,
@@ -283,4 +283,4 @@ const TableWrapper = ({
 	)
 }
 
-export default TableWrapper
+export default MasterlistTableWrapper

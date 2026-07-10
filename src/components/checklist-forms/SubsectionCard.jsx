@@ -24,7 +24,7 @@ import { createEmptyQuestion, QUESTION_TYPES } from "../../features/checklist/fo
 const SubsectionCard = ({ subsection, onUpdate, onDelete }) => {
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: subsection.id })
-	const [newQuestionType, setNewQuestionType] = useState("short_text")
+	const [newQuestionType, setNewQuestionType] = useState("rating")
 	const [expanded, setExpanded] = useState(true)
 
 	const style = { transform: CSS.Transform.toString(transform), transition }
