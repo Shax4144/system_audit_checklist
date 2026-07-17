@@ -22,7 +22,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Search, Loader2 } from "lucide-react"
 
 import OneChargingDropdown from "../components/dropdown/OneChargingDropdown"
-import RolesDropdown from "./RolesDropdown"
+import RolesDropdown from "./dropdown/RolesDropdown"
 import { useFetchRolesQuery } from "../features/roles/roles.api"
 import { useSelectedRow } from "../context/EditContext"
 import { appToast } from "./Toast"
@@ -106,10 +106,20 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
 
 	useEffect(() => {
 		if (formData.firstName && formData.lastName) {
-			const generated = (formData.firstName[0] + formData.lastName)
+			const initials = formData.firstName
+				.trim()
+				.split(/\s+/)
+				.map((name) => name[0])
+				.join("")
+
+			const generated = (initials + formData.lastName)
 				.toLowerCase()
 				.replace(/\s+/g, "")
-			setFormData((prev) => ({ ...prev, username: generated }))
+
+			setFormData((prev) => ({
+				...prev,
+				username: generated,
+			}))
 		}
 	}, [formData.firstName, formData.lastName])
 
@@ -122,7 +132,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
 	}
 
 	const handleSubmit = () => {
-		console.log("selected role on submit: ", selectedRole)
+		// console.log("selected role on submit: ", selectedRole)
 		if (!selectedRole) {
 			appToast.warning(
 				"No role Selected",
@@ -190,7 +200,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
 				<form className="flex flex-col gap-4">
 					{/* identity group */}
 					<div className="flex flex-col gap-3">
-						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+						<p className="text-lg font-semibold uppercase tracking-wider text-muted-foreground">
 							Information
 						</p>
 
@@ -235,7 +245,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
 							</div> */}
 						</div>
 
-						<div className="grid grid-cols-4 gap-1.5">
+						<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-1.5">
 							<div className="flex flex-col gap-1.5">
 								<Label htmlFor="firstName">
 									First Name <span className="text-destructive">*</span>
@@ -326,7 +336,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
 
 					{/* account group */}
 					<div className="flex flex-col gap-3">
-						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+						<p className="text-lg font-semibold uppercase tracking-wider text-muted-foreground">
 							ACCOUNT
 						</p>
 

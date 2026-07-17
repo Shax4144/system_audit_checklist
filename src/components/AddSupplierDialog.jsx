@@ -24,6 +24,7 @@ import { Search, Loader2 } from "lucide-react"
 import { useSelectedRow } from "../context/EditContext"
 import { appToast } from "./Toast"
 import SupplierTypeDropdown from "../components/dropdown/SupplierTypeDropdown"
+import LocationDropdown from "./dropdown/LocationDropdown"
 
 const initialForm = {
 	name: "",
@@ -34,6 +35,7 @@ const initialForm = {
 	products_offered: "",
 	email: "",
 	remarks: "",
+	location: "",
 }
 
 const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
@@ -54,6 +56,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 					products_offered: (selectedRow.products_offered || []).join(", "),
 					email: selectedRow.email,
 					remarks: selectedRow.remarks,
+					location: selectedRow.location,
 				})
       } else {
         // creating — reset
@@ -66,15 +69,23 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
     return
   }
 
-  const handleChange = (field) => (e) => {
-  let value = e.target.value;
+  const handleInputChange = (field) => (e) => {
+  	let value = e.target.value;
 
-  if (field === "contact_no") {
-    value = value.replace(/[^0-9, ]/g, "");
-  }
+  	if (field === "contact_no") {
+  	  value = value.replace(/[^0-9, ]/g, "");
+  	}
 
-  setFormData((prev) => ({ ...prev, [field]: value }));
-};
+  	setFormData((prev) => ({ ...prev, [field]: value }));
+	}
+
+	const handleDropdownChange = (field, value) => {
+		setFormData((prev) => ({
+			...prev,
+			[field]: value,
+		}))
+	}
+
 	const splitToArray = (str) => {
 		return (str || "")
 			.split(",")
@@ -118,6 +129,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 			products_offered: splitToArray(formData.products_offered),
 			email: formData.email,
 			remarks: formData.remarks,
+			location: formData.location,
 		}
     onConfirm(payload);
   }
@@ -142,7 +154,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 				<Separator />
 				<form className="flex flex-col gap-4">
 					<div className="flex flex-col gap-3">
-						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+						<p className="text-lg font-semibold uppercase tracking-wider text-muted-foreground">
 							Supplier Information
 						</p>
 
@@ -154,7 +166,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 								<Input
 									id="id-prefix"
 									value={formData.name}
-									onChange={handleChange("name")}
+									onChange={handleInputChange("name")}
 									required
 									disabled={isLoading}
 								/>
@@ -168,7 +180,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 									id="contact-person"
 									placeholder="e.g. John Doe, Jane Smith"
 									value={formData.contact_person}
-									onChange={handleChange("contact_person")}
+									onChange={handleInputChange("contact_person")}
 									required
 									disabled={isLoading}
 								/>
@@ -183,7 +195,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 								<Input
 									id="address"
 									value={formData.address}
-									onChange={handleChange("address")}
+									onChange={handleInputChange("address")}
 									required
 									disabled={isLoading}
 								/>
@@ -201,7 +213,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 									inputMode="numeric"
 									pattern="[0-9]*"
 									value={formData.tin_no}
-									onChange={handleChange("tin_no")}
+									onChange={handleInputChange("tin_no")}
 									required
 									disabled={isLoading}
 								/>
@@ -215,7 +227,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 									id="contact-no"
 									placeholder="e.g. 09171234567, 09281234567"
 									value={formData.contact_no}
-									onChange={handleChange("contact_no")}
+									onChange={handleInputChange("contact_no")}
 									required
 									disabled={isLoading}
 								/>
@@ -231,7 +243,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 									id="products-offered"
 									placeholder="e.g. Rice, Corn, Wheat"
 									value={formData.products_offered}
-									onChange={handleChange("products_offered")}
+									onChange={handleInputChange("products_offered")}
 									required
 									disabled={isLoading}
 								/>
@@ -244,7 +256,7 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 								<Input
 									id="email"
 									value={formData.email}
-									onChange={handleChange("email")}
+									onChange={handleInputChange("email")}
 									disabled={isLoading}
 								/>
 							</div>
@@ -255,11 +267,30 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
 								{/* <Input
 									id="supplier-type"
 									value={formData.remarks}
-									onChange={handleChange("remarks")}
+									onChange={handleInputChange("remarks")}
 									required
 									disabled={isLoading}
 								/> */}
-								<SupplierTypeDropdown />
+								<SupplierTypeDropdown
+									value={formData.remarks}
+									onChange={(val) => handleDropdownChange("remarks", val)}
+									triggerClassName="w-full h-8 text-sm"
+									disabled={isLoading}
+								/>
+							</div>
+						</div>
+
+						<div className="grid grid-cols-2 gap-1.5">
+							<div className="flex flex-col col-span-2 gap-1.5">
+								<Label>
+									Location <span className="text-destructive">*</span>
+								</Label>
+								<LocationDropdown
+									value={formData.location}
+									onChange={(val) => handleDropdownChange("location", val)}
+									triggerClassName="w-full h-8 rounded-[0.35rem]"
+									disabled={isLoading}
+								/>
 							</div>
 						</div>
 					</div>

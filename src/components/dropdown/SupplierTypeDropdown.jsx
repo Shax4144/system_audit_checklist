@@ -8,11 +8,11 @@ import {
 } from "@/components/ui/select"
 import { supplierTypes } from "../../constant/supplier-type"
 
-const LocationDropdown = ({ value, onChange, open }) => {
+const SupplierDropdown = ({ value, onChange, open, triggerClassName, disabled }) => {
 
   return (
-		<Select value={value} onValueChange={onChange}>
-			<SelectTrigger className="w-full h-24 shadow-sm text-sm">
+		<Select value={value} onValueChange={onChange} disabled={disabled}>
+			<SelectTrigger className={triggerClassName}>
 				<SelectValue placeholder={"Select Type"} />
 			</SelectTrigger>
 			<SelectContent
@@ -29,4 +29,4 @@ const LocationDropdown = ({ value, onChange, open }) => {
 	)
 }
 
-export default LocationDropdown
+export default SupplierDropdown

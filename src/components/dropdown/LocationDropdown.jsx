@@ -8,12 +8,12 @@ import {
 } from "@/components/ui/select"
 import { locationTypes } from "../../constant/location-type"
 
-const LocationDropdown = ({ value, onChange, triggerClassName }) => {
+const LocationDropdown = ({ value, onChange, triggerClassName, disabled }) => {
 
   return (
-		<Select value={value} onValueChange={onChange}>
+		<Select value={value} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger className={triggerClassName}>
-				<SelectValue placeholder={"Select Location"} />
+				<SelectValue placeholder={"Select location"} />
 			</SelectTrigger>
 			<SelectContent position="popper" className="w-(--radix-select-trigger-width)">
 				{locationTypes.map((location) => (

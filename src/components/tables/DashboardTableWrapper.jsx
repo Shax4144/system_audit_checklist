@@ -116,20 +116,20 @@ const DashboardTableWrapper = ({
   const pageNumbers = getPageNumbers(currentPage, lastPage);
 
   return (
-		<div>
+		<div className="max-h-[calc(100vh-250px)] flex flex-col gap-0 overflow-hidden">
 			{/* Toolbar */}
-			<div className="flex items-center justify-between px-0 py-3 bg-card">
+			<div className="flex items-center justify-between px-0 py-3">
 				<Tabs value={activeTab} onValueChange={onTabChange}>
 					<TabsList className="bg-transparent py-0 h-auto">
 						<TabsTrigger
 							value="pending"
-							className="rounded-b-xs px-8 py-6 text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground border data-[state=inactive]:border-border data-[state=active]:border-primary"
+							className="rounded-b-xs px-8 py-6 text-sm font-bold data-[state=active]:bg-primary dark:data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground border data-[state=inactive]:border-border data-[state=active]:border-primary"
 						>
 							Pending
 						</TabsTrigger>
 						<TabsTrigger
 							value="for_consolidate"
-							className="rounded-b-xs px-8 py-6 text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground border data-[state=inactive]:border-border data-[state=active]:border-primary"
+							className="rounded-b-xs px-8 py-6 text-sm font-bold data-[state=active]:bg-primary dark:data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground border data-[state=inactive]:border-border data-[state=active]:border-primary"
 						>
 							For Consolidate
 						</TabsTrigger>
@@ -137,7 +137,7 @@ const DashboardTableWrapper = ({
 				</Tabs>
 			</div>
 			{/* Table */}
-			<div className="flex flex-col gap-0 rounded-b-xl border overflow-hidden shadow-sm">
+			<div className="flex flex-1 flex-col gap-0 rounded-b-xl border overflow-auto shadow-sm">
 				<Table>
 					<TableHeader className="bg-muted">
 						{table.getHeaderGroups().map((headerGroup) => (

@@ -113,7 +113,7 @@ const MasterlistTableWrapper = ({
 	const pageNumbers = getPageNumbers(currentPage, lastPage);
 
 	return (
-		<div className="flex flex-col gap-0 rounded-xl border overflow-hidden shadow-sm">
+		<div className="max-h-[calc(100vh-250px)] flex flex-col gap-0 rounded-xl border overflow-hidden shadow-sm">
 			{/* Toolbar */}
 			<div className="flex items-center justify-between px-4 py-3 border-b">
 				{/* filterSlot */}
@@ -135,72 +135,76 @@ const MasterlistTableWrapper = ({
 				)}
 			</div>
 
-			{/* Table */}
-			<Table>
-				<TableHeader className="bg-muted">
-					{table.getHeaderGroups().map((headerGroup) => (
-						<TableRow key={headerGroup.id} className="border-b">
-							{headerGroup.headers.map((header) => (
-								<TableHead
-									key={header.id}
-									className="text-muted-foreground font-medium text-sm px-4 py-2"
-								>
-									{flexRender(
-										header.column.columnDef.header,
-										header.getContext(),
-									)}
-								</TableHead>
-							))}
-						</TableRow>
-					))}
-				</TableHeader>
+			<div className="flex-1 overflow-auto">
+				<Table>
+					<TableHeader className="bg-muted">
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id} className="border-b">
+								{headerGroup.headers.map((header) => (
+									<TableHead
+										key={header.id}
+										className="text-muted-foreground font-medium text-sm px-4 py-2"
+									>
+										{flexRender(
+											header.column.columnDef.header,
+											header.getContext(),
+										)}
+									</TableHead>
+								))}
+							</TableRow>
+						))}
+					</TableHeader>
 
-				<TableBody>
-					{isError ? (
-						<TableRow>
-							<TableCell
-								colSpan={columns.length}
-								className="text-center text-destructive py-10"
-							>
-								{errorMessage}
-							</TableCell>
-						</TableRow>
-					) : isFetching ? (
-						// Skeleton rows while fetching
-						Array.from({ length: 5 }).map((_, i) => (
-							<TableRow key={`skeleton-${i}`}>
-								{columns.map((col, j) => (
-									<TableCell key={j}>
-										<Skeleton className="h-4 w-full max-w-40" />
-									</TableCell>
-								))}
+					<TableBody>
+						{isError ? (
+							<TableRow>
+								<TableCell
+									colSpan={columns.length}
+									className="text-center text-destructive py-10"
+								>
+									{errorMessage}
+								</TableCell>
 							</TableRow>
-						))
-					) : table.getRowModel().rows.length ? (
-						table.getRowModel().rows.map((row) => (
-							<TableRow
-								key={row.id}
-								className="border-b last:border-0 hover:bg-muted"
-							>
-								{row.getVisibleCells().map((cell) => (
-									<TableCell key={cell.id} className="px-4 py-2">
-										{flexRender(cell.column.columnDef.cell, cell.getContext())}
-									</TableCell>
-								))}
+						) : isFetching ? (
+							// Skeleton rows while fetching
+							Array.from({ length: 5 }).map((_, i) => (
+								<TableRow key={`skeleton-${i}`}>
+									{columns.map((col, j) => (
+										<TableCell key={j}>
+											<Skeleton className="h-4 w-full max-w-40" />
+										</TableCell>
+									))}
+								</TableRow>
+							))
+						) : table.getRowModel().rows.length ? (
+							table.getRowModel().rows.map((row) => (
+								<TableRow
+									key={row.id}
+									className="border-b last:border-0 hover:bg-muted"
+								>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id} className="px-4 py-2">
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext(),
+											)}
+										</TableCell>
+									))}
+								</TableRow>
+							))
+						) : (
+							<TableRow>
+								<TableCell
+									colSpan={columns.length}
+									className="text-center text-muted-foreground py-10"
+								>
+									No results found.
+								</TableCell>
 							</TableRow>
-						))
-					) : (
-						<TableRow>
-							<TableCell
-								colSpan={columns.length}
-								className="text-center text-muted-foreground py-10"
-							>
-								No results found.
-							</TableCell>
-						</TableRow>
-					)}
-				</TableBody>
-			</Table>
+						)}
+					</TableBody>
+				</Table>
+			</div>
 
 			{/* Pagination */}
 			<div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">

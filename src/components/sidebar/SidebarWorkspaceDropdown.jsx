@@ -15,7 +15,10 @@ import {
 import {
 	ChevronDown,
 	LayoutDashboard,
-	ClipboardEdit
+	ClipboardEdit,
+	ClipboardCheck,
+	ChartNoAxesCombined,
+	UserCheck,
 } from "lucide-react"
 
 const workspaceItems = [
@@ -30,11 +33,20 @@ const workspaceItems = [
 		icon: ClipboardEdit,
 	},
 	{
+		label: "Checklist Assignment",
+		to: "/workspace/checklist-assignment",
+		icon: UserCheck,
+	},
+	{
 		label: "My Submissions",
 		to: "/workspace/submission",
-		icon: LayoutDashboard,
+		icon: ClipboardCheck,
 	},
-	{ label: "Reports", to: "/workspace/reports", icon: LayoutDashboard },
+	{
+		label: "Reports",
+		to: "/workspace/reports",
+		icon: ChartNoAxesCombined,
+	},
 ]
 
 const SidebarWorkspaceDropdown = () => {

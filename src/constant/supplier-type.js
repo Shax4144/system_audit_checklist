@@ -1,10 +1,10 @@
 export const supplierTypes = [
-  {
-    key: "Warehousing",
-    value: "warehousing",
-  },
-  {
-    key: "Manufacturer",
-    value: "manufacturer"
-  }
+	{
+		key: "Warehousing",
+		value: "warehousing",
+	},
+	{
+		key: "Manufacturing",
+		value: "manufacturing",
+	},
 ]

@@ -147,13 +147,13 @@ const AddRoleDialog = ({ open, onClose, onConfirm, isLoading}) => {
 				<Separator />
 				<form className="flex flex-col gap-4">
 					<div className="flex flex-col gap-4">
-						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+						<p className="text-lg font-semibold uppercase tracking-wider text-muted-foreground">
 							Role
 						</p>
 
 						<div className="grid grid-cols-1  gap-4">
 							<div className="flex flex-col gap-1.5">
-								<Label className="font-semibold" htmlFor="role-name">
+								<Label htmlFor="role-name">
 									Role Name <span className="text-destructive">*</span>
 								</Label>
 								<Input
@@ -168,7 +168,7 @@ const AddRoleDialog = ({ open, onClose, onConfirm, isLoading}) => {
 						</div>
 						<div className="">
 							<div className="flex flex-col gap-1.5">
-								<Label className="font-semibold" htmlFor="permission">
+								<Label htmlFor="permission">
 									Permission
 								</Label>
 

@@ -19,6 +19,8 @@ import {
 import { Bell, LogOutIcon, LockIcon } from "lucide-react"
 import { useNavigate, } from 'react-router-dom'
 import { useDispatch, useSelector } from "react-redux"
+import PopupSidebarWrapper from './sidebar/PopupSidebarWrapper'
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 
 const notifications = [
@@ -38,9 +40,7 @@ const Navbar = () => {
 	const navigate = useNavigate()
 	const [isDarkMode, setIsDarkMode] = useState(false)
 
-	const fullName = [user.last_name, user.first_name, user.middle_name ]
-		.filter(Boolean)
-		.join(" ")
+	const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ")
 	
 	const getInitials = (name) => {
 		if (!name) return
@@ -49,7 +49,7 @@ const Navbar = () => {
 			.map((word) => word[0])
 			.join("")
 			.toUpperCase()
-			.slice(0, 2)
+			.slice(0, 3)
 	}
 
 	const logoutHandler = () => {
@@ -64,6 +64,8 @@ const Navbar = () => {
 
   return (
 		<div className="flex h-16 items-center gap-3 px-4 sm:px-6 border">
+			<PopupSidebarWrapper />
+
 			<div className="ml-auto flex items-center gap-4">
 				<div className="relative flex items-center">
 					<DarkModeToggle />
@@ -76,41 +78,44 @@ const Navbar = () => {
 						</Button>
 					</DropdownMenuTrigger>
 
-					<DropdownMenuContent className="w-72 rounded-[0.35rem]" align="end">
-						<div className="max-h-50">
-							{notifications.map((notif, index) => (
-								<React.Fragment key={notif.id}>
-									<div className="p-3">
-										<h5 className="text-sm font-medium">{notif.title}</h5>
-										<p className="text-xs text-muted-foreground">
-											{notif.message}
-										</p>
-									</div>
-									{index < notifications.length - 1 && (
-										<DropdownMenuSeparator />
-									)}
-								</React.Fragment>
-							))}
-						</div>
+					<DropdownMenuContent className="w-72 p-0 rounded-[0.35rem]" align="end">
+						<ScrollArea className="max-h-52">
+							<div>
+								{notifications.map((notif, index) => (
+									<React.Fragment key={notif.id}>
+										<div className="p-3">
+											<h5 className="text-sm font-medium">{notif.title}</h5>
+											<p className="text-xs text-muted-foreground">
+												{notif.message}
+											</p>
+										</div>
+										{index < notifications.length - 1 && (
+											<DropdownMenuSeparator />
+										)}
+									</React.Fragment>
+								))}
+							</div>
+							{/* <Scrollbar orientation="vertical" /> */}
+						</ScrollArea>
 					</DropdownMenuContent>
 				</DropdownMenu>
 
-				<div className="hidden lg:block">
+				<div>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button
-								className="min-h-8.5 min-w-24 pl-0 pt-0 pb-0 pr-2  justify-between border-0 bg-sidebar/95"
+								className="min-h-10 min-w-24 pl-0 pt-0 pb-0 pr-4 rounded-3xl justify-between border-0 bg-sidebar/95"
 								variant="outline"
 							>
 								<span>
-									<Avatar>
-										<AvatarFallback>
-											{getInitials(user.username)}
-										</AvatarFallback>
+									<Avatar size="lg">
+										<AvatarFallback>{getInitials(fullName)}</AvatarFallback>
 									</Avatar>
 								</span>
 								<div>
-									<p className="text-[14px] font-semibold">{fullName}</p>
+									<p className="text-[14px] font-semibold">
+										{getInitials(user.first_name)}. {user.last_name}
+									</p>
 									<p className="text-[12px] text-muted-foreground">
 										{user.role}
 									</p>

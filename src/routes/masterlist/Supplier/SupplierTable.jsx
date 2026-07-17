@@ -105,6 +105,10 @@ const SupplierTable = ({
 				header: "Remarks",
 			},
 			{
+				accessorKey: "location",
+				header: "Location",
+			},
+			{
 				accessorKey: "status",
 				header: "Status",
 				cell: ({ row }) => {

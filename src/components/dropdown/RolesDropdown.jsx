@@ -12,7 +12,7 @@ const RolesDropdown = ({ rolesData, value, onChange, open, isLoading }) => {
 		<Select
 			value={value}
 			onValueChange={(val) => {
-				console.log("Role Selected: ", val)
+				// console.log("Role Selected: ", val)
 				onChange(val)
 			}}
 			disabled={isLoading}

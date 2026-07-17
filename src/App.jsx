@@ -8,7 +8,8 @@ import masterlistConfig from "./config/masterlist-routes.config"
 import workspaceConfig from "./config/workspace-routes.config"
 
 const Landing = lazy(() => import("./Landing"))
-const Dashboard = lazy(() => import("./routes/dashboard/Dashboard"))
+const Dashboard = lazy(() => import("./routes/workspace/Dashboard/Dashboard"))
+const MyChecklistAnswer = lazy(() => import("./routes/workspace/Dashboard/MyChecklistAnswer"))
 
 import { Toaster } from "@/components/ui/sonner"
 import { SelectedRowProvider } from "./context/EditContext"
@@ -24,15 +25,29 @@ export default function App() {
 						<Route path="/dashboard" element={<ProtectedRoute />}>
 							<Route
 								index
-								exac
+								exact
 								element={
 									<SuspenseWrapper>
 										<Dashboard />
 									</SuspenseWrapper>
 								}
 							/>
+							<Route
+								path="my-checklist/:id"
+								element={
+									<SuspenseWrapper>
+										<MyChecklistAnswer />
+									</SuspenseWrapper>
+								}
+							/>
 						</Route>
-						<Route exact path="/workspace" element={<ProtectedRoute />}>
+						<Route
+							exact
+							path="/workspace"
+							element={
+								<ProtectedRoute role={["Admin", "Admin-Audit", "Audit"]} />
+							}
+						>
 							{workspaceConfig.map(({ path, component: Component }) => (
 								<Route
 									key={path}
@@ -46,7 +61,11 @@ export default function App() {
 								></Route>
 							))}
 						</Route>
-						<Route exact path="/masterlist" element={<ProtectedRoute />}>
+						<Route
+							exact
+							path="/masterlist"
+							element={<ProtectedRoute role={["Admin"]} />}
+						>
 							{masterlistConfig.map(({ path, component: Component }) => (
 								<Route
 									key={path}

@@ -15,6 +15,24 @@ const workspaceConfig = [
 		component: lazy(() => import("../components/checklist-forms/FormBuilder")),
 	},
 	{
+		path: "checklist/builder/:id/preview",
+		component: lazy(() => import("../components/checklist-forms/FormPreview")),
+	},
+	{
+		path: "checklist-assignment",
+		component: lazy(
+			() =>
+				import("../routes/workspace/ChecklistAssignment/ChecklistAssignmentDashboard"),
+		),
+	},
+	{
+		path: "checklist-assignment/:id",
+		component: lazy(
+			() => import("../routes/workspace/ChecklistAssignment/ChecklistAssignmentDetail"),
+		),
+	},
+
+	{
 		path: "submission",
 		component: lazy(() => import("../routes/workspace/Submission/Submission")),
 	},

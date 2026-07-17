@@ -4,19 +4,26 @@ import { Plus, FileText, Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useFetchChecklistsQuery } from "../../features/checklist/checklist.api"
 
+const STATUS_LABEL = {
+	draft: "DRAFT",
+	ready: "READY",
+	published: "PUBLISHED",
+	archived: "ARCHIVED",
+}
+
 const STATUS_STYLES = {
-	draft: "bg-slate-400 text-slate-600 h-5 w-5",
-	published: "bg-green-500 text-green-700 h-5 w-5",
-	archived: "bg-amber-500 text-amber-700 h-5 w-5",
+	draft:
+		"text-xs xl:text-sm lg:text-xs bg-slate-300 text-slate-700 border-slate-200 dark:bg-slate-900/40 dark:text-slate-300 dark:border-slate-700",
+	ready:
+		"text-xs xl:text-sm lg:text-xs bg-blue-300 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700",
+	published:
+		"text-xs xl:text-sm lg:text-xs bg-green-300 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700",
+	archived:
+		"text-xs xl:text-sm lg:text-xs bg-amber-300 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-700",
 }
 
 const gradients = [
-	"from-sky-300/50 to-cyan-300/20",
-	"from-violet-300/50 to-fuchsia-300/20",
-	"from-emerald-300/50 to-teal-300/20",
-	"from-amber-300/50 to-orange-300/20",
-	"from-rose-300/50 to-pink-300/20",
-	"from-indigo-300/50 to-sky-300/20",
+	"from-orange-500/95 to-amber-500/35"
 ]
 
 const formatDate = (dateStr) => {
@@ -39,18 +46,18 @@ const FormsDashboard = () => {
 		pagination: "none",
 	})
 
-	const forms = checklistsResponse?.data ?? []
+	const checklist = checklistsResponse?.data ?? []
 
 	return (
 		<div className="flex flex-col gap-6 h-full">
 			<div className="flex flex-row justify-between items-center">
 				<div>
-					<h1 className="text-2xl font-semibold">Forms & Checklists</h1>
+					<h1 className="text-2xl font-semibold">Checklists</h1>
 					<p className="text-sm text-muted-foreground">
-						Create and manage your audit forms and checklists.
+						Create and manage your audit checklists.
 					</p>
 				</div>
-				<div className="flex justify-between items-center gap-4">
+				{/* <div className="flex justify-between items-center gap-4">
 					<p className="font-black text-sm">Legend:</p>
 					<div className="flex flex-row gap-2 items-center">
 						<p className="font-semibold text-xs">Draft</p>
@@ -64,7 +71,7 @@ const FormsDashboard = () => {
 						<p className="font-semibold text-xs">Archived</p>
 						<Badge className={STATUS_STYLES.archived}></Badge>
 					</div>
-				</div>
+				</div> */}
 			</div>
 
 			{isFetching ? (
@@ -99,30 +106,34 @@ const FormsDashboard = () => {
 						</span>
 					</button>
 
-					{forms.map((form, index) => (
+					{checklist.map((checklist, index) => (
 						<button
-							key={form.id}
-							onClick={() => navigate(`builder/${form.id}`)}
+							key={checklist.id}
+							onClick={() => navigate(`builder/${checklist.id}`)}
 							className={`aspect-square rounded-xl border bg-linear-to-br ${gradients[index % gradients.length]} p-4 flex flex-col justify-between text-left hover:border-primary hover:shadow-sm transition-all`}
 						>
 							<div className="flex items-start justify-between gap-2">
-								<div className="w-15 h-15 rounded-lg bg-muted flex items-center justify-center shrink-0">
-									<FileText className="h-8 w-8 text-muted-foreground" />
+								<div className="w-8 h-8 xl:w-15 xl:h-15 lg:w-8 lg:h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+									<FileText className="h-6 w-6 xl:h-8 xl:w-8 lg:h-4 lg:w-4 text-muted-foreground" />
 								</div>
 								<Badge
-									className={STATUS_STYLES[form.status] ?? STATUS_STYLES.draft}
+									className={
+										STATUS_STYLES[checklist.status] ?? STATUS_STYLES.draft
+									}
 								>
-									{form.status}
+									{STATUS_LABEL[checklist.status] ?? STATUS_LABEL.draft}
 								</Badge>
 							</div>
 
 							<div className="flex flex-col gap-1">
-								<p className="font-medium text-lg line-clamp-2">{form.title}</p>
-								<p className="text-sm text-muted-foreground">
-									Created {formatDate(form.created_at)}
+								<p className="font-medium text-lg lg:text-xs xl:text-xl line-clamp-2">
+									{checklist.title}
 								</p>
-								<p className="text-sm text-muted-foreground">
-									Updated {formatDate(form.updated_at)}
+								<p className="text-sm lg:text-xs xl:text-sm text-muted-foreground">
+									Created {formatDate(checklist.created_at)}
+								</p>
+								<p className="text-sm lg:text-xs xl:text-sm text-muted-foreground">
+									Updated {formatDate(checklist.updated_at)}
 								</p>
 							</div>
 						</button>

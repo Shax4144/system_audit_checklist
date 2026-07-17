@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { useSelector } from "react-redux"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, Eye, Save, Loader2, ChevronLeft } from "lucide-react"
+import { Plus, Eye, Save, Loader2, ChevronLeft, Send } from "lucide-react"
 import {
 	useFetchChecklistsQuery,
 	usePostChecklistMutation,
 	useUpdateChecklistMutation,
 	useArchiveChecklistMutation,
+	usePublishChecklistMutation,
 } from "../../features/checklist/checklist.api"
 import { createEmptySection } from "../../features/checklist/formBuilder.helpers"
 import SectionList from "./SectionList"
@@ -21,8 +23,13 @@ const initialFormState = {
 
 const FormBuilder = () => {
 	const { id: formId } = useParams()
+	
+
 	const navigate = useNavigate()
 	const isNew = !formId
+	
+	const user = useSelector((state) => state.user)
+	const userId = user?.id
 
 	const [form, setForm] = useState(isNew ? initialFormState : null)
 
@@ -45,10 +52,11 @@ const FormBuilder = () => {
 	const [postChecklist, { isLoading: isCreating }] = usePostChecklistMutation()
 	const [updateChecklist, { isLoading: isUpdating }] =
 		useUpdateChecklistMutation()
-	const [archiveChecklist, { isLoading: isArchive }] =
+	const [archiveChecklist, { isLoading: isArchiving }] =
 		useArchiveChecklistMutation()
+	const [publishChecklist, { isLoading: isPublishing}] = usePublishChecklistMutation()
 
-	const isSaving = isCreating || isUpdating || isArchive
+	const isSaving = isCreating || isUpdating || isArchiving || isPublishing
 
 	useEffect(() => {
 		if (!isNew && checklistData) {
@@ -180,15 +188,41 @@ const FormBuilder = () => {
 			if (isNew) {
 				const created = await postChecklist(payload).unwrap()
 				const newId = created.data?.id ?? created.id
-				appToast.success("Form created", "Your form has been saved as a draft.")
+				appToast.success("Checklistcreated",
+					created?.message ?? "Your form has been saved as a draft."
+				)
 				navigate(`/workspace/checklist/builder/${newId}`, { replace: true })
 			} else {
-				await updateChecklist({ id: formId, ...payload }).unwrap()
-				appToast.success("Form saved", "Your changes have been saved.")
+				const updated = await updateChecklist({ id: formId, ...payload }).unwrap()
+				appToast.success(
+					"Checklist saved",
+					updated?.message ?? "Your changes have been saved."
+				)
 			}
 		} catch (err) {
 			appToast.error("Error", err?.data?.message ?? "Failed to save form.")
 			console.error(err)
+		}
+	}
+
+	const handlePublish = async () => {
+		try {
+			const payload = buildPayload()
+			const response = await publishChecklist({ id: formId, ...payload }).unwrap()
+			const for_publishing = response.data?.id
+			const data = response.data
+			appToast.success(
+				"Checklist successfully published.",
+				response?.message ?? "Your checklist has been published, go to Checklist Assignment to assign and add due date."
+			)
+			console.log("id: ", for_publishing);
+			console.log("payload: ", data);
+
+		} catch (err) {
+			appToast.error(
+				"Error",
+				err?.data?.message ?? "Failed to publish the checklist"
+			)
 		}
 	}
 
@@ -204,8 +238,7 @@ const FormBuilder = () => {
 		<div className="flex flex-col gap-6 max-w-4xl mx-auto pb-20">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-3">
-					<Button
-						variant="ghost" size="xl" onClick={() => navigate(-1)}>
+					<Button variant="ghost" size="xl" onClick={() => navigate(-1)}>
 						<ChevronLeft className="size-full" />
 					</Button>
 					<div>
@@ -219,7 +252,9 @@ const FormBuilder = () => {
 				<div className="flex gap-2">
 					<Button
 						variant="outline"
-						onClick={() => navigate(`/forms/${formId}/preview`)}
+						onClick={() =>
+							navigate(`/workspace/checklist/builder/${formId}/preview`)
+						}
 						disabled={isNew}
 					>
 						<Eye className="h-4 w-4" /> Preview
@@ -232,6 +267,14 @@ const FormBuilder = () => {
 						)}
 						Save Draft
 					</Button>
+					{/* <Button variant="outline" onClick={handlePublish} disabled={isSaving}>
+						{isSaving ? (
+							<Loader2 className="h-4 w-4 animate-spin" />
+						) : (
+							<Send className="h-4 w-4" />
+						)}
+						Publish
+					</Button> */}
 				</div>
 			</div>
 

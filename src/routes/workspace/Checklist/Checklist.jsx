@@ -11,9 +11,9 @@ const Checklist = () => {
 		switch (user?.role) {
 			case "Admin":
 				return <FormDashboard />
-			case "Auditor":
-				return <HeadAuditorFormView />
-			case "User":
+			case "Admin-Audit":
+				return <FormDashboard />
+			case "Audit":
 			default:
 				return <UserFormView />
 		}

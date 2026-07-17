@@ -1,44 +1,50 @@
-import React, { useState } from 'react'
-import { Separator } from "../../components/ui/separator"
-import { useSelector} from 'react-redux'
-import {
-	Card,
-	CardHeader,
-	CardTitle,
-	CardDescription,
-	CardContent,
-} from "../../components/ui/card"
-import DashboardTable from './DashboardTable'
-import { Search } from 'lucide-react'
 import { Input } from "@/components/ui/input"
-import {
-	Select,
-	SelectTrigger,
-	SelectValue,
-	SelectContent,
-	SelectItem,
-} from "@/components/ui/select"
-import CategoryDropdown from "../../components/dropdown/CategoryDropdown"
-import LocationDropdown from '../../components/dropdown/LocationDropddown'
+import { Search } from "lucide-react"
+import { useState } from "react"
+import { useSelector } from "react-redux"
+import CategoryDropdown from "../../../components/dropdown/CategoryDropdown"
+import LocationDropdown from "../../../components/dropdown/LocationDropdown"
+import { Card, CardContent } from "../../../components/ui/card"
+import DashboardTable from "./DashboardTable"
+import { useFetchPublishedQuery } from "../../../features/checklist/publishedChecklist.api"
 
 const Dashboard = () => {
-	const [activeTab, setActiveTab] = useState("pending")
 	const user = useSelector((state) => state.user)
-  return (
+
+	const [activeTab, setActiveTab] = useState("pending")
+	const [page, setPage] = useState(1)
+	const [pageSize, setPageSize] = useState(10);
+	
+
+	const { data: publishedResponse,
+		isFetching: isFetchingPublished,
+		isError,
+		error,
+	} = useFetchPublishedQuery(
+		{
+			page,
+			per_page: pageSize,
+		},
+		{
+			refetchOnMountOrArgChange: true,
+		}
+	)
+
+	return (
 		<div>
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 				<div className="">
-					<h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
+					<h3 className="scroll-m-20 text-md xl:text-xl font-semibold tracking-tight">
 						Welcome back, {user.last_name}
 					</h3>
-					<p className="text-sm text-muted-foreground">
+					<p className="text-xs xl:text-sm text-muted-foreground">
 						Here's what waiting for you.
 					</p>
-					<h1 className="text-4xl">Select your supplier.</h1>
+					<h1 className="text-2xl xl:text-4xl">Select your supplier.</h1>
 				</div>
 			</div>
 
-			<div className="grid grid-cols-4 gap-5 py-8">
+			<div className="grid grid-cols-4 gap-5 py-4 lg:py-6 xl:py-8">
 				<Card className="flex flex-col gap-6 rounded-xl bg-card py-6 text-card-foreground shadow-lg shrink-0 overflow-hidden">
 					<CardContent>
 						<div className="flex flex-col justify-center gap-2">
@@ -85,7 +91,7 @@ const Dashboard = () => {
 			</div>
 
 			<div className="grid grid-cols-12 gap-5 items-center">
-				<div className="col-span-8 shadow-lg rounded-xl">
+				<div className="xl:col-span-8 col-span-6 shadow-lg rounded-xl">
 					<div className="relative ml-auto">
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
@@ -99,15 +105,13 @@ const Dashboard = () => {
 					</div>
 				</div>
 
-				<div className="col-span-2">
-					<LocationDropdown
-						triggerClassName="w-full h-12 rounded-xl shadow-lg"
-					/>
+				<div className=" col-span-3 xl:col-span-2">
+					<LocationDropdown triggerClassName="w-full h-13 rounded-xl shadow-lg" />
 				</div>
 
-				<div className="col-span-2">
+				<div className=" col-span-3 xl:col-span-2">
 					<CategoryDropdown
-						triggerClassName="w-full h-12 rounded-xl shadow-lg"
+						triggerClassName="w-full h-13 rounded-xl shadow-lg"
 						open={true}
 					/>
 				</div>
@@ -115,6 +119,10 @@ const Dashboard = () => {
 
 			<div className="py-4">
 				<DashboardTable
+					data={publishedResponse}
+					isFetching={isFetchingPublished}
+					isError={isError}
+					error={error}
 					activeTab={activeTab}
 					onTabChange={setActiveTab}
 				/>

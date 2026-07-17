@@ -15,7 +15,7 @@ export const store = configureStore({
     user: userReducer,
 
     [baseApi.reducerPath]: baseApi.reducer,
-    [authApi.reducerPath]: authApi.reducer,
+    [authApi.reducerPath]: authApi.reducer, 
 		[oneChargingBaseApi.reducerPath]: oneChargingBaseApi.reducer,
 	},
 	middleware: (getDefaultMiddleware) =>

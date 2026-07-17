@@ -106,7 +106,8 @@
   --sidebar-primary: oklch(0.706 0.174 49.5);
   --sidebar-primary-foreground: oklch(1.0000 0 0);
   --sidebar-accent: oklch(0.2596 0.0037 106.6523);
-  --sidebar-accent-foreground: oklch(0.2812 0.0039 84.5817);
+  /* --sidebar-accent-foreground: oklch(0.2812 0.0039 84.5817); */
+  --sidebar-accent-foreground: oklch(0.706 0.174 49.5);
   --sidebar-border: oklch(0.2311 0.0097 52.9899);
   --sidebar-ring: oklch(0.706 0.174 49.5);
   --font-sans: Poppins, Manrope, ui-sans-serif, sans-serif, system-ui;

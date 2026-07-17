@@ -39,6 +39,14 @@ export const checklistsApi = baseApi
 				}),
 				invalidatesTags: ["Checklists"],
 			}),
+			publishChecklist: builder.mutation({
+				query: ({ id, ...body }) => ({
+					url: `${BASE_ENDPOINT}/${id}/publish`,
+					method: "POST",
+					body,
+				}),
+				invalidatesTags: ["Checklists"],
+			}),
 		}),
 	})
 
@@ -48,4 +56,5 @@ export const {
 	usePostChecklistMutation,
 	useUpdateChecklistMutation,
 	useArchiveChecklistMutation,
+	usePublishChecklistMutation,
 } = checklistsApi

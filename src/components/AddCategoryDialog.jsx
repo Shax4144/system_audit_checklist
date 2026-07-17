@@ -61,7 +61,7 @@ const AddCategoryDialog = ({ open, onClose, onConfirm, isLoading}) => {
     const payload = {
 			name: formData.name,
 		}
-		console.log("payload:", payload)
+		// console.log("payload:", payload)
     onConfirm(payload);
   }
 
@@ -85,7 +85,7 @@ const AddCategoryDialog = ({ open, onClose, onConfirm, isLoading}) => {
 				<Separator />
 				<form className="flex flex-col gap-4">
 					<div className="flex flex-col gap-3">
-						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+						<p className="text-lg font-semibold uppercase tracking-wider text-muted-foreground">
 							Category
 						</p>
 

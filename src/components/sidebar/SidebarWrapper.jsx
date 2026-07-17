@@ -1,6 +1,8 @@
 import { useLocation, Link } from "react-router-dom"
+import { useSelector } from "react-redux"
 import SidebarMasterlistDropdown from "./SidebarMasterlistDropdown"
 import SidebarWorkspaceDropdown from "./SidebarWorkspaceDropdown"
+import logo from "../../assets/horiz_logo_system_audit_checklist.png"
 import {
 	Sidebar,
 	SidebarContent,
@@ -29,48 +31,31 @@ import {
 
 const SidebarWrapper = () => {
 	const { pathname } = useLocation()
+	const user = useSelector((state) => state.user)
+	const hasRole = (role) => {
+		return user?.role === role
+	}
 
 	return (
-		<Sidebar>
-			<SidebarHeader className="flex flex-row h-16">
-				<div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary">
-					<svg
-						width="32"
-						height="32"
-						viewBox="0 0 32 32"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							d="M6 16L16 6L26 16L16 26L6 16Z"
-							fill="white"
-							fillOpacity="0.2"
-						/>
-						<path
-							d="M10 16L16 10L22 16L16 22L10 16Z"
-							fill="white"
-							fillOpacity="0.6"
-						/>
-						<circle cx="16" cy="16" r="3" fill="white" />
-					</svg>
-				</div>
-				<div className="py-2.5">
-					<h1 className="text-xl font-semibold text-foreground">
-						Eros
-					</h1>
-				</div>
-			</SidebarHeader>
+		<div className="hidden lg:block">
+			<Sidebar>
+				<SidebarHeader className="flex flex-row h-16">
+					<img src={logo} alt="System Audit Checklist" className="h-8 w-auto" />
+				</SidebarHeader>
 
-			<SidebarContent>
-				{/* Workspace */}
-				<SidebarWorkspaceDropdown />
-				{/* end of workspace */}
+				<SidebarContent>
+					{/* Workspace */}
+					{(hasRole("Admin") || hasRole("Admin-Audit") || hasRole("Audit")) && (
+						<SidebarWorkspaceDropdown />
+					)}
+					{/* end of workspace */}
 
-				{/* Masterlist — collapsible */}
-				<SidebarMasterlistDropdown />
-				{/* end of masterlist */}
-			</SidebarContent>
-		</Sidebar>
+					{hasRole("Admin") && <SidebarMasterlistDropdown />}
+
+					{/* end of masterlist */}
+				</SidebarContent>
+			</Sidebar>
+		</div>
 	)
 }
 
