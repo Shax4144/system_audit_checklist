@@ -137,7 +137,7 @@ const MasterlistTableWrapper = ({
 
 			<div className="flex-1 overflow-auto">
 				<Table>
-					<TableHeader className="bg-muted">
+					<TableHeader className="sticky top-0 bg-muted">
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id} className="border-b">
 								{headerGroup.headers.map((header) => (

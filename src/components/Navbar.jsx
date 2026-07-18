@@ -20,7 +20,7 @@ import { Bell, LogOutIcon, LockIcon } from "lucide-react"
 import { useNavigate, } from 'react-router-dom'
 import { useDispatch, useSelector } from "react-redux"
 import PopupSidebarWrapper from './sidebar/PopupSidebarWrapper'
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 
 const notifications = [
@@ -79,7 +79,7 @@ const Navbar = () => {
 					</DropdownMenuTrigger>
 
 					<DropdownMenuContent className="w-72 p-0 rounded-[0.35rem]" align="end">
-						<ScrollArea className="max-h-52">
+						<ScrollArea className="h-52">
 							<div>
 								{notifications.map((notif, index) => (
 									<React.Fragment key={notif.id}>
@@ -95,7 +95,6 @@ const Navbar = () => {
 									</React.Fragment>
 								))}
 							</div>
-							{/* <Scrollbar orientation="vertical" /> */}
 						</ScrollArea>
 					</DropdownMenuContent>
 				</DropdownMenu>

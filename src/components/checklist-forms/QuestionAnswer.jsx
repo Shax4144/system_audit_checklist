@@ -7,6 +7,15 @@ import { Camera, X } from "lucide-react"
 
 const GRADE_OPTIONS = ["1", "2", "3", "4", "5", "N/A"]
 
+const GRADE_STYLES = {
+  1: "bg-red-500 text-white border-red-600",
+  2: "bg-orange-400 text-white border-orange-400",
+  3: "bg-blue-500 text-white border-blue-300",
+  4: "bg-blue-500 text-white border-blue-300",
+  5: "bg-green-700 text-white border-green-600",
+  "N/A": "bg-slate-400 text-white border-slate-500",
+};
+
 const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 	const fileInputRef = useRef(null)
 	const [preview, setPreview] = useState(
@@ -42,19 +51,21 @@ const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 					)}
 					<div className="flex gap-1">
 						{GRADE_OPTIONS.map((opt) => (
-							<button
+							<Button
 								key={opt}
-								type="button"
 								disabled={disabled}
 								onClick={() => updateAnswer({ grade: opt })}
-								className={`h-7 min-w-7 px-1.5 rounded-md text-xs font-medium border transition-colors ${
+								variant="ghost"
+								className={`h-10 min-w-10 px-1.5 rounded-full text-sm font-medium border transition-colors ${
 									grade === opt
-										? "bg-primary text-primary-foreground border-primary"
+										? 
+										// "bg-primary text-primary-foreground border-primary"
+										GRADE_STYLES[opt]
 										: "bg-background text-muted-foreground border-border hover:bg-muted"
 								} disabled:opacity-50 disabled:pointer-events-none`}
 							>
 								{opt}
-							</button>
+							</Button>
 						))}
 					</div>
 				</div>
@@ -83,11 +94,11 @@ const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 					<Button
 						type="button"
 						variant="outline"
-						size="icon"
+						size="lg"
 						onClick={() => fileInputRef.current?.click()}
 						disabled={disabled}
 					>
-						<Camera className="h-4 w-4" />
+						<Camera className="h-8 w-8" />
 					</Button>
 				</div>
 			</div>

@@ -119,11 +119,11 @@ const DashboardTable = ({
 					const id = row.original.id
 
 					return ["pending", "ongoing"].includes(status) ? (
-						<Button onClick={() => navigate(`/dashboard/my-checklists/${id}`)}>
+						<Button onClick={() => navigate(`/dashboard/my-checklist/${id}`)}>
 							Open
 						</Button>
 					) : (
-						<Button onClick={() => navigate(`/dashboard/my-checklists/${id}`)}>
+						<Button onClick={() => navigate(`/dashboard/my-checklist/${id}`)}>
 							Show
 						</Button>
 					)

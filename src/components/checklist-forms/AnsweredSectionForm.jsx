@@ -4,18 +4,19 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Loader2, Check } from "lucide-react"
 import QuestionAnswer from "./QuestionAnswer"
-import { useSubmitSectionAnswerMutation } from "../../features/checklist/publishedChecklist.api"
+// import { useSubmitSectionAnswerMutation } from "../../features/checklist/publishedChecklist.api"
 import { appToast } from "../Toast"
 
-const AnsweredSectionForm = ({ checklistId, section, sectionIndex }) => {
+const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChange}) => {
 	const hasSubsections = Boolean(section["sub-sections"])
 	const [isAnswered, setIsAnswered] = useState(Boolean(section.is_answered))
 	const [answers, setAnswers] = useState({}) // { [questionKey]: { grade, note, photo } }
 
-	const [submitSection, { isLoading }] = useSubmitSectionAnswerMutation()
+	// const [submitSection, { isLoading }] = useSubmitSectionAnswerMutation()
 
 	const handleAnswerChange = (questionKey) => (value) => {
 		setAnswers((prev) => ({ ...prev, [questionKey]: value }))
+		onAnswersChange?.(questionKey, value)
 	}
 
 	// Flatten all questions in this section (direct or nested in subsections) to check completeness
@@ -44,7 +45,7 @@ const AnsweredSectionForm = ({ checklistId, section, sectionIndex }) => {
 				})),
 			}
 
-			await submitSection(payload).unwrap()
+			// await submitSection(payload).unwrap()
 			setIsAnswered(true)
 			appToast.success(
 				"Section submitted",
@@ -103,9 +104,16 @@ const AnsweredSectionForm = ({ checklistId, section, sectionIndex }) => {
 			)}
 
 			{!isAnswered && (
-				<div className="flex justify-end pt-4 mt-4 border-t">
-					<Button onClick={handleSubmit} disabled={!allGraded || isLoading}>
-						{isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+				<div className="flex justify-end pt-4 mt-4 border-t gap-1.5">
+					<Button className="bg-background text-foreground border border-border hover:text-primary-foreground">
+						Save draft
+					</Button>
+					<Button 
+					// onClick={handleSubmit} 
+					// disabled={!allGraded || isLoading}
+					disabled={!allGraded}
+					>
+						{/* {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />} */}
 						Submit Section
 					</Button>
 				</div>
