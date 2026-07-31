@@ -43,6 +43,7 @@ const DashboardTableWrapper = ({
   onPageSizeChange,
   activeTab,
   onTabChange,
+  tabs,
 }) => {
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
@@ -117,181 +118,186 @@ const DashboardTableWrapper = ({
   const pageNumbers = getPageNumbers(currentPage, lastPage);
 
   return (
-    <div className="max-h-[calc(100vh-250px)] flex flex-col gap-0 overflow-hidden">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-0 py-3">
-        <Tabs value={activeTab} onValueChange={onTabChange}>
-          <TabsList className="bg-transparent py-0 h-auto">
-            <TabsTrigger
-              value="pending"
-              className="rounded-b-xs px-8 py-6 text-sm font-bold data-[state=active]:bg-primary dark:data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground border data-[state=inactive]:border-border data-[state=active]:border-primary"
-            >
-              Pending
-            </TabsTrigger>
-            <TabsTrigger
-              value="for_consolidate"
-              className="rounded-b-xs px-8 py-6 text-sm font-bold data-[state=active]:bg-primary dark:data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground border data-[state=inactive]:border-border data-[state=active]:border-primary"
-            >
-              For Consolidate
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      {/* Table */}
-      <div className="flex flex-1 flex-col gap-0 rounded-b-xl border shadow-sm">
-        <ScrollArea className="h-full w-full">
-          <Table className="min-w-max">
-            <TableHeader className="sticky top-0 bg-muted">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="border-b">
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className="text-muted-foreground font-medium text-sm px-4 py-2"
-                    >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
+		<div className="max-h-[calc(100vh-250px)] flex flex-col gap-0 overflow-hidden">
+			{/* Toolbar */}
+			<div className="flex items-center justify-between px-0 py-3">
+				<Tabs value={activeTab} onValueChange={onTabChange}>
+					<TabsList className="bg-transparent py-0 h-auto">
+						{tabs.map((tab) => (
+							<TabsTrigger
+								key={tab.value}
+								value={tab.value}
+								className="rounded-b-xs px-8 py-6 text-sm font-bold
+                  data-[state=active]:bg-primary
+                  dark:data-[state=active]:bg-primary
+                  data-[state=active]:text-primary-foreground
+                  data-[state=inactive]:bg-transparent
+                  data-[state=inactive]:text-muted-foreground
+                  border
+                  data-[state=inactive]:border-border
+                  data-[state=active]:border-primary"
+							>
+								{tab.label}
+							</TabsTrigger>
+						))}
+					</TabsList>
+				</Tabs>
+			</div>
+			{/* Table */}
+			<div className="flex flex-1 flex-col gap-0 rounded-b-xl border shadow-sm">
+				<ScrollArea className="h-full w-full">
+					<Table className="min-w-max">
+						<TableHeader className="sticky top-0 bg-muted">
+							{table.getHeaderGroups().map((headerGroup) => (
+								<TableRow key={headerGroup.id} className="border-b">
+									{headerGroup.headers.map((header) => (
+										<TableHead
+											key={header.id}
+											className="text-muted-foreground font-medium text-sm px-4 py-2"
+										>
+											{flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+										</TableHead>
+									))}
+								</TableRow>
+							))}
+						</TableHeader>
 
-            <TableBody>
-              {isError ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="text-center text-destructive py-10"
-                  >
-                    {errorMessage}
-                  </TableCell>
-                </TableRow>
-              ) : isFetching ? (
-                // Skeleton rows while fetching
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={`skeleton-${i}`}>
-                    {columns.map((col, j) => (
-                      <TableCell key={j}>
-                        <Skeleton className="h-4 w-full max-w-40" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : table.getRowModel().rows.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className="border-b last:border-0 hover:bg-muted"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-4 py-2">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="text-center text-muted-foreground py-10"
-                  >
-                    No results found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+						<TableBody>
+							{isError ? (
+								<TableRow>
+									<TableCell
+										colSpan={columns.length}
+										className="text-center text-destructive py-10"
+									>
+										{errorMessage}
+									</TableCell>
+								</TableRow>
+							) : isFetching ? (
+								// Skeleton rows while fetching
+								Array.from({ length: 5 }).map((_, i) => (
+									<TableRow key={`skeleton-${i}`}>
+										{columns.map((col, j) => (
+											<TableCell key={j}>
+												<Skeleton className="h-4 w-full max-w-40" />
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : table.getRowModel().rows.length ? (
+								table.getRowModel().rows.map((row) => (
+									<TableRow
+										key={row.id}
+										className="border-b last:border-0 hover:bg-muted"
+									>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id} className="px-4 py-2">
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell
+										colSpan={columns.length}
+										className="text-center text-muted-foreground py-10"
+									>
+										No results found.
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+					<ScrollBar orientation="horizontal" />
+				</ScrollArea>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <span>Show</span>
-            <Select
-              value={String(pageSize)}
-              onValueChange={(val) => {
-                onPageSizeChange(Number(val));
-                onPageChange(1);
-              }}
-            >
-              <SelectTrigger className="w-16 h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {[10, 20, 50].map((size) => (
-                  <SelectItem key={size} value={String(size)}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <span className="ml-2">
-              <span className="font-medium text-foreground">
-                {from}–{to}
-              </span>{" "}
-              of{" "}
-              <span className="font-medium text-foreground">{totalRows}</span>
-            </span>
-          </div>
+				{/* Pagination */}
+				<div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
+					<div className="flex items-center gap-2">
+						<span>Show</span>
+						<Select
+							value={String(pageSize)}
+							onValueChange={(val) => {
+								onPageSizeChange(Number(val))
+								onPageChange(1)
+							}}
+						>
+							<SelectTrigger className="w-18 h-8">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{[10, 20, 50].map((size) => (
+									<SelectItem key={size} value={String(size)}>
+										{size}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<span className="ml-2">
+							<span className="font-medium text-foreground">
+								{from}–{to}
+							</span>{" "}
+							of{" "}
+							<span className="font-medium text-foreground">{totalRows}</span>
+						</span>
+					</div>
 
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={!paginationData?.prev_page_url}
-              className="gap-1"
-            >
-              <ChevronLeft className="h-4 w-4" /> Previous
-            </Button>
+					<div className="flex items-center gap-1">
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => onPageChange(currentPage - 1)}
+							disabled={!paginationData?.prev_page_url}
+							className="gap-1"
+						>
+							<ChevronLeft className="h-4 w-4" /> Previous
+						</Button>
 
-            {pageNumbers.map((item, index) => {
-              if (item === "ellipsis") {
-                return (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className="px-2 text-muted-foreground"
-                  >
-                    ...
-                  </span>
-                );
-              }
+						{pageNumbers.map((item, index) => {
+							if (item === "ellipsis") {
+								return (
+									<span
+										key={`ellipsis-${index}`}
+										className="px-2 text-muted-foreground"
+									>
+										...
+									</span>
+								)
+							}
 
-              return (
-                <Button
-                  key={item}
-                  variant={currentPage === item ? "outline" : "ghost"}
-                  size="sm"
-                  className="w-8 h-8 p-0"
-                  onClick={() => onPageChange(item)}
-                >
-                  {item}
-                </Button>
-              );
-            })}
+							return (
+								<Button
+									key={item}
+									variant={currentPage === item ? "outline" : "ghost"}
+									size="sm"
+									className="w-8 h-8 p-0"
+									onClick={() => onPageChange(item)}
+								>
+									{item}
+								</Button>
+							)
+						})}
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={!paginationData?.next_page_url}
-              className="gap-1"
-            >
-              Next <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => onPageChange(currentPage + 1)}
+							disabled={!paginationData?.next_page_url}
+							className="gap-1"
+						>
+							Next <ChevronRight className="h-4 w-4" />
+						</Button>
+					</div>
+				</div>
+			</div>
+		</div>
+	)
 }
 
 export default DashboardTableWrapper

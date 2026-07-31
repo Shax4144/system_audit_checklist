@@ -67,6 +67,8 @@ const CategoryTable = ({
 	onPageChange,
 	pageSize,
 	onPageSizeChange,
+	search,
+	onSearchChange,
 }) => {
 	const columns = useMemo(
 		() => [
@@ -146,6 +148,8 @@ const CategoryTable = ({
 			isError={isError}
 			error={error}
 			searchKey="name"
+			searchValue={search}
+			onSearchChange={onSearchChange}
 			page={page}
 			onPageChange={onPageChange}
 			pageSize={pageSize}

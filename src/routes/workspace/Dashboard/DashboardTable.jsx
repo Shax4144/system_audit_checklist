@@ -37,13 +37,12 @@ const DashboardTable = ({
 	const navigate = useNavigate()
 
 	const tableData = useMemo(() => {
-		const checklist = data?.data
-		if (!checklist) return []
+		const checklists = data?.data ?? []
 
-		const information = checklist.information ?? {}
+		return checklists.map((checklist) => {
+			const information = checklist.information ?? {}
 
-		return [
-			{
+			return {
 				...information,
 				id: checklist.id,
 				title: checklist.title,
@@ -55,10 +54,27 @@ const DashboardTable = ({
 				contactNumber: Array.isArray(information.contactNumber)
 					? information.contactNumber.join(", ")
 					: information.contactNumber,
-			},
-		]
+			}
+		})
 	}, [data])
 
+	const deriveStatus = (checklistSections = []) => {
+		if (checklistSections.length === 0) return "open"
+
+		const allAnswered = checklistSections.every((s) => s.is_answered === 1)
+		if (allAnswered) return "done"
+
+		// Check if ANY question across ANY section has a non-null answer (partial progress)
+		const hasAnyAnswer = checklistSections.some((section) => {
+			const questions = section["sub-sections"]
+				? section["sub-sections"].flatMap((sub) => sub["sub-items"] ?? [])
+				: (section.item ?? [])
+
+			return questions.some((q) => q.answer != null)
+		})
+
+		return hasAnyAnswer ? "ongoing" : "pending"
+	}
 
 	const columns = useMemo(
 		() => [
@@ -98,7 +114,7 @@ const DashboardTable = ({
 				accessorKey: "status",
 				header: "Status",
 				cell: ({ row }) => {
-					const status = row?.original?.status
+					const status = deriveStatus(row.original.checklist)
 
 					return (
 						<Badge className={STATUS_STYLES[status] ?? STATUS_STYLES.pending}>
@@ -133,6 +149,11 @@ const DashboardTable = ({
 		[navigate],
 	)
 
+	const tabs = [
+		{ value: "pending", label: "Pending" },
+		{ value: "for_consolidate", label: "For Consolidate" },
+	]
+
 	return (
 		<DashboardTableWrapper
 			columns={columns}
@@ -148,6 +169,7 @@ const DashboardTable = ({
 			onPageSizeChange={onPageSizeChange}
 			activeTab={activeTab}
 			onTabChange={onTabChange}
+			tabs={tabs}
 		/>
 	)
 }

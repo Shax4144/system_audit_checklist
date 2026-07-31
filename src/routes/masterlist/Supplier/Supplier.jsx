@@ -1,49 +1,64 @@
-import React, { useState, useRef} from "react"
-import SupplierTable from "./SupplierTable"
 import { Button } from "@/components/ui/button"
-import { Plus, Import, Loader2} from "lucide-react"
+import { Import, Loader2, Plus } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import AddSupplierDialog from "../../../components/AddSupplierDialog"
-import DeleteConfirm from "../../../components/DeleteConfirm"
 import Confirm from "../../../components/Confirm"
-import { 
+import DeleteConfirm from "../../../components/DeleteConfirm"
+import { appToast } from "../../../components/Toast"
+import { useSelectedRow } from "../../../context/EditContext"
+import { useImportSupplierMutation } from "../../../features/supplier/supplier-import.api"
+import {
+	useArchiveSupplierMutation,
 	useFetchSuppliersQuery,
 	usePostSupplierMutation,
 	useUpdateSupplierMutation,
-	useArchiveSupplierMutation,
 } from "../../../features/supplier/supplier.api"
-import { useImportSupplierMutation } from "../../../features/supplier/supplier-import.api"
-import { appToast } from "../../../components/Toast"
-import { useSelectedRow } from "../../../context/EditContext"
+import SupplierTable from "./SupplierTable"
 
 const Supplier = () => {
 	const [showArchived, setShowArchived] = useState(false)
 	const [page, setPage] = useState(1)
-	const [pageSize, setPageSize] = useState(10);
+	const [pageSize, setPageSize] = useState(10)
+	const [search, setSearch] = useState("")
+	const [debouncedSearch, setDebouncedSearch] = useState("")
 
-	const { data: supplierData,
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			setDebouncedSearch(search)
+			setPage(1)
+		}, 500)
+		return () => clearTimeout(timeout)
+	}, [search])
+
+	const {
+		data: supplierData,
 		isFetching,
 		isError,
 		error,
-	} = useFetchSuppliersQuery({
-		status: showArchived ? 0 : 1,
-		page,
-		per_page: pageSize,
-	},{
-		refetchOnMountOrArgChange: true,
-	},
+	} = useFetchSuppliersQuery(
+		{
+			status: showArchived ? 0 : 1,
+			page,
+			per_page: pageSize,
+			search: debouncedSearch || undefined,
+		},
+		{ refetchOnMountOrArgChange: true },
 	)
 
 	const [postSupplier, { isLoading: isCreating }] = usePostSupplierMutation()
-	const [updateSupplier, { isLoading: isUpdating}] = useUpdateSupplierMutation()
-	const [archiveSupplier, { isLoading: isArchiving }] = useArchiveSupplierMutation()
-	const [importSuppliers, { isLoading: isImporting}] = useImportSupplierMutation()
+	const [updateSupplier, { isLoading: isUpdating }] =
+		useUpdateSupplierMutation()
+	const [archiveSupplier, { isLoading: isArchiving }] =
+		useArchiveSupplierMutation()
+	const [importSuppliers, { isLoading: isImporting }] =
+		useImportSupplierMutation()
 
 	const [openCreate, setOpenCreate] = useState(false)
 	const [openArchive, setOpenArchive] = useState(false)
 	const [openRestore, setOpenRestore] = useState(false)
 	const fileInputRef = useRef(null)
 	const { selectedRow, setSelectedRow, clearSelectedRow } = useSelectedRow()
-	
+
 	const handleOpenCreate = () => {
 		clearSelectedRow()
 		setOpenCreate(true)
@@ -67,22 +82,25 @@ const Supplier = () => {
 	}
 
 	const handleOpenImport = () => {
-		fileInputRef.current?.click();
+		fileInputRef.current?.click()
 	}
 
 	const handleCreateOrUpdate = async (supplierFormData) => {
 		try {
 			if (selectedRow) {
-				const response = await updateSupplier({ id: selectedRow.id, ...supplierFormData }).unwrap()
+				const response = await updateSupplier({
+					id: selectedRow.id,
+					...supplierFormData,
+				}).unwrap()
 				appToast.success(
 					"Supplier updated",
-					response?.message ?? "Supplier updated successfully"
+					response?.message ?? "Supplier updated successfully",
 				)
 			} else {
 				const response = await postSupplier(supplierFormData).unwrap()
 				appToast.success(
 					"Supplier created",
-					response?.message ?? "Supplier created successfully"
+					response?.message ?? "Supplier created successfully",
 				)
 			}
 			setOpenCreate(false)
@@ -90,7 +108,8 @@ const Supplier = () => {
 		} catch (error) {
 			appToast.error(
 				"Error",
-				error?.data?.message ?? "An error occurred while processing the supplier."
+				error?.data?.message ??
+					"An error occurred while processing the supplier.",
 			)
 			console.error("Error creating/updating supplier: ", error)
 		}
@@ -104,7 +123,7 @@ const Supplier = () => {
 				const response = await archiveSupplier(selectedRow.id).unwrap()
 				appToast.success(
 					"Supplier archived",
-					response?.message ?? "Supplier archived successfully"
+					response?.message ?? "Supplier archived successfully",
 				)
 			}
 			setOpenArchive(false)
@@ -112,7 +131,8 @@ const Supplier = () => {
 		} catch (error) {
 			appToast.error(
 				"Error",
-				error?.data?.message ?? "An error occurred while archiving the supplier."
+				error?.data?.message ??
+					"An error occurred while archiving the supplier.",
 			)
 			console.error("Error archiving supplier: ", error)
 		}
@@ -142,19 +162,19 @@ const Supplier = () => {
 	}
 
 	const handleImportSuppliers = async (file) => {
-		const formData = new FormData();
+		const formData = new FormData()
 		formData.append("file", file)
 
 		try {
 			const response = await importSuppliers(formData).unwrap()
 			appToast.success(
 				"Import successful",
-				response?.message ?? "Supplers imported successfully."
-			);
+				response?.message ?? "Suppliers imported successfully.",
+			)
 		} catch (error) {
 			appToast.error(
 				"Import failed",
-				error?.data?.message ?? "Unable to import suppliers."
+				error?.data?.message ?? "Something went wrong importing suppliers.",
 			)
 		}
 	}
@@ -174,7 +194,11 @@ const Supplier = () => {
 						onClick={handleOpenImport}
 						disabled={isImporting}
 					>
-						{isImporting ? <Loader2/> : <Import/>}
+						{isImporting ? (
+							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+						) : (
+							<Import />
+						)}
 						{isImporting ? "Importing..." : "Import"}
 					</Button>
 					<Button
@@ -201,6 +225,8 @@ const Supplier = () => {
 					onPageChange={setPage}
 					pageSize={pageSize}
 					onPageSizeChange={setPageSize}
+					search={search}
+					onSearchChange={setSearch}
 				/>
 			</div>
 			<AddSupplierDialog

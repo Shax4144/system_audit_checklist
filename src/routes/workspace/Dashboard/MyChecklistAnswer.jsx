@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { useSelector } from "react-redux"
 import { useFetchPublishedQuery } from "../../../features/checklist/publishedChecklist.api"
 import AnsweredSectionForm from "../../../components/checklist-forms/AnsweredSectionForm"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const getStoredUser = () => {
 	try {
@@ -21,24 +22,75 @@ const MyChecklistAnswer = () => {
 	const navigate = useNavigate()
 	const currentUser = getStoredUser()
 
-	const { data: response, isFetching } = useFetchPublishedQuery({ id })
+	const { data: response, isFetching } = useFetchPublishedQuery({ id }, {refetchOnMountOrArgChange: true})
 
-	const checklistData = response?.data
+	const checklistData = response?.data?.find((c) => String(c.id) === String(id))
 
 	const [allAnswers, setAllAnswers] = useState({});
 
-  	const handleSectionAnswersChange = (sectionIndex) => (questionKey, value) => {
-  	  setAllAnswers((prev) => ({
-  	    ...prev,
-  	    [`${sectionIndex}-${questionKey}`]: value,
-  	  }));
-  	};
+  const handleSectionAnswersChange = (sectionIndex) => (questionKey, value) => {
+  	setAllAnswers((prev) => ({
+  	  ...prev,
+  	  [`${sectionIndex}-${questionKey}`]: value,
+  	}));
+  };
 
 	if (isFetching || !checklistData) {
 		return (
-			<p className="text-sm text-muted-foreground py-10 text-center">
-				Loading checklist...
-			</p>
+			<div className="flex flex-col gap-6 max-w-3xl mx-auto pb-20">
+				<div className="flex items-center gap-3 w-full">
+					<Button variant="ghost" size="xl" onClick={() => navigate(-1)}>
+						<ChevronLeft className="size-full" />
+					</Button>
+					<div className="flex-1">
+						<div className="flex flex-row gap-2 p-2">
+							<Skeleton className="h-5 w-24" />
+							<Skeleton className="h-5 w-24" />
+						</div>
+						<div className="flex flex-row items-center justify-between">
+							<div className="flex flex-col gap-2">
+								<Skeleton className="h-12 w-md" />
+								<Skeleton className="h-6 w-sm" />
+							</div>
+							<Skeleton className="h-10 w-32" />
+						</div>
+					</div>
+				</div>
+
+				<div className="bg-card border border-border rounded-xl shadow-sm">
+					<div className="flex flex-col p-7 gap-1">
+						<div className="flex flex-row justify-between items-center">
+							<Skeleton className="h-5 w-24" />
+							<Skeleton className="h-5 w-18" />
+						</div>
+						<div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+							<Skeleton className="h-5 w-full" />
+						</div>
+						<Skeleton className="h-4 w-32" />
+					</div>
+				</div>
+
+				<div className="flex flex-col gap-4 shadow-sm rounded-xl">
+					{[...Array(3)].map((_, sectionIndex) => (
+						<div key={sectionIndex} className="rounded-xl border bg-card p-5">
+							<div className="flex items-center justify-between gap-4 mb-4">
+								<Skeleton className="h-8 w-48" />
+							</div>
+							<div className="flex flex-col gap-5">
+								{[...Array(2)].map((__, questionIndex) => (
+									<div key={questionIndex} className="border-l-2 pl-4">
+										<Skeleton className="h-6 w-3/4 mb-3" />
+										<div className="flex flex-col gap-2">
+											<Skeleton className="h-10 w-full" />
+											<Skeleton className="h-10 w-full" />
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
 		)
 	}
 
@@ -54,11 +106,12 @@ const MyChecklistAnswer = () => {
     	const hasSubsections = Boolean(section["sub-sections"]);
       	if (hasSubsections) {
         	return section["sub-sections"].flatMap((sub, subIdx) =>
-          	(sub["sub-items"] ?? []).map((q, qIdx) => ({
-            ...q,
-            answerKey: `${section.originalIndex}-${subIdx}-${qIdx}`,
-          })),
-        );
+						(sub["sub-items"] ?? []).map((q, qIdx) => ({
+							...q,
+							answerKey: `${section.originalIndex}-${subIdx}-${qIdx}`,
+							subSectionTitle: sub.item,
+						})),
+					)
       }
       return (section.item ?? []).map((q, qIdx) => ({
         ...q,
@@ -85,71 +138,78 @@ const MyChecklistAnswer = () => {
     const ratedItems = gradedQuestions.length;
     const progressPercent = totalItems
       ? Math.round((ratedItems / totalItems) * 100)
-      : 0;
+		: 0;
 
 	return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto pb-20">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <div className="flex flex-row gap-2">
-              <Badge variant="outline">
-                <Clock4 /> Time in: 10:30
-              </Badge>
-              <Badge variant="outline" className="border border-dashed">
-                <Clock4 /> Time out: 10:30
-              </Badge>
-          </div>
-          <h1 className="text-2xl font-semibold">{checklistData.title}</h1>
-          <p className="text-sm text-muted-foreground">
-            Supplier: {info.supplier}
-          </p>
-        </div>
-      </div>
+		<div className="flex flex-col gap-6 max-w-3xl mx-auto pb-20">
+			<div className="flex items-center gap-3 w-full">
+				<Button variant="ghost" size="xl" onClick={() => navigate(-1)}>
+					<ChevronLeft className="size-full" />
+				</Button>
+				<div className="flex-1">
+					<div className="flex flex-row gap-2">
+						<Badge variant="outline">
+							<Clock4 /> Time in: 10:30
+						</Badge>
+						<Badge variant="outline" className="border border-dashed">
+							<Clock4 /> Time out: 10:30
+						</Badge>
+					</div>
+					<div className="flex flex-row items-center justify-between">
+						<div className="flex flex-col">
+							<h1 className="text-2xl font-semibold">{checklistData.title}</h1>
+							<p className="text-sm text-muted-foreground capitalize">
+								Supplier: {info.supplier}
+							</p>
+						</div>
+						<p className="text-2xl text-muted-foreground">
+							{checklistData?.information?.reference_no}
+						</p>
+					</div>
+				</div>
+			</div>
 
-      <div className="bg-card border border-border rounded-xl shadow-sm">
-        <div className="flex flex-col p-7 gap-1">
-          <div className="flex flex-row justify-between items-center">
-            <p className="text-md font-medium text-muted-foreground">
-              Average Score
-            </p>
-            <p className="text-lg font-semibold">{averageScore}/5</p>
-          </div>
-          <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full bg-primary transition-all"
-              style={{ width: `${progressPercent}%` }}
-            ></div>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {ratedItems} of {totalItems} items rated
-          </p>
-        </div>
-      </div>
+			<div className="bg-card border border-border rounded-xl shadow-sm">
+				<div className="flex flex-col p-7 gap-1">
+					<div className="flex flex-row justify-between items-center">
+						<p className="text-md font-medium text-muted-foreground">
+							Average Score
+						</p>
+						<p className="text-lg font-semibold">{averageScore}/5</p>
+					</div>
+					<div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+						<div
+							className="h-full bg-primary transition-all"
+							style={{ width: `${progressPercent}%` }}
+						></div>
+					</div>
+					<p className="text-xs text-muted-foreground">
+						{ratedItems} of {totalItems} items rated
+					</p>
+				</div>
+			</div>
 
-      {mySections.length === 0 ? (
-        <p className="text-sm text-muted-foreground py-10 text-center">
-          You have no sections assigned in this checklist.
-        </p>
-      ) : (
-        <div className="flex flex-col gap-4 shadow-sm rounded-xl">
-          {mySections.map((section) => (
-            <AnsweredSectionForm
-              key={section.originalIndex}
-              checklistId={checklistData.id}
-              section={section}
-              sectionIndex={section.originalIndex}
-              onAnswersChange={handleSectionAnswersChange(
-                section.originalIndex,
-              )}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
+			{mySections.length === 0 ? (
+				<p className="text-sm text-muted-foreground py-10 text-center">
+					You have no sections assigned in this checklist.
+				</p>
+			) : (
+				<div className="flex flex-col gap-4 shadow-sm rounded-xl">
+					{mySections.map((section) => (
+						<AnsweredSectionForm
+							key={section.originalIndex}
+							checklistId={checklistData.id}
+							section={section}
+							sectionIndex={section.originalIndex}
+							onAnswersChange={handleSectionAnswersChange(
+								section.originalIndex,
+							)}
+						/>
+					))}
+				</div>
+			)}
+		</div>
+	)
 }
 
 export default MyChecklistAnswer

@@ -28,7 +28,8 @@ const workspaceConfig = [
 	{
 		path: "checklist-assignment/:id",
 		component: lazy(
-			() => import("../routes/workspace/ChecklistAssignment/ChecklistAssignmentDetail"),
+			() =>
+				import("../routes/workspace/ChecklistAssignment/ChecklistAssignmentDetail"),
 		),
 	},
 
@@ -38,7 +39,13 @@ const workspaceConfig = [
 	},
 	{
 		path: "reports",
-		component: lazy(() => import("../routes/workspace/Reports/Reports")),
+		component: lazy(
+			() => import("../routes/workspace/Reports/ReportDashboard"),
+		),
+	},
+	{
+		path: "reports/:id",
+		component: lazy(() => import("../routes/workspace/Reports/ReportDetail")),
 	},
 ]
 

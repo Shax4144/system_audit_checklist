@@ -31,6 +31,8 @@ const MasterlistTableWrapper = ({
 	data,
 	paginationData,
 	searchKey,
+	searchValue,
+	onSearchChange,
 	filterSlot,
 	isFetching,
 	isError,
@@ -125,9 +127,9 @@ const MasterlistTableWrapper = ({
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
 							placeholder={`Search ${searchKey}...`}
-							value={table.getColumn(searchKey)?.getFilterValue() ?? ""}
+							value={searchValue ?? ""}
 							onChange={(e) =>
-								table.getColumn(searchKey)?.setFilterValue(e.target.value)
+								onSearchChange?.(e.target.value)
 							}
 							className="pl-9 w-64 shadow-sm"
 						/>
@@ -183,7 +185,7 @@ const MasterlistTableWrapper = ({
 									className="border-b last:border-0 hover:bg-muted"
 								>
 									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id} className="px-4 py-2">
+										<TableCell key={cell.id} className="px-4 py-2 capitalize">
 											{flexRender(
 												cell.column.columnDef.cell,
 												cell.getContext(),

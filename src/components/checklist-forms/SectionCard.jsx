@@ -1,5 +1,7 @@
+import { useState } from "react"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { Label } from "@/components/ui/label"
 import {
 	GripVertical,
 	Trash2,
@@ -22,7 +24,7 @@ import {
 	CollapsibleTrigger,
 	CollapsibleContent,
 } from "@/components/ui/collapsible"
-import { useState } from "react"
+
 import QuestionList from "./QuestionList"
 import SubsectionList from "./SubsectionList"
 import {
@@ -130,6 +132,25 @@ const SectionCard = ({ section, onUpdate, onDelete }) => {
 							className="resize-none text-sm"
 							rows={2}
 						/>
+					</div>
+
+					<div className="flex items-center gap-2">
+						<Label className="text-xs text-muted-foreground shrink-0">
+							Weight
+						</Label>
+						<div className="relative w-24">
+							<Input
+								type="number"
+								min={0}
+								max={100}
+								value={section.percentage}
+								onChange={(e) => onUpdate({ percentage: e.target.value })}
+								className="h-8 pr-6 text-sm"
+							/>
+							<span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+								%
+							</span>
+						</div>
 					</div>
 
 					<CollapsibleTrigger asChild>

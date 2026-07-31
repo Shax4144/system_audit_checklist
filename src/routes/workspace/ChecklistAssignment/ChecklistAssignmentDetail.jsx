@@ -149,7 +149,8 @@ const ChecklistAssignmentDetail = () => {
 						<div key={sIndex} className="rounded-xl border bg-card p-5">
 							<div className="flex items-center justify-between gap-4 mb-4">
 								<h2 className="font-medium text-lg">
-									{sIndex + 1}. {section.section}
+									{/* {sIndex + 1}. */}
+									{section.section}
 								</h2>
 								{sectionAssignments[sIndex] && (
 									<Badge className="bg-green-100 text-green-700">
@@ -164,7 +165,7 @@ const ChecklistAssignmentDetail = () => {
 									{section["sub-sections"].map((sub, subIndex) => (
 										<div key={subIndex} className="border-l-2 pl-4">
 											<h3 className="font-medium text-sm mb-3 text-muted-foreground">
-												{sIndex + 1}.{String.fromCharCode(97 + subIndex)}{" "}
+												{/* {sIndex + 1}.{String.fromCharCode(97 + subIndex)}{" "} */}
 												{sub.item}
 											</h3>
 											<div className="flex flex-col gap-2">

@@ -69,6 +69,7 @@ const FormBuilder = () => {
 					description: "",
 					assigned_roles: [],
 					assigned_users: [],
+					percentage: s.percentage ?? 0,
 					display_order: sIndex,
 					questions: hasSubsections
 						? []
@@ -158,9 +159,15 @@ const FormBuilder = () => {
 		checklist: form.sections.map((section) => {
 			const hasSubsections = section.subsections.length > 0
 
+			const base = {
+				section: section.title,
+				percentage: Number(section.percentage) || 0,
+			}
+
 			if (hasSubsections) {
 				return {
-					section: section.title,
+					// section: section.title,
+					...base,
 					"sub-sections": section.subsections.map((sub) => ({
 						item: sub.title,
 						"sub-items": sub.questions.map((q) => ({
@@ -172,7 +179,8 @@ const FormBuilder = () => {
 			}
 
 			return {
-				section: section.title,
+				// section: section.title,
+				...base,
 				item: section.questions.map((q) => ({
 					name: q.label,
 					category: q.category,
@@ -234,6 +242,12 @@ const FormBuilder = () => {
 		)
 	}
 
+	const totalPercentage = form.sections.reduce(
+		(sum, s) => sum + (Number(s.percentage) || 0),
+		0,
+	)
+	const isValidTotal = totalPercentage === 100
+
 	return (
 		<div className="flex flex-col gap-6 max-w-4xl mx-auto pb-20">
 			<div className="flex items-center justify-between">
@@ -259,13 +273,13 @@ const FormBuilder = () => {
 					>
 						<Eye className="h-4 w-4" /> Preview
 					</Button>
-					<Button variant="outline" onClick={handleSave} disabled={isSaving}>
+					<Button variant="outline" onClick={handleSave} disabled={isSaving || !isValidTotal}>
 						{isSaving ? (
 							<Loader2 className="h-4 w-4 animate-spin" />
 						) : (
 							<Save className="h-4 w-4" />
 						)}
-						Save Draft
+						Save as Draft
 					</Button>
 					{/* <Button variant="outline" onClick={handlePublish} disabled={isSaving}>
 						{isSaving ? (
@@ -285,6 +299,19 @@ const FormBuilder = () => {
 					className="text-lg font-medium h-11"
 					placeholder="Form title"
 				/>
+			</div>
+
+			<div
+				className={`flex items-center justify-between rounded-lg border px-4 py-2.5 text-sm ${
+					isValidTotal
+						? "border-green-200 bg-green-50 text-green-700"
+						: "border-amber-200 bg-amber-50 text-amber-700"
+				}`}
+			>
+				<span>Total section weight</span>
+				<span className="font-semibold">
+					{totalPercentage}%{!isValidTotal && " (should total 100%)"}
+				</span>
 			</div>
 
 			<SectionList

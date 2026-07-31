@@ -37,11 +37,11 @@ const workspaceItems = [
 		to: "/workspace/checklist-assignment",
 		icon: UserCheck,
 	},
-	{
-		label: "My Submissions",
-		to: "/workspace/submission",
-		icon: ClipboardCheck,
-	},
+	// {
+	// 	label: "My Submissions",
+	// 	to: "/workspace/submission",
+	// 	icon: ClipboardCheck,
+	// },
 	{
 		label: "Reports",
 		to: "/workspace/reports",

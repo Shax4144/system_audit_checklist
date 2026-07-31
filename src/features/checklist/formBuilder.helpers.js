@@ -20,6 +20,7 @@ export const createEmptySection = (order) => ({
 	description: "",
 	assigned_roles: [],
 	assigned_users: [],
+	percentage: 0,
 	display_order: order,
 	questions: [], // direct questions live here
 	subsections: [], // optional nested subsections
@@ -63,3 +64,32 @@ export const QUESTION_TYPES = [
 	{ value: "file", label: "File Upload" },
 	{ value: "rating", label: "Rating" },
 ]
+
+export const appendFormData = (formData, data, parentKey) => {
+	if (data === null || data === undefined) {
+		return
+	}
+
+	if (data instanceof File || data instanceof Blob) {
+		formData.append(parentKey, data)
+		return
+	}
+
+	if (Array.isArray(data)) {
+		data.forEach((item, index) => {
+			appendFormData(formData, item, `${parentKey}[${index}]`)
+		})
+		return
+	}
+
+	if (typeof data === "object") {
+		Object.keys(data).forEach((key) => {
+			const value = data[key]
+			const nextKey = parentKey ? `${parentKey}[${key}]` : key
+			appendFormData(formData, value, nextKey)
+		})
+		return
+	}
+
+	formData.append(parentKey, data)
+}

@@ -1,18 +1,67 @@
 // components/checklist-answer/AnsweredSectionForm.jsx
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Loader2, Check } from "lucide-react"
 import QuestionAnswer from "./QuestionAnswer"
-// import { useSubmitSectionAnswerMutation } from "../../features/checklist/publishedChecklist.api"
+import { useSubmitSectionMutation } from "../../features/checklist/submitSectionChecklist.api"
 import { appToast } from "../Toast"
+import { appendFormData } from "../../features/checklist/formBuilder.helpers"
 
 const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChange}) => {
 	const hasSubsections = Boolean(section["sub-sections"])
-	const [isAnswered, setIsAnswered] = useState(Boolean(section.is_answered))
+	const [isAnswered, setIsAnswered] = useState(Boolean(section?.is_answered))
+	const [batchNo, setBatchNo] = useState("") 
 	const [answers, setAnswers] = useState({}) // { [questionKey]: { grade, note, photo } }
+	const [initializedFor, setInitializedFor] = useState(null)
+	const [submittingAction, setSubmittingAction] = useState(null)  
 
-	// const [submitSection, { isLoading }] = useSubmitSectionAnswerMutation()
+	const [submitSection] = useSubmitSectionMutation()
+
+	useEffect(() => {
+		if (!section) return
+		if (initializedFor === sectionIndex) return
+
+		const initialAnswers = {}
+		let existingBatchNo = ""
+		if (hasSubsections) {
+			section["sub-sections"].forEach((sub, subIdx) => {
+				;(sub["sub-items"] ?? []).forEach((q, qIdx) => {
+					initialAnswers[`${subIdx}-${qIdx}`] = {
+						grade: q.answer?.rating ?? "",
+						note: q.answer?.remarks ?? "",
+						photo: q.answer?.images?.[0] ?? null,
+					}
+					if (q.answer?.batch_no) existingBatchNo = q.answer.batch_no
+				})
+			})
+		} else {
+			;(section.item ?? []).forEach((q, qIdx) => {
+				initialAnswers[`${qIdx}`] = {
+					grade: q.answer?.rating ?? "",
+					note: q.answer?.remarks ?? "",
+					photo: q.answer?.images?.[0] ?? null,
+				}
+				if (q.answer?.batch_no) existingBatchNo = q.answer.batch_no
+			})
+		}
+
+		setAnswers(initialAnswers)
+		setBatchNo(existingBatchNo)
+
+		if (onAnswersChange) {
+			Object.entries(initialAnswers).forEach(([key, val]) => {
+				onAnswersChange(key, val)
+			})
+		}
+		setInitializedFor(sectionIndex)
+	}, [section, sectionIndex, initializedFor, hasSubsections])
+
+	useEffect(() => {
+		setIsAnswered(Boolean(section?.is_answered))
+	}, [section?.is_answered])
+
+	
 
 	const handleAnswerChange = (questionKey) => (value) => {
 		setAnswers((prev) => ({ ...prev, [questionKey]: value }))
@@ -31,31 +80,106 @@ const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChan
 
 	const allGraded = allQuestions.every((q) => answers[q.key]?.grade)
 
-	const handleSubmit = async () => {
-		try {
-			const payload = {
-				checklistId,
-				sectionIndex,
-				answers: allQuestions.map((q) => ({
-					name: q.name,
-					category: q.category,
-					grade: answers[q.key]?.grade ?? null,
-					note: answers[q.key]?.note ?? "",
-					// photo upload handling depends on backend (multipart vs base64) — adjust once confirmed
-				})),
+	const buildPayload = (isCompleted) => {
+		const content = allQuestions.map((q) => {
+			const gradeValue = answers[q.key]?.grade
+			const rating =
+				gradeValue && gradeValue !== "N/A" ? Number(gradeValue) : null
+
+			const entry = {
+				section: section.section,
+				name: q.name,
+				category: q.category,
+				rating,
+				remarks: answers[q.key]?.note ?? "",
 			}
 
-			// await submitSection(payload).unwrap()
-			setIsAnswered(true)
-			appToast.success(
-				"Section submitted",
-				`${section.section} has been submitted.`,
-			)
+			// Only questions that belong to a subsection get this key
+			if (q.subSectionTitle) {
+				entry["sub-sections"] = q.subSectionTitle
+			}
+
+			return entry
+		})
+
+		// image[i] = array of files for question i (currently max 1 photo per question,
+		// but shaped as an array so multiple uploads per question work without changes later)
+		const image = allQuestions.map((q) => {
+			const photo = answers[q.key]?.photo
+			return photo ? [photo] : []
+		})
+
+		return {
+			copy_id: String(checklistId),
+			content,
+			image,
+			is_completed: isCompleted ? 1 : 0,
+			batch_no: batchNo,
+		}
+	}
+
+	// const handleSubmit = async () => {
+	// 	try {
+	// 		const payload = {
+	// 			checklistId,
+	// 			sectionIndex,
+	// 			answers: allQuestions.map((q) => ({
+	// 				name: q.name,
+	// 				category: q.category,
+	// 				rating: answers[q.key]?.grade ?? null,
+	// 				remarks: answers[q.key]?.note ?? "",
+	// 				// photo upload handling depends on backend (multipart vs base64) — adjust once confirmed
+	// 			})),
+	// 		}
+
+	// 		// await submitSection(payload).unwrap()
+	// 		setIsAnswered(true)
+	// 		appToast.success(
+	// 			"Section submitted",
+	// 			`${section.section} has been submitted.`,
+	// 		)
+	// 	} catch (err) {
+	// 		appToast.error("Error", err?.data?.message ?? "Failed to submit section.")
+	// 		console.error(err)
+	// 	}
+	// }
+
+	const submit = async (isCompleted) => {
+		const action = isCompleted ? "submit" : "draft"
+		setSubmittingAction(action)
+		try {
+			const payload = buildPayload(isCompleted)
+
+			const formData = new FormData()
+			appendFormData(formData, payload)
+
+			await submitSection(formData).unwrap()
+
+			if (isCompleted) {
+				setIsAnswered(true)
+				appToast.success(
+					"Section submitted",
+					`${section.section} has been submitted.`,
+				)
+			} else {
+				appToast.success(
+					"Draft saved",
+					`${section.section} has been saved as draft.`,
+				)
+			}
 		} catch (err) {
 			appToast.error("Error", err?.data?.message ?? "Failed to submit section.")
 			console.error(err)
+		} finally {
+			setSubmittingAction(null)
 		}
 	}
+
+	const handleSubmit = () => submit(true)
+	const handleSaveDraft = () => submit(false)
+
+	const isSavingDraft = submittingAction === "draft"
+	const isSubmitting = submittingAction === "submit"
 
 	return (
 		<div className="rounded-xl border bg-card p-5">
@@ -105,15 +229,20 @@ const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChan
 
 			{!isAnswered && (
 				<div className="flex justify-end pt-4 mt-4 border-t gap-1.5">
-					<Button className="bg-background text-foreground border border-border hover:text-primary-foreground">
-						Save draft
-					</Button>
-					<Button 
-					// onClick={handleSubmit} 
-					// disabled={!allGraded || isLoading}
-					disabled={!allGraded}
+					<Button
+						className="bg-background text-foreground border border-border hover:text-primary-foreground"
+						onClick={handleSaveDraft}
+						disabled={isSavingDraft || isSubmitting}
 					>
-						{/* {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />} */}
+						{isSavingDraft && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+						Save as draft
+					</Button>
+
+					<Button
+						onClick={handleSubmit}
+						disabled={!allGraded || isSubmitting || isSavingDraft}
+					>
+						{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 						Submit Section
 					</Button>
 				</div>

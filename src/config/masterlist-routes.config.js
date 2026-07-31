@@ -20,10 +20,6 @@ const masterlistConfig = [
 		path: "category",
 		component: lazy(() => import("../routes/masterlist/Category/Category")),
 	},
-	// {
-	// 	path: "address",
-	// 	component: lazy(() => import("../routes/masterlist/Address/Address")),
-	// }
 ]
 
 export default masterlistConfig

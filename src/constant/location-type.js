@@ -1,10 +1,10 @@
 export const locationTypes = [
 	{
 		key: "Central Depot",
-		value: "central_depot",
+		value: "Central Depot",
 	},
 	{
 		key: "Feedmill",
-		value: "feedmill",
+		value: "Feedmill",
 	},
 ]

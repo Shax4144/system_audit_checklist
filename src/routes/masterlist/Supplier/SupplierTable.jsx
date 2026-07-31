@@ -12,24 +12,6 @@ import { useMemo } from "react"
 import StatusToggle from "../../../components/StatusToggle"
 import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
 
-// dummy data — replace with useQuery/fetch
-// const data = [
-// 	{
-// 		id: 1,
-//     name: "Alternatives Food Corp.",
-//     contact_person: ["Mikaela Beltran", "Kamill Bautista"],
-//     address: "Unit 903 One Corporate Center, Dona Julia Vargas Ave.,Cor.Meralco Ave. Ortigas, Pasig City",
-//     tin_no: "000-242-519-126",
-//     contact_no: ["8631-7228", "09267501987"],
-//     products_offered: ["chicken skin"],
-//     email: "afc_sales@alternatives.ph",
-// 		remarks: "Warehousing",
-// 		created_at: "2026-03-18T01:59:34.000000Z",
-// 		updated_at: "2026-05-15T08:36:52.000000Z",
-// 		deleted_at: null,
-// 	}
-// ]
-
 const tabs = [
 	{ label: "Active", value: "active" },
 	{ label: "Archived", value: "archived" },
@@ -49,6 +31,8 @@ const SupplierTable = ({
 	onPageChange,
 	pageSize,
 	onPageSizeChange,
+	search,
+	onSearchChange,
 }) => {
 	const columns = useMemo(
 		() => [
@@ -180,6 +164,8 @@ const SupplierTable = ({
 			isError={isError}
 			error={error}
 			searchKey="name"
+			searchValue={search}
+			onSearchChange={onSearchChange}
 			page={page}
 			onPageChange={onPageChange}
 			pageSize={pageSize}

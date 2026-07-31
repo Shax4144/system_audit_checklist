@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useSelector } from "react-redux"
 import CategoryDropdown from "../../../components/dropdown/CategoryDropdown"
 import LocationDropdown from "../../../components/dropdown/LocationDropdown"
@@ -14,7 +14,20 @@ const Dashboard = () => {
 	const [activeTab, setActiveTab] = useState("pending")
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState(10);
+	const [search, setSearch] = useState("");
+	const [debouncedSearch, setDebouncedSearch] = useState("")
+	const [location, setLocation] = useState("")
+	const [category, setCategory] = useState("")
 	
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			setDebouncedSearch(search)
+			setPage(1)
+		}, 500)
+		return () => clearTimeout(timeout)
+	}, [search])
+
+	const isAnsweredParam = activeTab === "pending" ? 0 : 1;
 
 	const { data: publishedResponse,
 		isFetching: isFetchingPublished,
@@ -24,6 +37,10 @@ const Dashboard = () => {
 		{
 			page,
 			per_page: pageSize,
+			search: debouncedSearch,
+			location: location, 
+			category: category,
+			is_answered: isAnsweredParam,
 		},
 		{
 			refetchOnMountOrArgChange: true,
@@ -96,23 +113,29 @@ const Dashboard = () => {
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
 							placeholder="Search supplier's name or business address etc.,"
-							// value={table.getColumn(searchKey)?.getFilterValue() ?? ""}
-							// onChange={(e) =>
-							// 	table.getColumn(searchKey)?.setFilterValue(e.target.value)
-							// }
+							value={search}
+							onChange={
+								(e) => setSearch?.(e.target.value)
+							}
 							className="pl-9 shadow-sm py-6 rounded-xl"
 						/>
 					</div>
 				</div>
 
 				<div className=" col-span-3 xl:col-span-2">
-					<LocationDropdown triggerClassName="w-full h-13 rounded-xl shadow-lg" />
+					<LocationDropdown
+						triggerClassName="w-full h-13 rounded-xl shadow-lg"
+						value={location}
+						onChange={setLocation}
+					/>
 				</div>
 
 				<div className=" col-span-3 xl:col-span-2">
 					<CategoryDropdown
 						triggerClassName="w-full h-13 rounded-xl shadow-lg"
 						open={true}
+						value={category}
+						onChange={setCategory}
 					/>
 				</div>
 			</div>
@@ -123,6 +146,9 @@ const Dashboard = () => {
 					isFetching={isFetchingPublished}
 					isError={isError}
 					error={error}
+					page={page}
+					pageSize={pageSize}
+					onPageSizeChange={setPageSize}
 					activeTab={activeTab}
 					onTabChange={setActiveTab}
 				/>

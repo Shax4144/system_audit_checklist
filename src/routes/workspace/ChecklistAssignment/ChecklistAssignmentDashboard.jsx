@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { FileText, Loader2 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useFetchChecklistsQuery } from "../../../features/checklist/checklist.api"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const STATUS_LABEL = {
 	draft: "DRAFT",
@@ -38,6 +39,7 @@ const ChecklistAssignmentDashboard = () => {
 
 	const {
 		data: checklistsResponse,
+		error,
 		isFetching,
 		isError,
 	} = useFetchChecklistsQuery({
@@ -51,6 +53,8 @@ const ChecklistAssignmentDashboard = () => {
 		(c) => (c.status ?? "draft") === "draft",
 	)
 
+	const isNoChecklists = isError && error?.status === 404
+
 	return (
 		<div className="flex flex-col gap-6 h-full">
 			<div>
@@ -61,17 +65,35 @@ const ChecklistAssignmentDashboard = () => {
 			</div>
 
 			{isFetching ? (
-				<div className="flex items-center justify-center py-20">
-					<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+				<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+					{/* <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /> */}
+					{Array.from({ length: 2 }).map((_, index) => (
+						<div
+							key={index}
+							className="aspect-square rounded-xl border bg-linear-to-br from-orange-500/95 to-amber-500/35 p-4 flex flex-col justify-between"
+						>
+							<div className="flex items-start justify-between gap-2">
+								<div className="w-8 h-8 xl:w-15 xl:h-15 lg:w-8 lg:h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+									<FileText className="h-6 w-6 xl:h-8 xl:w-8 lg:h-4 lg:w-4 text-muted-foreground" />
+								</div>
+								<Skeleton className="h-5 w-14 bg-muted" />
+							</div>
+
+							<div className="flex flex-col gap-1">
+								<Skeleton className="h-8 w-full bg-muted" />
+								<Skeleton className="h-6 w-full bg-muted" />
+							</div>
+						</div>
+					))}
+				</div>
+			) : isNoChecklists || draftChecklists.length === 0 ? (
+				<div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
+					No draft checklists available for assignment.
 				</div>
 			) : isError ? (
 				<p className="text-sm text-destructive py-10 text-center">
 					Failed to load checklists.
 				</p>
-			) : draftChecklists.length === 0 ? (
-				<div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
-					No draft checklists available for assignment.
-				</div>
 			) : (
 				<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
 					{draftChecklists.map((checklist, index) => (

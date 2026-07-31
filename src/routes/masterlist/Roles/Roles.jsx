@@ -1,26 +1,36 @@
-import { React, useState } from 'react'
-import RolesTable from './RolesTable'
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import AddRoleDialog from '../../../components/AddRoleDialog'
-import DeleteConfirm from '../../../components/DeleteConfirm'
-import Confirm from '../../../components/Confirm'
+import { useEffect, useState } from "react"
+import AddRoleDialog from "../../../components/AddRoleDialog"
+import Confirm from "../../../components/Confirm"
+import DeleteConfirm from "../../../components/DeleteConfirm"
+import { appToast } from "../../../components/Toast"
+import { useSelectedRow } from "../../../context/EditContext"
 import {
+	useArchiveRoleMutation,
 	useFetchRolesQuery,
-	useLazyFetchRolesQuery,
 	usePostRoleMutation,
 	useUpdateRoleMutation,
-	useArchiveRoleMutation,
-} from '../../../features/roles/roles.api'
-import { appToast } from '../../../components/Toast'
-import { useSelectedRow } from '../../../context/EditContext'
+} from "../../../features/roles/roles.api"
+import RolesTable from "./RolesTable"
 
 const Roles = () => {
 	const [showArchived, setShowArchived] = useState(false)
 	const [page, setPage] = useState(1)
-	const [pageSize, setPageSize] = useState(10);
+	const [pageSize, setPageSize] = useState(10)
+	const [search, setSearch] = useState("")
+	const [debouncedSearch, setDebouncedSearch] = useState("")
 
-	const { data: rolesData,
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			setDebouncedSearch(search)
+			setPage(1)
+		}, 500)
+		return () => clearTimeout(timeout)
+	}, [search])
+
+	const {
+		data: rolesData,
 		isFetching,
 		isError,
 		error,
@@ -29,10 +39,9 @@ const Roles = () => {
 			status: showArchived ? 0 : 1,
 			page,
 			per_page: pageSize,
+			search: debouncedSearch || undefined,
 		},
-		{
-		refetchOnMountOrArgChange: true,
-		}
+		{ refetchOnMountOrArgChange: true },
 	)
 
 	const [createRole, { isLoading: isCreating }] = usePostRoleMutation()
@@ -66,11 +75,14 @@ const Roles = () => {
 	const handleCreateOrUpdate = async (roleData) => {
 		try {
 			if (selectedRow) {
-				const response = await updateRole({ id: selectedRow.id, ...roleData }).unwrap()
+				const response = await updateRole({
+					id: selectedRow.id,
+					...roleData,
+				}).unwrap()
 				appToast.success(
 					"Role updated",
-					response?.message ?? "The role has been updated successfully."
-				);
+					response?.message ?? "The role has been updated successfully.",
+				)
 			} else {
 				const response = await createRole(roleData).unwrap()
 				appToast.success(
@@ -83,8 +95,8 @@ const Roles = () => {
 		} catch (error) {
 			appToast.error(
 				"Error",
-				error?.data?.message ?? "An error occurred while processing the role."
-			);
+				error?.data?.message ?? "An error occurred while processing the role.",
+			)
 			console.error("Failed to create/update role:", error)
 		}
 	}
@@ -94,15 +106,15 @@ const Roles = () => {
 			await archiveRole(selectedRow.id).unwrap()
 			appToast.success(
 				"Role archived",
-				"The role has been archived successfully."
-			);
+				"The role has been archived successfully.",
+			)
 			setOpenArchiveDialog(false)
 			clearSelectedRow()
 		} catch (error) {
 			appToast.error(
 				"Error",
-				error?.data?.message ?? "An error occurred while archiving the role."
-			);
+				error?.data?.message ?? "An error occurred while archiving the role.",
+			)
 			console.error("Failed to archive role:", error)
 		}
 	}
@@ -125,7 +137,7 @@ const Roles = () => {
 		}
 	}
 
-  return (
+	return (
 		<div className="flex flex-col gap-6 h-full xl:mr-50 xl:ml-50">
 			<div className="flex flex-row justify-between items-center">
 				<div className="">
@@ -159,6 +171,8 @@ const Roles = () => {
 					onPageChange={setPage}
 					pageSize={pageSize}
 					onPageSizeChange={setPageSize}
+					search={search}
+					onSearchChange={setSearch}
 				/>
 			</div>
 			<AddRoleDialog

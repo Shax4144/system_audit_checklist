@@ -20,6 +20,7 @@ const EditableDropdownField = ({
 	isLoading,
 	onSelectOption, 
 	placeholder,
+	readOnly = false,
 }) => {
 	const [open, setOpen] = useState(false)
 
@@ -42,6 +43,7 @@ const EditableDropdownField = ({
 					placeholder={isLoading ? "Loading..." : placeholder}
 					disabled={isLoading}
 					className="flex-1"
+					readOnly={readOnly}
 				/>
 
 				<Popover open={open} onOpenChange={setOpen}>

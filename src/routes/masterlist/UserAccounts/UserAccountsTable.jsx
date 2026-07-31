@@ -31,6 +31,8 @@ const UserAccountsTable = ({
 	onPageChange,
 	pageSize,
 	onPageSizeChange,
+	search,
+	onSearchChange,
 }) => {
 	const columns = useMemo(
 		() => [
@@ -128,7 +130,9 @@ const UserAccountsTable = ({
 			isFetching={isFetching}
 			isError={isError}
 			error={error}
-			searchKey="name"
+			searchKey="username"
+			searchValue={search}
+			onSearchChange={onSearchChange}
 			page={page}
 			onPageChange={onPageChange}
 			pageSize={pageSize}

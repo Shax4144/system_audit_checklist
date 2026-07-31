@@ -1,5 +1,5 @@
 // components/checklist-answer/QuestionAnswer.jsx
-import { useState, useRef } from "react"
+import { useState, useRef, useMemo, useEffect} from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -18,9 +18,27 @@ const GRADE_STYLES = {
 
 const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 	const fileInputRef = useRef(null)
-	const [preview, setPreview] = useState(
-		value?.photo ? URL.createObjectURL(value.photo) : null,
-	)
+	// const [preview, setPreview] = useState(
+	// 	value?.photo ? URL.createObjectURL(value.photo) : null,
+	// )
+
+	const preview = useMemo(() => {
+		if (!value?.photo) return null
+
+		if (value.photo instanceof File) {
+			return URL.createObjectURL(value.photo)
+		}
+
+		return value.photo // existing image URL
+	}, [value?.photo])
+
+	useEffect(() => {
+		return () => {
+			if (preview?.startsWith("blob:")) {
+				URL.revokeObjectURL(preview)
+			}
+		}
+	}, [preview])
 
 	const grade = value?.grade ?? ""
 	const note = value?.note ?? ""
@@ -30,13 +48,13 @@ const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 	const handlePhotoChange = (e) => {
 		const file = e.target.files?.[0]
 		if (file) {
-			setPreview(URL.createObjectURL(file))
+			// setPreview(URL.createObjectURL(file))
 			updateAnswer({ photo: file })
 		}
 	}
 
 	const handleRemovePhoto = () => {
-		setPreview(null)
+		// setPreview(null)
 		updateAnswer({ photo: null })
 		if (fileInputRef.current) fileInputRef.current.value = ""
 	}
@@ -49,7 +67,7 @@ const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 					{question.category && (
 						<Badge variant="outline">{question.category}</Badge>
 					)}
-					<div className="flex gap-1">
+					<div className="hidden md:flex gap-1">
 						{GRADE_OPTIONS.map((opt) => (
 							<Button
 								key={opt}
@@ -58,9 +76,8 @@ const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 								variant="ghost"
 								className={`h-10 min-w-10 px-1.5 rounded-full text-sm font-medium border transition-colors ${
 									grade === opt
-										? 
-										// "bg-primary text-primary-foreground border-primary"
-										GRADE_STYLES[opt]
+										? // "bg-primary text-primary-foreground border-primary"
+											GRADE_STYLES[opt]
 										: "bg-background text-muted-foreground border-border hover:bg-muted"
 								} disabled:opacity-50 disabled:pointer-events-none`}
 							>
@@ -69,6 +86,25 @@ const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 						))}
 					</div>
 				</div>
+			</div>
+
+			<div className="md:hidden flex gap-1 justify-end">
+				{GRADE_OPTIONS.map((opt) => (
+					<Button
+						key={opt}
+						disabled={disabled}
+						onClick={() => updateAnswer({ grade: opt })}
+						variant="ghost"
+						className={`h-10 min-w-10 px-1.5 rounded-full text-sm font-medium border transition-colors ${
+							grade === opt
+								? // "bg-primary text-primary-foreground border-primary"
+									GRADE_STYLES[opt]
+								: "bg-background text-muted-foreground border-border hover:bg-muted"
+						} disabled:opacity-50 disabled:pointer-events-none`}
+					>
+						{opt}
+					</Button>
+				))}
 			</div>
 
 			<div className="flex items-start gap-2">

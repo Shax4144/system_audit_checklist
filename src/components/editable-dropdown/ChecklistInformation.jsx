@@ -89,6 +89,10 @@ const ChecklistInformation = ({ value, onChange }) => {
 							data={suppliersData}
 							value={info.supplier}
 							onChange={(name, selectedSupplier) => {
+								console.log(
+									"selectedSupplier.location:",
+									selectedSupplier?.location,
+								)
 								onChange({
 									...info,
 									supplier: name,
@@ -158,16 +162,16 @@ const ChecklistInformation = ({ value, onChange }) => {
 
 					<div className="flex flex-col gap-1.5 col-span-2">
 						<Label>Location</Label>
-						{/* <LocationDropdown
+						<LocationDropdown
 							value={info.location}
 							onChange={(val) => updateField("location", val)}
 							triggerClassName="shadow-none w-full h-8"
-						/> */}
-						<Input
+						/>
+						{/* <Input
 							value={info.location}
 							onChange={(e) => updateField("location", e.target.value)}
 							placeholder="Auto-filled from  chosen supplier"
-						/>
+						/> */}
 					</div>
 				</div>
 
@@ -183,6 +187,7 @@ const ChecklistInformation = ({ value, onChange }) => {
 							options={scopeOptions}
 							isLoading={false}
 							placeholder="Select or type audit scope"
+							readOnly
 						/>
 					</div>
 
@@ -194,6 +199,7 @@ const ChecklistInformation = ({ value, onChange }) => {
 							options={objectiveOptions}
 							isLoading={false}
 							placeholder="Select or type audit objectives"
+							readOnly
 						/>
 					</div>
 
@@ -215,6 +221,7 @@ const ChecklistInformation = ({ value, onChange }) => {
 							options={languageOptions}
 							isLoading={false}
 							placeholder="Select or type language"
+							readOnly
 						/>
 					</div>
 				</div>
