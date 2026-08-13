@@ -24,7 +24,7 @@ export const appToast = {
 	},
 
 	info(title, message) {
-		toast(title, {
+		toast.info(title, {
 			description: message,
 			icon: <Info className="h-5 w-5 text-info" />,
 		})

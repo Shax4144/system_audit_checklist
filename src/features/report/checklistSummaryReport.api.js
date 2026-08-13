@@ -30,5 +30,6 @@ export const reportsApi = baseApi
 
 export const {
   useFetchReportsQuery,
-  useFetchReportByIdQuery
+  useFetchReportByIdQuery,
+  useLazyFetchReportByIdQuery
 } = reportsApi

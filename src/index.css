@@ -231,6 +231,181 @@
   }
 }
 
+/* These are only shown in the react-to-print document. */
+.print-running-header,
+.print-running-footer,
+.print-running-watermark {
+  display: none;
+}
+
+/*@media print {
+  @page {
+    size: letter;
+    margin: 0;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+  }
+
+  body {
+    visibility: hidden;
+  }
+
+  .print-area {
+    visibility: visible !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .print-area * {
+    visibility: visible !important;
+  }
+
+  .report-pdf-content {
+    display: block !important;
+  }
+
+  .pdf-page {
+    width: 8.5in !important;
+    min-height: 11in !important;
+    height: auto !important;
+    padding: 0.75in !important;
+    box-sizing: border-box;
+    display: block !important;
+    overflow: visible !important;
+    break-inside: auto;
+    page-break-inside: auto;
+    box-shadow: none !important;
+  }
+
+  .pdf-page > .relative.z-0 {
+    display: block !important;
+  }
+
+  .pdf-page--cover,
+  .pdf-page--details {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .info-row,
+  .finding-entry,
+  .signature-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  table {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+}*/
+/* index.css */
+@media print {
+  @page {
+    size: letter;
+    /* reserve space at top/bottom for the fixed header/footer to sit in */
+    margin: 0.5in 0.75in 0.5in 0.75in;
+  }
+
+  body {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+    transform: none !important;
+  }
+
+  .print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .report-pdf-content {
+    position: relative;
+  }
+
+  /* Fixed header/footer — repeat on every printed page automatically */
+  .pdf-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0.5in;
+  }
+
+  .pdf-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0.5in;
+  }
+
+  /* Content flows naturally within @page margins — browser handles pagination */
+  .pdf-content {
+    position: relative;
+  }
+
+  .pdf-section--break-before {
+    break-before: page;
+  }
+
+  .copy-watermark {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .copy-watermark span {
+    font-size: 10rem;
+    font-weight: bold;
+    color: rgba(239, 68, 68, 0.1);
+    transform: rotate(-30deg);
+    user-select: none;
+    white-space: nowrap;
+  }
+}
+
+/* On-screen preview styling (non-print) — keeps your existing card/page look for the modal preview */
+.report-pdf-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/*.pdf-header,
+.pdf-footer {
+  display: none;  
+}*/
+
+@media screen {
+  .pdf-content {
+    background: white;
+    box-shadow: var(--shadow-lg);
+    width: 8.5in;
+    min-height: 11in;
+    padding: 1in 0.75in;
+  }
+}
+
 .cn-toast {
   border-radius: var(--radius);
   border: 1px solid var(--border);
@@ -257,8 +432,3 @@
   border-color: color-mix(in oklab, var(--info) 20%, transparent);
   color: var(--info-foreground);
 }
-
-
-
-
-

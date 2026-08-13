@@ -137,15 +137,15 @@ const MasterlistTableWrapper = ({
 				)}
 			</div>
 
-			<div className="flex-1 overflow-auto">
-				<Table>
-					<TableHeader className="sticky top-0 bg-muted">
+			<div className="min-h-0 flex-1 overflow-auto">
+				<Table containerClassName="overflow-visible">
+					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id} className="border-b">
 								{headerGroup.headers.map((header) => (
 									<TableHead
 										key={header.id}
-										className="text-muted-foreground font-medium text-sm px-4 py-2"
+										className="sticky top-0 z-10 bg-muted px-4 py-2 text-sm font-medium text-muted-foreground"
 									>
 										{flexRender(
 											header.column.columnDef.header,
