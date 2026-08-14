@@ -41,6 +41,10 @@ const dummyPermissionData = [
 	{
 		id: 4,
 		name: "Report",
+  },
+  {
+		id: 5,
+		name: "Dashboard",
 	},
 ]
 

@@ -138,7 +138,7 @@ const ReportDetail = () => {
       </div>
 
       <Tabs defaultValue="results">
-        <div className="flex sticky top-0 z-10 bg-transparent pb-2 justify-end items-center">
+        <div className="flex flex-col sticky top-0 z-10 bg-transparent pb-2 items-end">
           <TabsList className="gap-1">
             <TabsTrigger
               value="results"
@@ -177,6 +177,8 @@ const ReportDetail = () => {
             </p>
           )}
         </div>
+
+        
 
         <TabsContent value="results">
           <ChecklistResultsTab report={report} />

@@ -6,10 +6,10 @@ import {
 	SelectContent,
 	SelectItem,
 } from "@/components/ui/select"
-import { useFetchCategoriesQuery } from "../../features/category/category.api"
+import { useFetchDropdownCategoriesQuery } from "../../features/dropdown/category-types"
 
 const CategoryDropdown = ({ value, onChange, open, triggerClassName }) => {
-	const { data: categoriesResponse, isFetching } = useFetchCategoriesQuery(
+	const { data: categoriesResponse, isFetching } = useFetchDropdownCategoriesQuery(
 		{ pagination: "none" },
 		{ skip: !open},
 	)

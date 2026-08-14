@@ -55,7 +55,7 @@ const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChan
 			})
 		}
 		setInitializedFor(sectionIndex)
-	}, [section, sectionIndex, initializedFor, hasSubsections])
+	}, [section, sectionIndex, initializedFor, hasSubsections, onAnswersChange])
 
 	useEffect(() => {
 		setIsAnswered(Boolean(section?.is_answered))

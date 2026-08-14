@@ -19,7 +19,7 @@ const STATUS_STYLES = {
 const STATUS_LABELS = {
 	pending: "Pending",
 	ongoing: "On going",
-	for_consolidate: "Done",
+	done: "Done",
 }
 
 const DashboardTable = ({
@@ -46,7 +46,8 @@ const DashboardTable = ({
 				...information,
 				id: checklist.id,
 				title: checklist.title,
-				status: checklist.status ?? "pending",
+				checklist: checklist.checklist ?? [],
+				// status: checklist.status ?? "done",
 				products_offered: information.products ?? [],
 				contactPerson: Array.isArray(information.contactPerson)
 					? information.contactPerson.join(", ")
@@ -59,21 +60,21 @@ const DashboardTable = ({
 	}, [data])
 
 	const deriveStatus = (checklistSections = []) => {
-		if (checklistSections.length === 0) return "open"
-
-		const allAnswered = checklistSections.every((s) => s.is_answered === 1)
-		if (allAnswered) return "done"
-
-		// Check if ANY question across ANY section has a non-null answer (partial progress)
-		const hasAnyAnswer = checklistSections.some((section) => {
-			const questions = section["sub-sections"]
-				? section["sub-sections"].flatMap((sub) => sub["sub-items"] ?? [])
-				: (section.item ?? [])
-
-			return questions.some((q) => q.answer != null)
-		})
-
-		return hasAnyAnswer ? "ongoing" : "pending"
+		if (checklistSections.length === 0) return "pending"
+	
+		const answeredCount = checklistSections.filter(
+			(section) => section.is_answered === 1,
+		).length
+	
+		if (answeredCount === 0) {
+			return "pending"
+		}
+	
+		if (answeredCount === checklistSections.length) {
+			return "done"
+		}
+	
+		return "ongoing"
 	}
 
 	const columns = useMemo(
@@ -117,8 +118,8 @@ const DashboardTable = ({
 					const status = deriveStatus(row.original.checklist)
 
 					return (
-						<Badge className={STATUS_STYLES[status] ?? STATUS_STYLES.pending}>
-							{STATUS_LABELS[status] ?? "Pending"}
+						<Badge className={STATUS_STYLES[status]}>
+							{STATUS_LABELS[status]}
 						</Badge>
 					)
 				},
@@ -131,16 +132,16 @@ const DashboardTable = ({
 				id: "actions",
 				header: "Actions",
 				cell: ({ row }) => {
-					const status = row.original.status
+					const status = deriveStatus(row.original.checklist)
 					const id = row.original.id
 
-					return ["pending", "ongoing"].includes(status) ? (
+					return ["done", "ongoing"].includes(status) ? (
 						<Button onClick={() => navigate(`/dashboard/my-checklist/${id}`)}>
-							Open
+							Show
 						</Button>
 					) : (
 						<Button onClick={() => navigate(`/dashboard/my-checklist/${id}`)}>
-							Show
+							Open
 						</Button>
 					)
 				},

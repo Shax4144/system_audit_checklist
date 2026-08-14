@@ -69,7 +69,7 @@ const ReportPdfContent = ({ report, isCopy }) => {
       <main className="pdf-content">
 
         {/* ── Section 1: Cover ── */}
-        <div className="pdf-section pt-24 pb-20">
+        <div className="pdf-section">
           <h1 className="text-center text-xl font-bold tracking-wide">AUDIT REPORT</h1>
 
           <table className="w-full border text-sm mt-6">
@@ -109,12 +109,12 @@ const ReportPdfContent = ({ report, isCopy }) => {
         </div>
 
         {/* Force a new page before Audit Details, but content within flows/overflows naturally */}
-        <div className="pdf-section pdf-section--break-before pt-24">
+        <div className="pdf-section pdf-section--break-before">
           <p className="font-semibold mb-2">The audit was conducted through:</p>
           <p className="pl-4 whitespace-pre-wrap">{context.conducted_through || "-"}</p>
 
           <p className="font-semibold mb-1 mt-4">Audit summary</p>
-          <p className="whitespace-pre-wrap">{context.audit_summary || "-"}</p>
+          <p className="pl-4 whitespace-pre-wrap">{context.audit_summary || "-"}</p>
 
           <p className="font-semibold mb-3 mt-4">Audit Findings and observation:</p>
           <p className="mb-4">
@@ -126,7 +126,7 @@ const ReportPdfContent = ({ report, isCopy }) => {
             if (!group || group.length === 0) return null
 
             return (
-              <div key={rating} className="mb-4 pb-3">
+              <div key={rating} className="mb-4 pdf-section--rating-group">
                 <p className="font-semibold italic mb-1.5">{RATING_LABELS[rating]}:</p>
                 <div className="pl-4 flex flex-col gap-2">
                   {group.map((entry, i) => {
@@ -147,7 +147,7 @@ const ReportPdfContent = ({ report, isCopy }) => {
         </div>
 
         {/* Force a new page before Conclusion */}
-        <div className="pdf-section pdf-section--break-before pt-24 pb-24">
+        <div className="pdf-section pdf-section--break-before">
           <p className="font-semibold mb-1">Conclusion:</p>
           <p className="whitespace-pre-wrap">{context.conclusion || "-"}</p>
 

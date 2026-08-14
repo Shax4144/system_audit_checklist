@@ -15,11 +15,21 @@ export const publishedApi = baseApi
 					params,
 				}),
 				providesTags: ["Published"],
+      }),
+
+			fetchPublishedById: builder.query({
+				query: (id) => ({
+					url: `${BASE_ENDPOINT}/${id}`,
+					method: "GET",
+				}),
+				providesTags: ["Published"],
 			}),
 		}),
 	})
 
 export const {
   useFetchPublishedQuery,
-  useLazyFetchPublishedQuery
+  useFetchPublishedByIdQuery,
+  useLazyFetchPublishedQuery,
+  useLazyFetchPublishedByIdQuery,
 } = publishedApi

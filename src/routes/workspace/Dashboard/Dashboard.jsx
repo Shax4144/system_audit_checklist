@@ -7,6 +7,7 @@ import LocationDropdown from "../../../components/dropdown/LocationDropdown"
 import { Card, CardContent } from "../../../components/ui/card"
 import DashboardTable from "./DashboardTable"
 import { useFetchPublishedQuery } from "../../../features/checklist/publishedChecklist.api"
+import { useLazyFetchReportByIdQuery } from "../../../features/report/checklistSummaryReport.api"
 
 const Dashboard = () => {
 	const user = useSelector((state) => state.user)

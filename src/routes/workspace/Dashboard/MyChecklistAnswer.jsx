@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom"
 import { ChevronLeft, Clock4 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useSelector } from "react-redux"
-import { useFetchPublishedQuery } from "../../../features/checklist/publishedChecklist.api"
+// import { useSelector } from "react-redux"
+// import { useFetchPublishedQuery } from "../../../features/checklist/publishedChecklist.api"
+import { useFetchReportByIdQuery } from "../../../features/report/checklistSummaryReport.api"
 import AnsweredSectionForm from "../../../components/checklist-forms/AnsweredSectionForm"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -22,9 +23,10 @@ const MyChecklistAnswer = () => {
 	const navigate = useNavigate()
 	const currentUser = getStoredUser()
 
-	const { data: response, isFetching } = useFetchPublishedQuery({ id }, {refetchOnMountOrArgChange: true})
+	const { data: response, isFetching } = useFetchReportByIdQuery(id, {refetchOnMountOrArgChange: true})
 
-	const checklistData = response?.data?.find((c) => String(c.id) === String(id))
+  const checklistData = response?.data
+    // ?.find((c) => String(c.id) === String(id))
 
 	const [allAnswers, setAllAnswers] = useState({});
 

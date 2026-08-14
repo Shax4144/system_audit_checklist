@@ -71,7 +71,7 @@ const Navbar = () => {
 					<DarkModeToggle />
 				</div>
 
-				<DropdownMenu>
+				{/* <DropdownMenu>
 					<DropdownMenuTrigger className="border-2 rounded-2xl" asChild>
 						<Button size="icon-lg" variant="outline">
 							<Bell />
@@ -97,7 +97,7 @@ const Navbar = () => {
 							</div>
 						</ScrollArea>
 					</DropdownMenuContent>
-				</DropdownMenu>
+				</DropdownMenu>*/}
 
 				<div>
 					<DropdownMenu>

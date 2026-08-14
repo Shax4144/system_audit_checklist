@@ -14,7 +14,7 @@ export const submitSectionApi = baseApi
 					method: "POST",
 					body,
 				}),
-				invalidatesTags: ["Submit"],
+				invalidatesTags: ["Submit", "Reports"],
       }),
 		}),
 	})
