@@ -1,4 +1,5 @@
 import { useLocation, Link } from "react-router-dom"
+import { useSelector } from "react-redux"
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -16,7 +17,7 @@ import {
 	ChevronDown,
 	LayoutDashboard,
 	ClipboardEdit,
-	ClipboardCheck,
+	// ClipboardCheck,
 	ChartNoAxesCombined,
 	UserCheck,
 } from "lucide-react"
@@ -25,17 +26,20 @@ const workspaceItems = [
 	{
 		label: "Dashboard",
 		to: "/dashboard",
-		icon: LayoutDashboard,
+    icon: LayoutDashboard,
+		permission: "Dashboard"
 	},
 	{
 		label: "Checklist Form",
 		to: "/workspace/checklist",
-		icon: ClipboardEdit,
+    icon: ClipboardEdit,
+		permission: "Checklist"
 	},
 	{
 		label: "Checklist Assignment",
 		to: "/workspace/checklist-assignment",
-		icon: UserCheck,
+    icon: UserCheck,
+		permission: "Checklist-build"
 	},
 	// {
 	// 	label: "My Submissions",
@@ -45,12 +49,18 @@ const workspaceItems = [
 	{
 		label: "Reports",
 		to: "/workspace/reports",
-		icon: ChartNoAxesCombined,
+    icon: ChartNoAxesCombined,
+    permission: "Report"
 	},
 ]
 
 const SidebarWorkspaceDropdown = () => {
-	const { pathname } = useLocation()
+  const { pathname } = useLocation()
+  const user = useSelector((state) => state.user)
+
+  const userPermissions = user?.permissions ?? []
+
+  const visibleItems = workspaceItems.filter((item) => userPermissions.includes(item.permission))
 
 	return (
 		<Collapsible defaultOpen className="group/collapsible">
@@ -68,7 +78,7 @@ const SidebarWorkspaceDropdown = () => {
 				<CollapsibleContent>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							{workspaceItems.map(({ label, to, icon: Icon }) => (
+							{visibleItems.map(({ label, to, icon: Icon }) => (
 								<SidebarMenuItem key={to}>
 									<SidebarMenuButton asChild isActive={pathname === to}>
 										<Link to={to}>

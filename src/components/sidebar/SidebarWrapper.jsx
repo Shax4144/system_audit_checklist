@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import SidebarMasterlistDropdown from "./SidebarMasterlistDropdown"
 import SidebarWorkspaceDropdown from "./SidebarWorkspaceDropdown"
@@ -7,30 +7,17 @@ import {
 	Sidebar,
 	SidebarContent,
 	SidebarHeader,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	SidebarGroup,
-	SidebarGroupLabel,
-	SidebarGroupContent,
+	// SidebarMenu,
+	// SidebarMenuButton,
+	// SidebarMenuItem,
 } from "../ui/sidebar"
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from "../ui/collapsible"
-import {
-	ChevronDown,
-	LayoutDashboard,
-	ClipboardList,
-	UserRoundCog,
-	ShieldUser,
-	Truck,
-	Tags,
-} from "lucide-react"
+// import {
+// 	LayoutDashboard,
+// } from "lucide-react"
 
 const SidebarWrapper = () => {
-	const { pathname } = useLocation()
+ //  const { pathname } = useLocation()
+	// const navigate = useNavigate()
 	const user = useSelector((state) => state.user)
 	const hasRole = (role) => {
 		return user?.role === role
@@ -43,7 +30,25 @@ const SidebarWrapper = () => {
 					<img src={logo} alt="System Audit Checklist" className="h-8 w-auto" />
 				</SidebarHeader>
 
-				<SidebarContent>
+        <SidebarContent>
+          {/* Dashboard */}
+          {/* {(hasRole("Admin") || hasRole("Admin-Audit") || hasRole("Audit")) && (
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={() => navigate("/dashboard")}
+                  isActive={pathname === "/dashboard"}
+                  tooltip="Dashboard"
+                >
+                  <LayoutDashboard />
+                  <span>
+                    Dashboard
+                  </span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          )}*/}
+          
 					{/* Workspace */}
 					{(hasRole("Admin") || hasRole("Admin-Audit") || hasRole("Audit")) && (
 						<SidebarWorkspaceDropdown />

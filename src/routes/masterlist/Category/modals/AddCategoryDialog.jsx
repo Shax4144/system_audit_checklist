@@ -1,28 +1,19 @@
-import { React, useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog"
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Field, FieldGroup, FieldLegend } from "@/components/ui/field"
 import { Separator } from "@/components/ui/separator"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Search, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 
-import { useSelectedRow } from "../context/EditContext"
-import { appToast } from "./Toast"
+import { useSelectedRow } from "../../../../context/EditContext"
 
 const initialForm = {
 	name: "",

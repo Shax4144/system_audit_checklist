@@ -219,10 +219,10 @@ const MasterlistTableWrapper = ({
 							onPageChange(1)
 						}}
 					>
-						<SelectTrigger className="w-16 h-8">
+						<SelectTrigger className="w-18 h-8">
 							<SelectValue />
 						</SelectTrigger>
-						<SelectContent>
+						<SelectContent position="popper" className="w-18 min-w-0">
 							{[10, 20, 50].map((size) => (
 								<SelectItem key={size} value={String(size)}>
 									{size}

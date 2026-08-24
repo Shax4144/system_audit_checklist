@@ -1,7 +1,7 @@
 import { lazy } from "react"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ProtectedRoute } from "./components/ProtectedRoute"
+import { ProtectedRoute, RequirePermission} from "./components/ProtectedRoute"
 import SuspenseWrapper from "./components/SuspenseWrapper"
 
 import masterlistConfig from "./config/masterlist-routes.config"
@@ -22,7 +22,7 @@ export default function App() {
 				<Router>
 					<Routes>
 						<Route exact path="/" element={<Landing />} />
-						<Route path="/dashboard" element={<ProtectedRoute />}>
+						<Route path="/dashboard" element={<ProtectedRoute role={["Admin", "Admin-Audit", "Audit"]} />}>
 							<Route
 								index
 								exact
@@ -48,17 +48,19 @@ export default function App() {
 								<ProtectedRoute role={["Admin", "Admin-Audit", "Audit"]} />
 							}
 						>
-							{workspaceConfig.map(({ path, component: Component }) => (
+							{workspaceConfig.map(({ path, component: Component, permissions }) => (
 								<Route
 									key={path}
 									exact
 									path={path}
-									element={
-										<SuspenseWrapper>
-											<Component />
-										</SuspenseWrapper>
-									}
-								></Route>
+                  element={
+                    <RequirePermission permissions={permissions}>
+                      <SuspenseWrapper>
+                        <Component />
+                      </SuspenseWrapper>
+                    </RequirePermission>
+                  }
+									/>
 							))}
 						</Route>
 						<Route
@@ -66,17 +68,19 @@ export default function App() {
 							path="/masterlist"
 							element={<ProtectedRoute role={["Admin"]} />}
 						>
-							{masterlistConfig.map(({ path, component: Component }) => (
+							{masterlistConfig.map(({ path, component: Component, permissions }) => (
 								<Route
 									key={path}
 									exact
 									path={path}
 									element={
-										<SuspenseWrapper>
-											<Component />
-										</SuspenseWrapper>
+										<RequirePermission permissions={permissions}>
+											<SuspenseWrapper>
+												<Component />
+											</SuspenseWrapper>
+										</RequirePermission>
 									}
-								></Route>
+									/>
 							))}
 						</Route>
 					</Routes>

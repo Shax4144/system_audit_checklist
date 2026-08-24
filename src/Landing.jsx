@@ -33,9 +33,27 @@ export function Landing() {
   
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
-	const session = window.localStorage.getItem("token")
+	// const session = window.localStorage.getItem("token")
 
-	const [login, { isLoading: isLoggingIn, isError}] = useLoginMutation()
+  const [login, { isLoading: isLoggingIn, isError }] = useLoginMutation()
+
+  const getDestination = (user) => {
+    const permissions = user?.permissions ?? []
+
+    if (permissions.includes("Masterlist")) {
+      return "/masterlist/user-accounts"
+    }
+    
+    if (permissions.includes("Report")) {
+      return "/workspace/reports"
+    }
+
+    if (permissions.includes("Dashboard")) {
+      return "/dashboard"
+    }
+
+    return "/accessdenied"
+  }
 
 	const handleChange = (field) => (e) => {
 		setCredential((prev) => ({ ...prev, [field]: e.target.value }))
@@ -52,9 +70,10 @@ export function Landing() {
 			localStorage.setItem("user", JSON.stringify(user))
 
 			dispatch(setUserDetails(user))
-			dispatch(authenticate())
-
-			navigate("/dashboard")
+      dispatch(authenticate())
+ 
+      navigate(getDestination(user))
+      
 			appToast.success(
 				response?.message ?? "Login successful!",
 				""

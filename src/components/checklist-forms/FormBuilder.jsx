@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { useSelector } from "react-redux"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, Eye, Save, Loader2, ChevronLeft, Send } from "lucide-react"
+import { Plus, Eye, Save, Loader2, ChevronLeft } from "lucide-react"
 import {
 	useFetchChecklistsQuery,
 	usePostChecklistMutation,
 	useUpdateChecklistMutation,
-	useArchiveChecklistMutation,
-	usePublishChecklistMutation,
+	// usePublishChecklistMutation,
 } from "../../features/checklist/checklist.api"
 import { createEmptySection } from "../../features/checklist/formBuilder.helpers"
 import SectionList from "./SectionList"
@@ -27,9 +25,6 @@ const FormBuilder = () => {
 
 	const navigate = useNavigate()
 	const isNew = !formId
-	
-	const user = useSelector((state) => state.user)
-	const userId = user?.id
 
 	const [form, setForm] = useState(isNew ? initialFormState : null)
 
@@ -52,11 +47,9 @@ const FormBuilder = () => {
 	const [postChecklist, { isLoading: isCreating }] = usePostChecklistMutation()
 	const [updateChecklist, { isLoading: isUpdating }] =
 		useUpdateChecklistMutation()
-	const [archiveChecklist, { isLoading: isArchiving }] =
-		useArchiveChecklistMutation()
-	const [publishChecklist, { isLoading: isPublishing}] = usePublishChecklistMutation()
+	// const [publishChecklist, { isLoading: isPublishing}] = usePublishChecklistMutation()
 
-	const isSaving = isCreating || isUpdating || isArchiving || isPublishing
+	const isSaving = isCreating || isUpdating || isPublishing
 
 	useEffect(() => {
 		if (!isNew && checklistData) {
@@ -213,26 +206,26 @@ const FormBuilder = () => {
 		}
 	}
 
-	const handlePublish = async () => {
-		try {
-			const payload = buildPayload()
-			const response = await publishChecklist({ id: formId, ...payload }).unwrap()
-			const for_publishing = response.data?.id
-			const data = response.data
-			appToast.success(
-				"Checklist successfully published.",
-				response?.message ?? "Your checklist has been published, go to Checklist Assignment to assign and add due date."
-			)
-			console.log("id: ", for_publishing);
-			console.log("payload: ", data);
+	// const handlePublish = async () => {
+	// 	try {
+	// 		const payload = buildPayload()
+	// 		const response = await publishChecklist({ id: formId, ...payload }).unwrap()
+	// 		const for_publishing = response.data?.id
+	// 		const data = response.data
+	// 		appToast.success(
+	// 			"Checklist successfully published.",
+	// 			response?.message ?? "Your checklist has been published, go to Checklist Assignment to assign and add due date."
+	// 		)
+	// 		console.log("id: ", for_publishing);
+	// 		console.log("payload: ", data);
 
-		} catch (err) {
-			appToast.error(
-				"Error",
-				err?.data?.message ?? "Failed to publish the checklist"
-			)
-		}
-	}
+	// 	} catch (err) {
+	// 		appToast.error(
+	// 			"Error",
+	// 			err?.data?.message ?? "Failed to publish the checklist"
+	// 		)
+	// 	}
+	// }
 
 	if (!isNew && (isFetching || !form)) {
 		return (

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Import, Loader2, Plus } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import AddSupplierDialog from "../../../components/AddSupplierDialog"
+import AddSupplierDialog from "../Supplier/modals/AddSupplierDialog"
 import Confirm from "../../../components/Confirm"
 import DeleteConfirm from "../../../components/DeleteConfirm"
 import { appToast } from "../../../components/Toast"

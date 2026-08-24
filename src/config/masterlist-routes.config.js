@@ -6,19 +6,22 @@ const masterlistConfig = [
 		component: lazy(
 			() => import("../routes/masterlist/UserAccounts/UserAccounts"),
 		),
-		// wrapper: PasswordContextProvider,
+		permissions: ["Masterlist"]
 	},
 	{
 		path: "roles",
-		component: lazy(() => import("../routes/masterlist/Roles/Roles")),
+    component: lazy(() => import("../routes/masterlist/Roles/Roles")),
+		permissions: ["Masterlist"]
 	},
 	{
 		path: "supplier",
-		component: lazy(() => import("../routes/masterlist/Supplier/Supplier")),
+    component: lazy(() => import("../routes/masterlist/Supplier/Supplier")),
+		permissions: ["Masterlist"]
 	},
 	{
 		path: "category",
-		component: lazy(() => import("../routes/masterlist/Category/Category")),
+    component: lazy(() => import("../routes/masterlist/Category/Category")),
+		permissions: ["Masterlist"]
 	},
 ]
 

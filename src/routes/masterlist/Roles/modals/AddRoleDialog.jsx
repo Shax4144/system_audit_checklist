@@ -21,11 +21,11 @@ import {
 } from "@/components/ui/popover"
 import { ChevronDown, X, Loader2} from "lucide-react"
 
-import { useSelectedRow } from "../context/EditContext"
+import { useSelectedRow } from "../../../../context/EditContext"
 
-import { appToast } from "./Toast"
+import { appToast } from "../../../../components/Toast"
 
-const dummyPermissionData = [
+const permissionConstant = [
 	{
 		id: 1,
 		name: "Masterlist",
@@ -220,7 +220,7 @@ const AddRoleDialog = ({ open, onClose, onConfirm, isLoading}) => {
 										collisionPadding={0}
 										className="w-(--radix-popover-trigger-width) p-1"
 									>
-										{dummyPermissionData.map((permission) => (
+										{permissionConstant.map((permission) => (
 											<div
 												key={permission.id}
 												className="group flex items-center gap-2 px-2 py-1.5 rounded-[0.35rem] hover:bg-muted cursor-pointer"

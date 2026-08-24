@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Camera, X } from "lucide-react"
+import { Camera } from "lucide-react"
 import { useFetchChecklistsQuery } from "../../features/checklist/checklist.api"
 
 const FormPreview = () => {

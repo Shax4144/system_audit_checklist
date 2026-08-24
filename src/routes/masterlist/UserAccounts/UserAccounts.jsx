@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useEffect, useState } from "react"
-import AddUserDialog from "../../../components/AddUserDialog"
+import AddUserDialog from "../UserAccounts/modals/AddUserDialog"
 import Confirm from "../../../components/Confirm"
 import DeleteConfirm from "../../../components/DeleteConfirm"
 import { appToast } from "../../../components/Toast"

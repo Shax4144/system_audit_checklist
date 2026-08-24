@@ -23,3 +23,19 @@ export const ProtectedRoute = ({ role }) => {
 	return hasRole ? <Layout /> : <Navigate to="/" />
 	// return <Layout /> 
 }
+
+export const RequirePermission = ({ permissions, children }) => {
+	const user = useSelector((state) => state.user)
+  const userPermissions = user?.permissions ?? []
+	
+  if (!permissions || permissions.length === 0) {
+    return children
+  }
+
+  const hasAccess = permissions.some((p) => userPermissions.includes(p))
+
+  if (!hasAccess)
+    return <Navigate to="/unauthorized" replace />
+
+  return children
+}

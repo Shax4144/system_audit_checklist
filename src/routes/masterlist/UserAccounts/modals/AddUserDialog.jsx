@@ -21,11 +21,11 @@ import { Separator } from "@/components/ui/separator"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Search, Loader2 } from "lucide-react"
 
-import OneChargingDropdown from "../components/dropdown/OneChargingDropdown"
-import RolesDropdown from "./dropdown/RolesDropdown"
-import { useFetchRolesQuery } from "../features/roles/roles.api"
-import { useSelectedRow } from "../context/EditContext"
-import { appToast } from "./Toast"
+import OneChargingDropdown from "../../../../components/dropdown/OneChargingDropdown"
+import RolesDropdown from "../../../../components/dropdown/RolesDropdown"
+import { useFetchRolesQuery } from "../../../../features/roles/roles.api"
+import { useSelectedRow } from "../../../../context/EditContext"
+import { appToast } from "../../../../components/Toast"
 
 // const dummyRoleData = [
 // 	{

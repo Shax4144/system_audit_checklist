@@ -2,12 +2,13 @@ import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useSelector } from "react-redux"
-import CategoryDropdown from "../../../components/dropdown/CategoryDropdown"
+// import CategoryDropdown from "../../../components/dropdown/CategoryDropdown"
 import LocationDropdown from "../../../components/dropdown/LocationDropdown"
 import { Card, CardContent } from "../../../components/ui/card"
 import DashboardTable from "./DashboardTable"
 import { useFetchPublishedQuery } from "../../../features/checklist/publishedChecklist.api"
-import { useLazyFetchReportByIdQuery } from "../../../features/report/checklistSummaryReport.api"
+import { useFetchDashboardCountQuery } from "../../../features/count/dashboardCount.api"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const Dashboard = () => {
 	const user = useSelector((state) => state.user)
@@ -18,7 +19,9 @@ const Dashboard = () => {
 	const [search, setSearch] = useState("");
 	const [debouncedSearch, setDebouncedSearch] = useState("")
 	const [location, setLocation] = useState("")
-	const [category, setCategory] = useState("")
+  // const [category, setCategory] = useState("")
+
+  
 	
 	useEffect(() => {
 		const timeout = setTimeout(() => {
@@ -40,14 +43,39 @@ const Dashboard = () => {
 			per_page: pageSize,
 			search: debouncedSearch,
 			location: location, 
-			category: category,
+			// category: category,
 			is_answered: isAnsweredParam,
 		},
 		{
 			refetchOnMountOrArgChange: true,
 		}
-	)
+    )
 
+	const { data: dashboardCountResponse,
+    isFetching: isFetchingDashboardCount,
+    // isError: isErrorDashboardCount,
+    // error: errorDashboardCount,
+  } = useFetchDashboardCountQuery({ refetchOnMountOrArgChange: true })
+
+	const summaryCards = [
+		{
+			label: "ENROLLED SUPPLIERS",
+			value: dashboardCountResponse?.total_suppliers ?? 0,
+		},
+		{
+			label: "PENDING",
+			value: (dashboardCountResponse?.total_pending ?? 0),
+		},
+		{
+			label: "COMPLETED",
+			value: dashboardCountResponse?.total_completed ?? 0,
+		},
+		// {
+		// 	label: "AVG",
+		// 	value: dashboardCountResponse?.total_average ?? 0,
+		// },
+  ]
+	
 	return (
 		<div>
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -62,7 +90,7 @@ const Dashboard = () => {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-4 gap-5 py-4 lg:py-6 xl:py-8">
+			{/* <div className="grid grid-cols-4 gap-5 py-4 lg:py-6 xl:py-8">
 				<Card className="flex flex-col gap-6 rounded-xl bg-card py-6 text-card-foreground shadow-lg shrink-0 overflow-hidden">
 					<CardContent>
 						<div className="flex flex-col justify-center gap-2">
@@ -106,10 +134,31 @@ const Dashboard = () => {
 						</div>
 					</CardContent>
 				</Card>
+			</div>*/}
+
+			<div className="grid grid-cols-3 gap-5 py-4 lg:py-6 xl:py-8">
+				{summaryCards.map(({ label, value }) => (
+					<Card
+						key={label}
+						className="flex flex-col gap-6 rounded-xl bg-card py-6 text-card-foreground shadow-lg shrink-0 overflow-hidden"
+					>
+						<CardContent>
+							<div className="flex flex-col justify-center gap-2">
+								<h4 className="text-muted-foreground font-semibold text-xs">
+									{label}
+                </h4>
+                {isFetchingDashboardCount
+                  ? <Skeleton className="h-10 w-16 rounded-xl" />
+                  : <p className="font-bold text-4xl">{value}</p>
+                }
+              </div>
+						</CardContent>
+					</Card>
+				))}
 			</div>
 
 			<div className="grid grid-cols-12 gap-5 items-center">
-				<div className="xl:col-span-8 col-span-6 shadow-lg rounded-xl">
+				<div className="xl:col-span-6 col-span-6 shadow-lg rounded-xl">
 					<div className="relative ml-auto">
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
@@ -123,7 +172,7 @@ const Dashboard = () => {
 					</div>
 				</div>
 
-				<div className=" col-span-3 xl:col-span-2">
+				<div className=" col-span-3 xl:col-span-3">
 					<LocationDropdown
 						triggerClassName="w-full h-13 rounded-xl shadow-lg"
 						value={location}
@@ -131,14 +180,14 @@ const Dashboard = () => {
 					/>
 				</div>
 
-				<div className=" col-span-3 xl:col-span-2">
+				{/* <div className=" col-span-3 xl:col-span-3">
 					<CategoryDropdown
 						triggerClassName="w-full h-13 rounded-xl shadow-lg"
 						open={true}
 						value={category}
 						onChange={setCategory}
 					/>
-				</div>
+				</div>*/}
 			</div>
 
 			<div className="py-4">

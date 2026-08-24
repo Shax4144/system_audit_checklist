@@ -1,52 +1,63 @@
-import { lazy } from "react"
+import { lazy } from "react";
 
 const workspaceConfig = [
-	{
-		path: "checklist",
-		component: lazy(() => import("../routes/workspace/Checklist/Checklist")),
-		// wrapper: PasswordContextProvider,
-	},
-	{
-		path: "checklist/builder/new",
-		component: lazy(() => import("../components/checklist-forms/FormBuilder")),
-	},
-	{
-		path: "checklist/builder/:id",
-		component: lazy(() => import("../components/checklist-forms/FormBuilder")),
-	},
-	{
-		path: "checklist/builder/:id/preview",
-		component: lazy(() => import("../components/checklist-forms/FormPreview")),
-	},
-	{
-		path: "checklist-assignment",
-		component: lazy(
-			() =>
-				import("../routes/workspace/ChecklistAssignment/ChecklistAssignmentDashboard"),
-		),
-	},
-	{
-		path: "checklist-assignment/:id",
-		component: lazy(
-			() =>
-				import("../routes/workspace/ChecklistAssignment/ChecklistAssignmentDetail"),
-		),
-	},
+  {
+    path: "dashboard",
+    component: lazy(() => import("../routes/workspace/Dashboard/Dashboard")),
+    permissions: ["Dashboard"]
+  },
+  {
+    path: "checklist",
+    component: lazy(() => import("../routes/workspace/Checklist/Checklist")),
+    permissions: ["Checklist"]
+  },
+  {
+    path: "checklist/builder/new",
+    component: lazy(() => import("../components/checklist-forms/FormBuilder")),
+    permissions: ["Checklist"]
+  },
+  {
+    path: "checklist/builder/:id",
+    component: lazy(() => import("../components/checklist-forms/FormBuilder")),
+    permissions: ["Checklist"]
+  },
+  {
+    path: "checklist/builder/:id/preview",
+    component: lazy(() => import("../components/checklist-forms/FormPreview")),
+    permissions: ["Checklist"]
+  },
+  {
+    path: "checklist-assignment",
+    component: lazy(
+      () =>
+        import("../routes/workspace/ChecklistAssignment/ChecklistAssignmentDashboard"),
+    ),
+    permissions: ["Checklist-build"]
+  },
+  {
+    path: "checklist-assignment/:id",
+    component: lazy(
+      () =>
+        import("../routes/workspace/ChecklistAssignment/ChecklistAssignmentDetail"),
+    ),
+    permissions: ["Checklist-build"]
+  },
+  // {
+  // 	path: "submission",
+  // 	component: lazy(() => import("../routes/workspace/Submission/Submission")),
+  // },
+  {
+    path: "reports",
+    component: lazy(
+      () => import("../routes/workspace/Reports/ReportDashboard"),
+    ),
+    permissions: ["Report"]
+  },
+  {
+    path: "reports/:id",
+    component: lazy(() => import("../routes/workspace/Reports/ReportDetail")),
+    permissions: ["Report"]
+  },
+];
 
-	{
-		path: "submission",
-		component: lazy(() => import("../routes/workspace/Submission/Submission")),
-	},
-	{
-		path: "reports",
-		component: lazy(
-			() => import("../routes/workspace/Reports/ReportDashboard"),
-		),
-	},
-	{
-		path: "reports/:id",
-		component: lazy(() => import("../routes/workspace/Reports/ReportDetail")),
-	},
-]
-
-export default workspaceConfig
+export default workspaceConfig;

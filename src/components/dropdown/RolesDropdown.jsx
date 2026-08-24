@@ -17,7 +17,7 @@ const RolesDropdown = ({ rolesData, value, onChange, open, isLoading }) => {
 			}}
 			disabled={isLoading}
 		>
-			<SelectTrigger className="w-auto">
+			<SelectTrigger className="h-8 w-auto">
 				<SelectValue placeholder={isLoading ? "Loading..." : "Select Role"} />
 			</SelectTrigger>
 			<SelectContent position="popper">

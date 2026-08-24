@@ -1,4 +1,3 @@
-import React from 'react'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -8,7 +7,6 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Loader2 } from 'lucide-react'
 

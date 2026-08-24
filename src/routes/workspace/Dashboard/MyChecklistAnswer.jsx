@@ -144,7 +144,7 @@ const MyChecklistAnswer = () => {
 
 	return (
 		<div className="flex flex-col gap-6 max-w-3xl mx-auto pb-20">
-			<div className="flex items-center gap-3 w-full">
+			<div className="flex items-center w-full">
 				<Button variant="ghost" size="xl" onClick={() => navigate(-1)}>
 					<ChevronLeft className="size-full" />
 				</Button>
@@ -157,16 +157,19 @@ const MyChecklistAnswer = () => {
 							<Clock4 /> Time out: 10:30
 						</Badge>
 					</div>
-					<div className="flex flex-row items-center justify-between">
+					<div className="flex flex-row justify-between">
 						<div className="flex flex-col">
 							<h1 className="text-2xl font-semibold">{checklistData.title}</h1>
 							<p className="text-sm text-muted-foreground capitalize">
 								Supplier: {info.supplier}
 							</p>
-						</div>
-						<p className="text-2xl text-muted-foreground">
+            </div>
+            <div>
+              <p className="text-xl text-muted-foreground">
 							{checklistData?.information?.reference_no}
 						</p>
+            </div>
+						
 					</div>
 				</div>
 			</div>

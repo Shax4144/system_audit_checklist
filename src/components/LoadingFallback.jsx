@@ -1,5 +1,3 @@
-import React from 'react'
-
 const LoadingFallback = () => {
   return (
 		<div className="w-full">

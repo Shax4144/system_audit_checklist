@@ -3,7 +3,7 @@ import { Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import CategoryTable from "./CategoryTable"
 
-import AddCategoryDialog from "../../../components/AddCategoryDialog"
+import AddCategoryDialog from "../Category/modals/AddCategoryDialog"
 import Confirm from "../../../components/Confirm"
 import DeleteConfirm from "../../../components/DeleteConfirm"
 import { appToast } from "../../../components/Toast"
