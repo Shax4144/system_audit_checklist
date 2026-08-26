@@ -2,7 +2,7 @@ import { useState, useEffect} from "react"
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
+	// DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogFooter,

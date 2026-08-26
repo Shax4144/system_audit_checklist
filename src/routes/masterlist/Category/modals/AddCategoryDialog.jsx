@@ -38,9 +38,9 @@ const AddCategoryDialog = ({ open, onClose, onConfirm, isLoading}) => {
     }
   }, [open, selectedRow])
 
-  const handleSearch = () => {
-    return
-  }
+  // const handleSearch = () => {
+  //   return
+  // }
 
   const handleChange = (field) => (e) => {
   let value = e.target.value;

@@ -87,22 +87,22 @@ const DashboardTable = ({
 				accessorKey: "address",
 				header: "Business address",
 			},
-			{
-				accessorKey: "tin_no",
-				header: "TIN #",
-			},
-			{
-				accessorKey: "contactPerson",
-				header: "Contact Person",
-			},
-			{
-				accessorKey: "contactNumber",
-				header: "Contact #",
-			},
-			{
-				accessorKey: "email",
-				header: "Email",
-			},
+			// {
+			// 	accessorKey: "tin_no",
+			// 	header: "TIN #",
+			// },
+			// {
+			// 	accessorKey: "contactPerson",
+			// 	header: "Contact Person",
+			// },
+			// {
+			// 	accessorKey: "contactNumber",
+			// 	header: "Contact #",
+			// },
+			// {
+			// 	accessorKey: "email",
+			// 	header: "Email",
+			// },
 			{
 				accessorKey: "products",
 				header: "Products Offered",
@@ -163,7 +163,6 @@ const DashboardTable = ({
 			isFetching={isFetching}
 			isError={isError}
 			error={error}
-			searchKey="name"
 			page={page}
 			onPageChange={onPageChange}
 			pageSize={pageSize}

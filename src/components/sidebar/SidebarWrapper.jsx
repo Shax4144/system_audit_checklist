@@ -1,4 +1,3 @@
-import { useLocation, useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import SidebarMasterlistDropdown from "./SidebarMasterlistDropdown"
 import SidebarWorkspaceDropdown from "./SidebarWorkspaceDropdown"

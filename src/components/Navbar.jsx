@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import DarkModeToggle from "./DarkModeToggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -18,6 +17,7 @@ import PopupSidebarWrapper from "./sidebar/PopupSidebarWrapper";
 import { unauthenticate } from "../features/auth/auth.slice";
 import { clearUserDetails } from "../features/users/users.slice";
 import { useLogoutMutation } from "../features/auth/logout.api";
+import { baseApi } from "../features/users/base.api";
 
 // const notifications = [
 // 	{
@@ -53,13 +53,14 @@ const Navbar = () => {
     try {
       await logout().unwrap();
     } catch (error) {
-      console.log("error: ", error.response);
+      console.log("Logout request failed: ", error);
     } finally {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
-
+      
       dispatch(unauthenticate());
       dispatch(clearUserDetails());
+      dispatch(baseApi.util.resetApiState());
       navigate("/", {
         replace: true,
       });

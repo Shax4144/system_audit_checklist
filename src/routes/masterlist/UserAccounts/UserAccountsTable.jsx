@@ -12,11 +12,6 @@ import { useMemo } from "react"
 import StatusToggle from "../../../components/StatusToggle"
 import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
 
-const tabs = [
-	{ label: "Active", value: "active" },
-	{ label: "Archived", value: "archived" },
-]
-
 const UserAccountsTable = ({
 	data,
 	isFetching,
@@ -62,7 +57,7 @@ const UserAccountsTable = ({
 			{
 				accessorKey: "deleted_at",
 				header: "Status",
-				cell: ({ row }) => {
+				cell: () => {
 					return (
 						<Badge
 							className={
@@ -119,7 +114,7 @@ const UserAccountsTable = ({
 				),
 			},
 		],
-		[onEdit, onArchive, onRestore],
+		[onEdit, onArchive, onRestore, showArchived],
 	)
 
 	return (

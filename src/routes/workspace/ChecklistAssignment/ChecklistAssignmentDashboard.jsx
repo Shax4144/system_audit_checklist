@@ -1,6 +1,6 @@
 // routes/workspace/ChecklistAssignment/AssignmentDashboard.jsx
 import { Badge } from "@/components/ui/badge"
-import { FileText, Loader2 } from "lucide-react"
+import { FileText } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useFetchChecklistsQuery } from "../../../features/checklist/checklist.api"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -66,8 +66,7 @@ const ChecklistAssignmentDashboard = () => {
 
 			{isFetching ? (
 				<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-					{/* <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /> */}
-					{Array.from({ length: 2 }).map((_, index) => (
+					{Array.from({ length: 1 }).map((_, index) => (
 						<div
 							key={index}
 							className="aspect-square rounded-xl border bg-linear-to-br from-orange-500/95 to-amber-500/35 p-4 flex flex-col justify-between"

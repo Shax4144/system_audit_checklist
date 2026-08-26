@@ -57,9 +57,9 @@ const AddSupplierDialog = ({ open, onClose, onConfirm, isLoading}) => {
     }
   }, [open, selectedRow])
 
-  const handleSearch = () => {
-    return
-  }
+  // const handleSearch = () => {
+  //   return
+  // }
 
   const handleInputChange = (field) => (e) => {
   	let value = e.target.value;

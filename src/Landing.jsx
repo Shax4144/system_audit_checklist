@@ -3,13 +3,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import {
-	Alert,
-	AlertAction,
-	AlertDescription,
-	AlertTitle,
-} from "@/components/ui/alert"
 
 import { appToast } from "./components/Toast"
 
@@ -19,7 +12,7 @@ import { authenticate } from "./features/auth/auth.slice"
 import { setUserDetails } from "./features/users/users.slice"
 
 import { useLoginMutation } from "./api/authApi"
-import { AlertCircleIcon, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import vert_logo from "../src/assets/vert_logo_system_audit_checklist.png"
 import horiz_logo from "../src/assets/horiz_logo_system_audit_checklist.png"
 import mis_logo from "../src/assets/MIS_logo.png"
@@ -35,7 +28,7 @@ export function Landing() {
 	const dispatch = useDispatch()
 	// const session = window.localStorage.getItem("token")
 
-  const [login, { isLoading: isLoggingIn, isError }] = useLoginMutation()
+  const [login, { isLoading: isLoggingIn }] = useLoginMutation()
 
   const getDestination = (user) => {
     const permissions = user?.permissions ?? []

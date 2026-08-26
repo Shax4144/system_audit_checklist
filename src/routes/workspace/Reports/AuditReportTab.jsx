@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-// import { Input } from "@/components/ui/input";
+import { useState, useRef, useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -79,8 +79,16 @@ const displayValue = (value, type = "text") => {
 const AuditReportTab = ({ report }) => {
   const info = report.information ?? {};
   const sections = report.checklist ?? [];
-  const [postFinding] = usePostFindingMutation();
+
+  const findings = Array.isArray(report?.findings) ? report.findings : [];
+  const hasFindings =
+    Array.isArray(report?.findings) &&
+    report.findings.length > 0;
+  const existingFinding = findings[0];
   
+  const [postFinding] = usePostFindingMutation();
+  const navigate = useNavigate();
+
   const supplierInfoFields = [
     {
       label: "Supplier",
@@ -167,6 +175,37 @@ const AuditReportTab = ({ report }) => {
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
+  useEffect(() => {
+      if (!hasFindings || !existingFinding) return;
+  
+      const context = existingFinding.context ?? {};
+  
+      setConductedThrough(context.conducted_through ?? "");
+      setAuditSummary(context.audit_summary ?? "");
+      setConclusion(context.conclusion ?? "");
+  
+      setCorrectiveActions(
+        context.corrective_actions ??
+          DEFAULT_CORRECTIVE_ACTION_TEXT
+      );
+  
+      setFollowUpAudit(context.follow_up_audit ?? "");
+  
+      setObservers(
+        Array.isArray(existingFinding.observers)
+          ? existingFinding.observers.map(
+              (observer) => observer.id
+            )
+          : []
+      );
+  
+      if (context.submission_date) {
+        setSubmissionDate(
+          new Date(context.submission_date)
+        );
+      }
+    }, [hasFindings, existingFinding]);
+
   // ── Derived / auto-filled data ──
   const overallPercentage = computeOverallPercentage(sections);
   const findingsByRating = buildFindingsByRating(sections);
@@ -183,6 +222,8 @@ const AuditReportTab = ({ report }) => {
   const removeObserverSlot = (index) => {
     setObservers((prev) => prev.filter((_, i) => i !== index));
   };
+
+  
 
   const getFirstMissingField = () => {
     const fields = [
@@ -267,6 +308,7 @@ const AuditReportTab = ({ report }) => {
         "Report Generated",
         "The audit report has been generated successfully.",
       );
+      navigate("/workspace/reports");
     } catch (error) {
       appToast.error(
         "Error",
@@ -336,6 +378,7 @@ const AuditReportTab = ({ report }) => {
             onChange={(e) => setConductedThrough(e.target.value)}
             placeholder="e.g. On-site inspection, document review, staff interviews"
             rows={3}
+            disabled={hasFindings}
           />
         </div>
 
@@ -347,6 +390,7 @@ const AuditReportTab = ({ report }) => {
             onChange={(e) => setAuditSummary(e.target.value)}
             placeholder="Provide a summary of the audit"
             rows={4}
+            disabled={hasFindings}
           />
         </div>
       </div>
@@ -396,6 +440,7 @@ const AuditReportTab = ({ report }) => {
             onChange={(e) => setConclusion(e.target.value)}
             placeholder="Provide the audit conclusion"
             rows={4}
+            disabled={hasFindings}
           />
         </div>
 
@@ -407,6 +452,7 @@ const AuditReportTab = ({ report }) => {
             value={correctiveActions}
             onChange={(e) => setCorrectiveActions(e.target.value)}
             rows={3}
+            disabled={hasFindings}
           />
         </div>
       </div>
@@ -425,6 +471,7 @@ const AuditReportTab = ({ report }) => {
             onChange={(e) => setFollowUpAudit(e.target.value)}
             placeholder="Provide follow-up audit details, if any"
             rows={3}
+            disabled={hasFindings}
           />
         </div>
       </div>
@@ -450,43 +497,60 @@ const AuditReportTab = ({ report }) => {
           )}
         </div>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-2">
-            {observers.map((userId, index) => (
-              <div key={index} className="flex items-center gap-2 max-w-sm">
-                <span className="text-sm text-muted-foreground">
-                  Observer {index + 1}:
-                </span>
-                <UsersDropdown
-                  value={userId ?? ""}
-                  onChange={(val) => updateObserver(index, val)}
-                  open={true}
-                  triggerClassName="flex-1"
-                />
-                {observers.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeObserverSlot(index)}
+        {hasFindings ? (
+          report.findings[0]?.observers?.map((observer, index) => (
+            <p key={observer.id} className="text-sm">
+              <span className="text-muted-foreground">
+                Observer {index + 1}:
+              </span>{" "}
+              {observer.full_name}
+            </p>
+          ))
+        ) : (
+            // Creating a new finding
+            <>
+              <div className="flex flex-col gap-2">
+                {observers.map((userId, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 max-w-sm"
                   >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
+                    <span className="text-sm text-muted-foreground">
+                      Observer {index + 1}:
+                    </span>
+        
+                    <UsersDropdown
+                      value={userId ?? ""}
+                      onChange={(val) => updateObserver(index, val)}
+                      open={true}
+                      triggerClassName="flex-1"
+                    />
+        
+                    {observers.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeObserverSlot(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addObserverSlot}
-            className="self-start mt-1"
-          >
-            <Plus className="h-4 w-4" /> Add Observer
-          </Button>
-        </div>
+        
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addObserverSlot}
+                className="self-start mt-1"
+              >
+                <Plus className="h-4 w-4" /> Add Observer
+              </Button>
+            </>
+          )}
       </div>
 
       {/* ── Submission Date ── */}
@@ -497,30 +561,36 @@ const AuditReportTab = ({ report }) => {
             value={submissionDate}
             onChange={setSubmissionDate}
             placeholder="Pick a date"
+            disabled={hasFindings}
           />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={handleSaveDraft}
-            disabled={isSavingDraft || isGeneratingReport}
-          >
-            {isSavingDraft && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            Save as Draft
-          </Button>
-          <Button
-            variant="default"
-            onClick={handleGenerateReport}
-            disabled={isSavingDraft || isGeneratingReport}
-          >
-            {isGeneratingReport && (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            )}
-            Generate Report
-          </Button>
-        </div>
+        {!hasFindings && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleSaveDraft}
+              disabled={isSavingDraft || isGeneratingReport}
+            >
+              {isSavingDraft && (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              )}
+              Save as Draft
+            </Button>
+        
+            <Button
+              variant="default"
+              onClick={handleGenerateReport}
+              disabled={isSavingDraft || isGeneratingReport}
+            >
+              {isGeneratingReport && (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              )}
+              Generate Report
+            </Button>
+          </div>
+        )}
       </div>
 
       <Confirm

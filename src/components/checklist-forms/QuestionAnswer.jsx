@@ -1,5 +1,5 @@
 // components/checklist-answer/QuestionAnswer.jsx
-import { useState, useRef, useMemo, useEffect} from "react"
+import { useState, useRef, useEffect} from "react"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -18,28 +18,54 @@ const GRADE_STYLES = {
 
 const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 	const fileInputRef = useRef(null)
-	// const [preview, setPreview] = useState(
-	// 	value?.photo ? URL.createObjectURL(value.photo) : null,
-	// )
+	const [preview, setPreview] = useState(null)
 
-	const preview = useMemo(() => {
-		if (!value?.photo) return null
+	// const preview = useMemo(() => {
+	// 	if (!value?.photo) return null
 
-		if (value.photo instanceof File) {
-			return URL.createObjectURL(value.photo)
-		}
+	// 	if (value.photo instanceof File) {
+	// 		return URL.createObjectURL(value.photo)
+	// 	}
 
-		return value.photo // existing image URL
-	}, [value?.photo])
+	// 	return value.photo // existing image URL
+	// }, [value?.photo])
 
-	useEffect(() => {
-		return () => {
-			if (preview?.startsWith("blob:")) {
-				URL.revokeObjectURL(preview)
-			}
-		}
-	}, [preview])
+	// // useEffect(() => {
+	// 	return () => {
+	// 		if (preview?.startsWith("blob:")) {
+	// 			URL.revokeObjectURL(preview)
+	// 		}
+	// 	}
+	// }, [preview])
 
+  useEffect(() => {
+    let objectUrl = null
+
+    const photo = value?.photo
+
+    if (!photo) {
+      setPreview(null)
+      return
+    }
+
+    //New uploaded file
+    if (photo instanceof File || photo instanceof Blob) {
+      objectUrl = URL.createObjectURL(photo)
+      setPreview(objectUrl)
+    } else if (typeof photo === "string") {
+      // Existing image URL
+      setPreview(photo)
+    } else {
+      setPreview(null)
+    }
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl)
+      }
+    }
+  }, [value?.photo])
+  
 	const grade = value?.grade ?? ""
 	const note = value?.note ?? ""
 
@@ -73,7 +99,7 @@ const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 								key={opt}
 								disabled={disabled}
 								onClick={() => updateAnswer({ grade: opt })}
-								variant="ghost"
+								variant="grade_button"
 								className={`h-10 min-w-10 px-1.5 rounded-full text-sm font-medium border transition-colors ${
 									grade === opt
 										? // "bg-primary text-primary-foreground border-primary"
@@ -94,7 +120,7 @@ const QuestionAnswer = ({ question, value, onChange, disabled }) => {
 						key={opt}
 						disabled={disabled}
 						onClick={() => updateAnswer({ grade: opt })}
-						variant="ghost"
+						variant="grade_button"
 						className={`h-10 min-w-10 px-1.5 rounded-full text-sm font-medium border transition-colors ${
 							grade === opt
 								? // "bg-primary text-primary-foreground border-primary"

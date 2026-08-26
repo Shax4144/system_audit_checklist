@@ -49,7 +49,7 @@ const FormBuilder = () => {
 		useUpdateChecklistMutation()
 	// const [publishChecklist, { isLoading: isPublishing}] = usePublishChecklistMutation()
 
-	const isSaving = isCreating || isUpdating || isPublishing
+	const isSaving = isCreating || isUpdating
 
 	useEffect(() => {
 		if (!isNew && checklistData) {
@@ -295,7 +295,7 @@ const FormBuilder = () => {
 			</div>
 
 			<div
-				className={`flex items-center justify-between rounded-lg border px-4 py-2.5 text-sm ${
+				className={`sticky top-0 z-10 flex items-center justify-between rounded-lg border px-4 py-2.5 text-sm shadow-sm ${
 					isValidTotal
 						? "border-green-200 bg-green-50 text-green-700"
 						: "border-amber-200 bg-amber-50 text-amber-700"

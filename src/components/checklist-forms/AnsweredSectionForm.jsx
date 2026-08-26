@@ -1,72 +1,93 @@
 // components/checklist-answer/AnsweredSectionForm.jsx
-import { useState, useEffect } from "react"
+import { forwardRef, useImperativeHandle,useState, useEffect, useRef } from "react"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Loader2, Check } from "lucide-react"
+// import { Button } from "@/components/ui/button"
+import { Check } from "lucide-react"
 import QuestionAnswer from "./QuestionAnswer"
-import { useSubmitSectionMutation } from "../../features/checklist/submitSectionChecklist.api"
-import { appToast } from "../Toast"
-import { appendFormData } from "../../features/checklist/formBuilder.helpers"
+// import { useSubmitSectionMutation } from "../../features/checklist/submitSectionChecklist.api"
+// import { appToast } from "../Toast"
+// import { appendFormData } from "../../features/checklist/formBuilder.helpers"
 
-const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChange}) => {
+const AnsweredSectionForm = forwardRef(({ checklistId, section, sectionIndex, onAnswersChange, answers = {} }, ref) => {
 	const hasSubsections = Boolean(section["sub-sections"])
 	const [isAnswered, setIsAnswered] = useState(Boolean(section?.is_answered))
-	const [batchNo, setBatchNo] = useState("") 
-	const [answers, setAnswers] = useState({}) // { [questionKey]: { grade, note, photo } }
-	const [initializedFor, setInitializedFor] = useState(null)
-	const [submittingAction, setSubmittingAction] = useState(null)  
+  const [batchNo, setBatchNo] = useState("") 
+	const initializedForRef = useRef(false)
+	// const [answers, setAnswers] = useState({}) // { [questionKey]: { grade, note, photo } }
+	// const [initializedFor, setInitializedFor] = useState(null)
+	// const [submittingAction, setSubmittingAction] = useState(null)  
 
-	const [submitSection] = useSubmitSectionMutation()
+	// const [submitSection] = useSubmitSectionMutation()
 
 	useEffect(() => {
-		if (!section) return
-		if (initializedFor === sectionIndex) return
-
+    if (!section) return
+		if (initializedForRef.current === sectionIndex) return
+		
 		const initialAnswers = {}
-		let existingBatchNo = ""
+    let existingBatchNo = ""
+		
 		if (hasSubsections) {
 			section["sub-sections"].forEach((sub, subIdx) => {
-				;(sub["sub-items"] ?? []).forEach((q, qIdx) => {
-					initialAnswers[`${subIdx}-${qIdx}`] = {
-						grade: q.answer?.rating ?? "",
-						note: q.answer?.remarks ?? "",
-						photo: q.answer?.images?.[0] ?? null,
-					}
-					if (q.answer?.batch_no) existingBatchNo = q.answer.batch_no
+        ; (sub["sub-items"] ?? []).forEach((q, qIdx) => {
+          const key = `${subIdx}-${qIdx}`
+          
+          // Keep the batch number from the existing response
+          if (q.answer?.batch_no) {
+            existingBatchNo = q.answer.batch_no
+          }
+          
+          // Only initialize if parent doesn't already have it
+          if (answers[key] === undefined) {
+            initialAnswers[key] = {
+              grade: q.answer?.rating ?? "",
+              note: q.answer?.remarks ?? "",
+              photo: q.answer?.images?.[0] ?? null,
+            }
+          }
 				})
 			})
 		} else {
-			;(section.item ?? []).forEach((q, qIdx) => {
-				initialAnswers[`${qIdx}`] = {
-					grade: q.answer?.rating ?? "",
-					note: q.answer?.remarks ?? "",
-					photo: q.answer?.images?.[0] ?? null,
-				}
-				if (q.answer?.batch_no) existingBatchNo = q.answer.batch_no
+      ; (section.item ?? []).forEach((q, qIdx) => {
+        const key = `${qIdx}`
+
+        if (q.answer?.batch_no) {
+          existingBatchNo = q.answer.batch_no
+        }
+
+        if (answers[key] === undefined) {
+          initialAnswers[key] = {
+            grade: q.answer?.rating ?? "",
+            note: q.answer?.remarks ?? "",
+            photo: q.answer?.images?.[0] ?? null,
+          }
+        }
 			})
 		}
-
-		setAnswers(initialAnswers)
-		setBatchNo(existingBatchNo)
-
-		if (onAnswersChange) {
+    if (existingBatchNo) {
+      setBatchNo(existingBatchNo)
+		}
+		
+		if (onAnswersChange && Object.keys(initialAnswers).length > 0) {
 			Object.entries(initialAnswers).forEach(([key, val]) => {
 				onAnswersChange(key, val)
 			})
 		}
-		setInitializedFor(sectionIndex)
-	}, [section, sectionIndex, initializedFor, hasSubsections, onAnswersChange])
+		initializedForRef.current = sectionIndex
+	}, [section, sectionIndex, hasSubsections, onAnswersChange, answers])
 
 	useEffect(() => {
 		setIsAnswered(Boolean(section?.is_answered))
 	}, [section?.is_answered])
 
-	
+	// const handleAnswerChange = (questionKey) => (value) => {
+	// 	setAnswers((prev) => ({ ...prev, [questionKey]: value }))
+	// 	onAnswersChange?.(questionKey, value)
+ //  }
 
-	const handleAnswerChange = (questionKey) => (value) => {
-		setAnswers((prev) => ({ ...prev, [questionKey]: value }))
-		onAnswersChange?.(questionKey, value)
-	}
+  const handleAnswerChange = (questionKey) => (value) => {
+      // setAnswers((prev) => ({ ...prev, [questionKey]: value }))
+      onAnswersChange?.(questionKey, value)
+    }
 
 	// Flatten all questions in this section (direct or nested in subsections) to check completeness
 	const allQuestions = hasSubsections
@@ -98,7 +119,6 @@ const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChan
 			if (q.subSectionTitle) {
 				entry["sub-sections"] = q.subSectionTitle
 			}
-
 			return entry
 		})
 
@@ -144,45 +164,51 @@ const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChan
 	// 	}
 	// }
 
-	const submit = async (isCompleted) => {
-		const action = isCompleted ? "submit" : "draft"
-		setSubmittingAction(action)
-		try {
-			const payload = buildPayload(isCompleted)
+	// const submit = async (isCompleted) => {
+	// 	const action = isCompleted ? "submit" : "draft"
+	// 	setSubmittingAction(action)
+	// 	try {
+	// 		const payload = buildPayload(isCompleted)
 
-			const formData = new FormData()
-			appendFormData(formData, payload)
+	// 		const formData = new FormData()
+	// 		appendFormData(formData, payload)
 
-			await submitSection(formData).unwrap()
+	// 		await submitSection(formData).unwrap()
 
-			if (isCompleted) {
-				setIsAnswered(true)
-				appToast.success(
-					"Section submitted",
-					`${section.section} has been submitted.`,
-				)
-			} else {
-				appToast.success(
-					"Draft saved",
-					`${section.section} has been saved as draft.`,
-				)
-			}
-		} catch (err) {
-			appToast.error("Error", err?.data?.message ?? "Failed to submit section.")
-			console.error(err)
-		} finally {
-			setSubmittingAction(null)
-		}
-	}
+	// 		if (isCompleted) {
+	// 			setIsAnswered(true)
+	// 			appToast.success(
+	// 				"Section submitted",
+	// 				`${section.section} has been submitted.`,
+	// 			)
+	// 		} else {
+	// 			appToast.success(
+	// 				"Draft saved",
+	// 				`${section.section} has been saved as draft.`,
+	// 			)
+	// 		}
+	// 	} catch (err) {
+	// 		appToast.error("Error", err?.data?.message ?? "Failed to submit section.")
+	// 		console.error(err)
+	// 	} finally {
+	// 		setSubmittingAction(null)
+	// 	}
+	// }
 
-	const handleSubmit = () => submit(true)
-	const handleSaveDraft = () => submit(false)
+	// const handleSubmit = () => submit(true)
+	// const handleSaveDraft = () => submit(false)
 
-	const isSavingDraft = submittingAction === "draft"
-	const isSubmitting = submittingAction === "submit"
+	// const isSavingDraft = submittingAction === "draft"
+	// const isSubmitting = submittingAction === "submit"
+
+	useImperativeHandle(ref, () => ({
+    isValid: allGraded,
+    buildPayload,
+    sectionTitle: section.section,
+	}))
 
 	return (
-		<div className="rounded-xl border bg-card p-5">
+		<div className="rounded-xl border bg-card p-5 shadow-sm">
 			<div className="flex items-center justify-between gap-4 mb-4">
 				<h2 className="font-medium text-lg">{section.section}</h2>
 				{isAnswered && (
@@ -227,7 +253,7 @@ const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChan
 				</div>
 			)}
 
-			{!isAnswered && (
+			{/* {!isAnswered && (
 				<div className="flex justify-end pt-4 mt-4 border-t gap-1.5">
 					<Button
 						className="bg-background text-foreground border border-border hover:text-primary-foreground"
@@ -246,9 +272,9 @@ const AnsweredSectionForm = ({ checklistId, section, sectionIndex, onAnswersChan
 						Submit Section
 					</Button>
 				</div>
-			)}
+			)}*/}
 		</div>
 	)
-}
+})
 
 export default AnsweredSectionForm
