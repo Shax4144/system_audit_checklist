@@ -129,7 +129,7 @@ const ChecklistInformation = ({ value, onChange }) => {
 						<DatePicker
 							value={info.auditDate}
 							onChange={(date) => updateField("auditDate", date)}
-							placeholder="Pick a Date"
+              placeholder="Pick a Date"
 						/>
 					</div>
 

@@ -20,7 +20,7 @@ const DatePicker = ({value, onChange, placeholder, disabled}) => {
 					<Button
 						variant="outline"
 						id="date-picker-simple"
-            className="justify-start font-normal rounded-[0.35rem]"
+            className="justify-start font-normal rounded-[0.35rem] overflow-hidden"
             disabled={disabled}
 					>
 						{value ? format(value, "PPP") : <span className='text-muted-foreground'>{placeholder}</span>}

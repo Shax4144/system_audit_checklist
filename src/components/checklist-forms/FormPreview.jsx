@@ -1,15 +1,22 @@
 import { useRef } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { ChevronLeft } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Camera } from "lucide-react"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Camera, EyeOff } from "lucide-react"
 import { useFetchChecklistsQuery } from "../../features/checklist/checklist.api"
 
 const FormPreview = () => {
 	const { id } = useParams()
 	const navigate = useNavigate()
+	const location = useLocation()
 
 	const { data: checklistsResponse, isFetching } = useFetchChecklistsQuery({
 		pagination: "none",
@@ -33,20 +40,48 @@ const FormPreview = () => {
 				Checklist not found.
 			</p>
 		)
-	}
+  }
+
+	const handleGoBack = () => {
+    navigate(location.pathname.replace("/preview", ""));
+  };
+
+	const handleBack = () => {
+    navigate("/workspace/checklist");
+	};
 
 	return (
 		<div className="flex flex-col gap-6 max-w-3xl mx-auto pb-20">
-			<div className="flex items-center gap-3">
-				<Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-					<ChevronLeft className="h-4 w-4" />
+			<div className="flex w-full items-center gap-3">
+				<Button variant="ghost" size="xl" onClick={handleBack}>
+					<ChevronLeft className="size-full" />
 				</Button>
-				<div>
-					<h1 className="text-2xl font-semibold">{checklistData.title}</h1>
-					<p className="text-sm text-muted-foreground">
-						Preview mode — read only
-					</p>
-				</div>
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+          <div className="min-w-0">
+            <h1 className="text-sm sm:text-2xl font-semibold">{checklistData.title}</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Preview mode — read only
+            </p>
+          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={handleGoBack}
+                >
+                  <EyeOff className="h-4 w-4" />
+                  <span className="hidden sm:inline">Close Preview</span>
+                </Button>
+              </TooltipTrigger>
+              
+              <TooltipContent className="sm:hidden">
+                Close Preview
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
 			</div>
 
 			<div className="flex flex-col gap-5">

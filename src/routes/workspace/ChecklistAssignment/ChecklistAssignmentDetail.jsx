@@ -121,18 +121,33 @@ const ChecklistAssignmentDetail = () => {
 						<ChevronLeft className="size-full" />
 					</Button>
 					<div>
-						<h1 className="text-2xl font-semibold">{checklistData.title}</h1>
-						<p className="text-sm text-muted-foreground">
+						<h1 className="text-sm sm:text-2xl font-semibold">{checklistData.title}</h1>
+						<p className="text-xs sm:text-sm text-muted-foreground">
 							Assign a user to each section before publishing.
 						</p>
 					</div>
 				</div>
 
-				<Button onClick={handlePublish} disabled={!canPublish || isPublishing}>
-					{isPublishing && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-					Publish
-				</Button>
-			</div>
+        <div className="hidden sm:block">
+          <Button
+            onClick={handlePublish}
+            disabled={!canPublish || isPublishing}
+          >
+            {isPublishing && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+            Publish
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex justify-end sm:hidden">
+        <Button
+          onClick={handlePublish}
+          disabled={!canPublish || isPublishing}
+        >
+          {isPublishing && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+          Publish
+        </Button>
+      </div>
 
 			<div>
 				<ChecklistInformation

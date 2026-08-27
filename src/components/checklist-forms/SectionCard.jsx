@@ -116,9 +116,29 @@ const SectionCard = ({ section, onUpdate, onDelete }) => {
 						className="cursor-grab text-muted-foreground mt-2"
 					>
 						<GripVertical className="h-4 w-4" />
-					</button>
+          </button>
 
-					<div className="flex-1 flex flex-col gap-2">
+          <div className="flex-1 flex flex-col gap-2 sm:hidden">
+            <div className="flex flex-row gap-1">
+              <Label className="text-xs text-muted-foreground shrink-0">
+							Weight
+						</Label>
+						<div className="relative w-24">
+							<Input
+								type="number"
+								min={0}
+								max={100}
+								value={section.percentage}
+								onChange={(e) => onUpdate({ percentage: e.target.value })}
+								className="h-8 pr-6 text-sm"
+							/>
+							<span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+								%
+							</span>
+						</div>
+            </div>
+              
+            
 						<Input
 							value={section.title}
 							onChange={(e) => onUpdate({ title: e.target.value })}
@@ -134,7 +154,23 @@ const SectionCard = ({ section, onUpdate, onDelete }) => {
 						/>
 					</div>
 
-					<div className="flex items-center gap-2">
+					<div className="hidden sm:flex-1 sm:flex flex-col gap-2">
+						<Input
+							value={section.title}
+							onChange={(e) => onUpdate({ title: e.target.value })}
+							className="font-medium"
+							placeholder="Section title"
+						/>
+						<Textarea
+							value={section.description}
+							onChange={(e) => onUpdate({ description: e.target.value })}
+							placeholder="Section description (optional)"
+							className="resize-none text-sm"
+							rows={2}
+						/>
+					</div>
+
+					<div className="hidden sm:flex items-center gap-2">
 						<Label className="text-xs text-muted-foreground shrink-0">
 							Weight
 						</Label>
