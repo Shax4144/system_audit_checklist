@@ -138,7 +138,7 @@ const Roles = () => {
 	}
 
 	return (
-		<div className="flex flex-col gap-6 h-full xl:mr-50 xl:ml-50">
+		<div className="flex flex-col gap-6 h-full">
 			<div className="flex flex-row justify-between items-center">
 				<div className="">
 					<h1 className="text-2xl font-semibold">Roles</h1>

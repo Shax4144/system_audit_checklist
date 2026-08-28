@@ -311,7 +311,7 @@ const MyChecklistAnswer = () => {
         }
       }
 
-      await refetch();
+      // await refetch();
       appToast.success(
         "Checklist Submitted",
         "All assigned sections have been submitted successfully.",

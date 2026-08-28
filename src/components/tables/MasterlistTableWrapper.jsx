@@ -117,13 +117,17 @@ const MasterlistTableWrapper = ({
 	return (
 		<div className="max-h-[calc(100vh-250px)] flex flex-col gap-0 rounded-xl border overflow-hidden shadow-sm">
 			{/* Toolbar */}
-			<div className="flex items-center justify-between px-4 py-3 border-b">
+			<div className="flex sm:items-center justify-between gap-3 px-4 py-3 border-b">
 				{/* filterSlot */}
-				{filterSlot && <div>{filterSlot}</div>}
+        {filterSlot && (
+          <div className="shrink-0">
+            {filterSlot}
+          </div>
+        )}
 
 				{/* Search */}
 				{searchKey && (
-					<div className="relative ml-auto">
+					<div className="relative w-full sm:w-64 min-w-0">
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
 							placeholder={`Search ${searchKey}...`}
@@ -131,7 +135,7 @@ const MasterlistTableWrapper = ({
 							onChange={(e) =>
 								onSearchChange?.(e.target.value)
 							}
-							className="pl-9 w-64 shadow-sm"
+							className="pl-9 w-full shadow-sm"
 						/>
 					</div>
 				)}

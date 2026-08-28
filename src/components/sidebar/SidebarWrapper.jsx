@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux"
 import SidebarMasterlistDropdown from "./SidebarMasterlistDropdown"
 import SidebarWorkspaceDropdown from "./SidebarWorkspaceDropdown"
-import logo from "../../assets/horiz_logo_system_audit_checklist.png"
+import logo from "../../assets/horizontal.png"
 import {
 	Sidebar,
 	SidebarContent,
@@ -25,8 +25,8 @@ const SidebarWrapper = () => {
 	return (
 		<div className="hidden lg:block">
 			<Sidebar>
-				<SidebarHeader className="flex flex-row h-16">
-					<img src={logo} alt="System Audit Checklist" className="h-8 w-auto" />
+				<SidebarHeader className="flex flex-row items-center h-16 px-4">
+					<img src={logo} alt="System Audit Checklist" className="h-10 w-auto" />
 				</SidebarHeader>
 
         <SidebarContent>

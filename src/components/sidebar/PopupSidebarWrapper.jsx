@@ -11,7 +11,7 @@ import {
 	SheetTrigger,
 } from "../ui/sheet"
 import { Button } from "../ui/button"
-import logo from "../../assets/horiz_logo_system_audit_checklist.png"
+import logo from "../../assets/horizontal.png"
 import SidebarMasterlistDropdown from "./SidebarMasterlistDropdown"
 import SidebarWorkspaceDropdown from "./SidebarWorkspaceDropdown"
 
@@ -45,7 +45,7 @@ const PopupSidebarWrapper = () => {
 							<img
 								src={logo}
 								alt="System Audit Checklist"
-								className="h-8 w-auto"
+								className="h-13 w-auto"
 							/>
 						</SheetTitle>
 					</SheetHeader>

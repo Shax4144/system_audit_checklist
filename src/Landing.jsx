@@ -13,8 +13,8 @@ import { setUserDetails } from "./features/users/users.slice"
 
 import { useLoginMutation } from "./api/authApi"
 import { Loader2 } from "lucide-react"
-import vert_logo from "../src/assets/vert_logo_system_audit_checklist.png"
-import horiz_logo from "../src/assets/horiz_logo_system_audit_checklist.png"
+import vert_logo from "../src/assets/vertical.png"
+import horiz_logo from "../src/assets/horizontal.png"
 import mis_logo from "../src/assets/MIS_logo.png"
 
 export function Landing() {
@@ -108,15 +108,15 @@ export function Landing() {
 						{/* Mobile logo (shown only on small screens) */}
 						<div className="flex lg:hidden items-center gap-2 mb-8">
 							<img
-								src={horiz_logo}
+								src={vert_logo}
 								alt="Logo"
 								className="w-full h-full object-contain"
 							/>
 						</div>
 
 						{/* Heading */}
-						<div className="flex justify-center mb-8">
-							<h2 className="text-2xl font-semibold">LOGIN</h2>
+						<div className="flex justify-center lg:mb-8">
+							<h2 className="hidden lg:inline text-2xl font-semibold">LOGIN</h2>
 						</div>
 
 						{/* Form */}

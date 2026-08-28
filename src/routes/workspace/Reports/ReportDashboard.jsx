@@ -90,7 +90,7 @@ const ReportsDashboard = () => {
       await document.fonts?.ready;
       await new Promise(requestAnimationFrame);
       await new Promise(requestAnimationFrame);
-      await printReport();
+      printReport();``
     };
   
     startPrint().catch((printError) => {

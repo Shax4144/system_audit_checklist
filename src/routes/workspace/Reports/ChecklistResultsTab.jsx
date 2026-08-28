@@ -232,7 +232,7 @@ const ItemsTable = ({ items }) => {
               <p>{item.name}</p>
 
               {answer?.remarks && (
-                <span className="text-xs text-muted-foreground max-w-40 truncate">
+                <span className="text-xs text-muted-foreground whitespace-normal wrap-break-words">
                   {answer.remarks}
                 </span>
               )}

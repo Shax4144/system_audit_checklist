@@ -130,7 +130,7 @@ const ReportDetail = () => {
         </Button>
         <div>
           <h1 className="text-2xl font-semibold">{report.title}</h1>
-          <p className="text-sm text-muted-foreground">{info.supplier}</p>
+          {/* <p className="text-sm text-muted-foreground">{info.supplier}</p>*/}
           <p className="text-sm text-muted-foreground">
             Reference Number: {info.reference_no}
           </p>
@@ -180,11 +180,19 @@ const ReportDetail = () => {
 
         
 
-        <TabsContent value="results">
+        <TabsContent
+          className="data-[state=inactive]:hidden"
+          value="results"
+          forceMount
+        >
           <ChecklistResultsTab report={report} />
         </TabsContent>
 
-        <TabsContent value="audit-report">
+        <TabsContent
+          className="data-[state=inactive]:hidden"
+          value="audit-report"
+          forceMount
+        >
           <AuditReportTab report={report} />
         </TabsContent>
       </Tabs>
