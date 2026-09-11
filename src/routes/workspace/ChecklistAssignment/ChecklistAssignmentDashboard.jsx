@@ -99,14 +99,14 @@ const ChecklistAssignmentDashboard = () => {
             </div>
           ))}
         </div>
-      ) : isNoChecklists || draftChecklists.length === 0 ? (
-        <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
-          No draft checklists available for assignment.
-        </div>
-      ) : isError ? (
+      ) : isError && error?.status !== 404 ? (
         <p className="text-sm text-destructive py-10 text-center">
           Failed to load checklists.
         </p>
+      ) : draftChecklists.length === 0 ? (
+        <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
+          No draft checklists available for assignment.
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-2">
           {draftChecklists.map((checklist, index) => (
@@ -126,11 +126,13 @@ const ChecklistAssignmentDashboard = () => {
                   </p>
                   <div className="flex flex-wrap gap-1">
                     <p className="text-[10px] text-muted-foreground mt-1">
-                      Created: <strong>{formatDate(checklist.created_at)}</strong>
+                      Created:{" "}
+                      <strong>{formatDate(checklist.created_at)}</strong>
                     </p>
 
                     <p className="text-[10px] text-muted-foreground mt-1">
-                      Updated: <strong>{formatDate(checklist.updated_at)}</strong>
+                      Updated:{" "}
+                      <strong>{formatDate(checklist.updated_at)}</strong>
                     </p>
                   </div>
                 </div>

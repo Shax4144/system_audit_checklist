@@ -7,8 +7,8 @@ import { useFetchReportByIdQuery } from "../../../features/report/checklistSumma
 import AuditReportTab from "./AuditReportTab";
 import ChecklistResultsTab from "./ChecklistResultsTab";
 
-const isChecklistFullyAnswered = (sections =[]) => 
-	sections.length > 0 && sections.every((s) => s.is_answered === 1)
+const isChecklistFullyAnswered = (sections = []) =>
+  sections.length > 0 && sections.every((s) => s.is_answered === 1);
 
 const ReportDetail = () => {
   const { id } = useParams();
@@ -21,7 +21,11 @@ const ReportDetail = () => {
     return (
       <div className="flex flex-col gap-6 max-w-5xl mx-auto pb-20">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="xl" onClick={() => navigate(-1)}>
+          <Button
+            variant="ghost"
+            size="xl"
+            onClick={() => navigate(-1)}
+          >
             <ChevronLeft className="size-xl" />
           </Button>
           <div className="w-full">
@@ -114,13 +118,15 @@ const ReportDetail = () => {
   }
 
   if (isError) {
-    <p className="text-center text-destructive py-10">
-      Failed to load the data.
-    </p>;
+    return (
+      <p className="text-center text-destructive py-10">
+        Failed to load the data.
+      </p>
+    );
   }
 
   const info = report.information ?? {};
-  const allAnswered = isChecklistFullyAnswered(report.checklist)
+  const allAnswered = isChecklistFullyAnswered(report.checklist);
 
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto pb-20">
@@ -177,8 +183,6 @@ const ReportDetail = () => {
             </p>
           )}
         </div>
-
-        
 
         <TabsContent
           className="data-[state=inactive]:hidden"

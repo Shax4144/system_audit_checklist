@@ -120,7 +120,7 @@ const RolesTable = ({
 				),
 			},
 		],
-		[onEdit, onArchive, onRestore],
+		[onEdit, onArchive, onRestore, showArchived],
 	)
 
 	return (

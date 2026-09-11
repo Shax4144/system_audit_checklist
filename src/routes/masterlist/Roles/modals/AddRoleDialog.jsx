@@ -172,9 +172,12 @@ const AddRoleDialog = ({ open, onClose, onConfirm, isLoading}) => {
 						</div>
 						<div className="">
 							<div className="flex flex-col gap-1.5">
-								<Label htmlFor="permission">
+								{/* <Label htmlFor="permission">
 									Permission
-								</Label>
+								</Label>*/}
+								<p className="text-sm font-medium">
+									Permission
+								</p>
 
 								{/* Multi-select via Popover + Checkboxes */}
 								<Popover open={popoverOpen} onOpenChange={setPopoverOpen}>

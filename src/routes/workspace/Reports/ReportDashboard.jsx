@@ -1,25 +1,28 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
-import { useReactToPrint } from "react-to-print"
-import { Button } from "@/components/ui/button"
-import DashboardTableWrapper from "../../../components/tables/DashboardTableWrapper"
-import { useFetchReportsQuery, useLazyFetchReportByIdQuery } from "../../../features/report/checklistSummaryReport.api"
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
+import { Button } from "@/components/ui/button";
+import DashboardTableWrapper from "../../../components/tables/DashboardTableWrapper";
+import {
+  useFetchReportsQuery,
+  useLazyFetchReportByIdQuery,
+} from "../../../features/report/checklistSummaryReport.api";
 // import PdfPreviewModal from "../../../components/PdfPreviewModal"
-import ReportPdfContent from "../../../components/ReportPdfContent"
+import ReportPdfContent from "../../../components/ReportPdfContent";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Eye, Printer, MoreHorizontal } from "lucide-react"
-import { appToast } from "../../../components/Toast"
+} from "@/components/ui/dropdown-menu";
+import { Eye, Printer, MoreHorizontal } from "lucide-react";
+import { appToast } from "../../../components/Toast";
 
 const TABS = [
   { value: "consolidated", label: "Consolidated" },
   { value: "generated", label: "Generated" },
-]
+];
 
 // The browser owns pagination; @page margins reserve a safe content area for
 // the fixed elements that react-to-print repeats on each physical page.
@@ -33,17 +36,20 @@ const PRINT_PAGE_STYLE = `
     margin: 0 !important;
     padding: 0 !important;
   }
-`
+`;
 
 const ReportsDashboard = () => {
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState("consolidated")
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [reportToPrint, setReportToPrint] = useState(null)
-  const printContentRef = useRef(null)
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  // const [activeTab, setActiveTab] = useState("consolidated");
+  const activeTab = searchParams.get("tab") || "consolidated";
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [reportToPrint, setReportToPrint] = useState(null);
+  const printContentRef = useRef(null);
 
-  const [fetchReportById, { isLoading: isFetchingReportById }] = useLazyFetchReportByIdQuery()
+  const [fetchReportById, { isLoading: isFetchingReportById }] =
+    useLazyFetchReportByIdQuery();
 
   const printReport = useReactToPrint({
     contentRef: printContentRef,
@@ -52,21 +58,24 @@ const ReportsDashboard = () => {
       `Audit_Report_${reportToPrint?.information?.reference_no ?? "report"}`,
     onAfterPrint: () => setReportToPrint(null),
     onPrintError: (_errorLocation, printError) => {
-      setReportToPrint(null)
-      appToast.error("Print error", printError.message ?? "Failed to print report.")
+      setReportToPrint(null);
+      appToast.error(
+        "Print error",
+        printError.message ?? "Failed to print report.",
+      );
     },
-  })
+  });
 
   const { data, isFetching, isError, error } = useFetchReportsQuery({
     status: activeTab,
     page,
     per_page: pageSize,
-  })
+  });
 
   const handleOpenDetail = useCallback(
     (reportId) => navigate(`/workspace/reports/${reportId}`),
     [navigate],
-  )
+  );
 
   const handlePrintPdf = useCallback(
     async (reportId) => {
@@ -90,19 +99,55 @@ const ReportsDashboard = () => {
       await document.fonts?.ready;
       await new Promise(requestAnimationFrame);
       await new Promise(requestAnimationFrame);
-      printReport();``
+      printReport();
     };
-  
+
     startPrint().catch((printError) => {
-      setReportToPrint(null)
-      appToast.error("Print error", printError.message ?? "Failed to print report.")
-    })
+      setReportToPrint(null);
+      appToast.error(
+        "Print error",
+        printError.message ?? "Failed to print report.",
+      );
+    });
   }, [printReport, reportToPrint]);
 
-  const handleTabChange = useCallback((tab) => {
-    setActiveTab(tab)
-    setPage(1)
-  }, [])
+  // useEffect(() => {
+  //   if (!reportToPrint || !printContentRef.current) return
+
+  //   const startPrint = async () => {
+  //     await document.fonts?.ready
+  //     await new Promise(requestAnimationFrame)
+  //     await new Promise(requestAnimationFrame)
+
+  //     console.log("PRINT REPORT:", reportToPrint)
+  //     console.log("PRINT NODE:", printContentRef.current)
+
+  //     printReport()
+  //   }
+
+  //   startPrint().catch((printError) => {
+  //     console.error("PRINT ERROR:", printError)
+  //     setReportToPrint(null)
+
+  //     appToast.error(
+  //       "Print error",
+  //       printError.message ?? "Failed to print report.",
+  //     )
+  //   })
+  // }, [reportToPrint, printReport])
+
+  // const handleTabChange = useCallback((tab) => {
+  //   setActiveTab(tab);
+  //   setPage(1);
+  // }, []);
+
+  const handleTabChange = useCallback(
+    (tab) => {
+      setSearchParams({ tab });
+      setPage(1);
+    },
+    [setSearchParams],
+  );
 
   const columns = useMemo(
     () => [
@@ -123,20 +168,20 @@ const ReportsDashboard = () => {
         accessorKey: "progress",
         header: "Progress",
         cell: ({ row }) => {
-          const summary = row.original.checklist_summary
-          if (!summary) return "-"
+          const summary = row.original.checklist_summary;
+          if (!summary) return "-";
           return (
             <span className="text-sm">
               {summary.answered} / {summary.total} sections ({summary.percent}%)
             </span>
-          )
+          );
         },
       },
       {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {
-          const report = row.original
+          const report = row.original;
 
           if (activeTab === "generated") {
             return (
@@ -148,7 +193,9 @@ const ReportsDashboard = () => {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="w-40 rounded-xl">
-                  <DropdownMenuItem onSelect={() => handleOpenDetail(report.id)}>
+                  <DropdownMenuItem
+                    onSelect={() => handleOpenDetail(report.id)}
+                  >
                     <Eye className="h-4 w-4" />
                     View
                   </DropdownMenuItem>
@@ -164,19 +211,19 @@ const ReportsDashboard = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            )
+            );
           }
 
           return (
             <Button size="sm" onClick={() => handleOpenDetail(report.id)}>
               Open
             </Button>
-          )
+          );
         },
       },
     ],
     [activeTab, handleOpenDetail, handlePrintPdf, isFetchingReportById],
-  )
+  );
 
   return (
     <div className="flex flex-col gap-0 h-full">
@@ -213,7 +260,7 @@ const ReportsDashboard = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ReportsDashboard
+export default ReportsDashboard;

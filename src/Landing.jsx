@@ -72,10 +72,12 @@ export function Landing() {
 				""
 			)
 		} catch (error) {
-			console.error("Login failed:", error)
+			// console.error("Login failed:", error)
 			appToast.error(
 				"Login Failed",
-				error?.data?.message ?? "Invalid Credentials"
+        error?.data?.message
+        ?? error?.error
+        ?? "Invalid Credentials"
 			)
 		}
 	}

@@ -9,16 +9,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { Plus, Eye, Save, Loader2, ChevronLeft } from "lucide-react";
+import { Plus, Eye, Save, Loader2, ChevronLeft, Trash2 } from "lucide-react";
 import {
   useFetchChecklistsQuery,
   usePostChecklistMutation,
   useUpdateChecklistMutation,
   // usePublishChecklistMutation,
+  useArchiveChecklistMutation,
 } from "../../features/checklist/checklist.api";
 import { createEmptySection } from "../../features/checklist/formBuilder.helpers";
 import SectionList from "./SectionList";
 import { appToast } from "../Toast";
+import DeleteConfirm from "../DeleteConfirm";
 
 const initialFormState = {
   title: "Untitled Form",
@@ -54,6 +56,9 @@ const FormBuilder = () => {
   const [updateChecklist, { isLoading: isUpdating }] =
     useUpdateChecklistMutation();
   // const [publishChecklist, { isLoading: isPublishing}] = usePublishChecklistMutation()
+  const [archiveChecklist, { isLoading: isArchiving }] =
+    useArchiveChecklistMutation();
+  const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
 
   const isSaving = isCreating || isUpdating;
 
@@ -130,7 +135,25 @@ const FormBuilder = () => {
     }));
   };
 
+  // const handleUpdateSection = (sectionId, updates) => {
+  //   setForm((prev) => ({
+  //     ...prev,
+  //     sections: prev.sections.map((s) =>
+  //       s.id === sectionId ? { ...s, ...updates } : s,
+  //     ),
+  //   }));
+  // };
+
   const handleUpdateSection = (sectionId, updates) => {
+    if (updates.title !== undefined) {
+      const isDuplicate = isDuplicateSectionTitle(updates.title, sectionId);
+
+      if (isDuplicate) {
+        appToast.warning("Duplicate section", "Section names must be unique.");
+        return;
+      }
+    }
+
     setForm((prev) => ({
       ...prev,
       sections: prev.sections.map((s) =>
@@ -191,28 +214,92 @@ const FormBuilder = () => {
   const handleBack = () => {
     navigate("/workspace/checklist");
   };
-  
+
   const handlePreview = () => {
-    navigate(`/workspace/checklist/builder/${formId}/preview`, { replace: true });
+    navigate(`/workspace/checklist/builder/${formId}/preview`, {
+      replace: true,
+    });
   };
-  
+
+  const isDuplicateSectionTitle = (title, currentSectionId) => {
+    const normalizedTitle = title.trim().toLowerCase();
+
+    if (!normalizedTitle) return false;
+
+    return form.sections.some(
+      (section) =>
+        section.id !== currentSectionId &&
+        section.title?.trim().toLowerCase() === normalizedTitle,
+    );
+  };
+
+  const hasDuplicateSections = () => {
+    const titles = form.sections
+      .map((section) => section.title?.trim().toLowerCase())
+      .filter(Boolean);
+
+    return new Set(titles).size !== titles.length;
+  };
+
+  // const handleSave = async () => {
+  //   try {
+  //     const payload = buildPayload();
+
+  //     if (isNew) {
+  //       const created = await postChecklist(payload).unwrap();
+  //       const newId = created.data?.id ?? created.id;
+  //       appToast.success(
+  //         "Checklistcreated",
+  //         created?.message ?? "Your form has been saved as a draft.",
+  //       );
+  //       navigate(`/workspace/checklist/builder/${newId}`, { replace: true });
+  //     } else {
+  //       const updated = await updateChecklist({
+  //         id: formId,
+  //         ...payload,
+  //       }).unwrap();
+  //       appToast.success(
+  //         "Checklist saved",
+  //         updated?.message ?? "Your changes have been saved.",
+  //       );
+  //     }
+  //   } catch (err) {
+  //     appToast.error("Error", err?.data?.message ?? "Failed to save form.");
+  //     console.error(err);
+  //   }
+  // };
+
   const handleSave = async () => {
+    if (hasDuplicateSections()) {
+      appToast.warning(
+        "Duplicate section",
+        "Each section must have a unique name.",
+      );
+      return;
+    }
+
     try {
       const payload = buildPayload();
 
       if (isNew) {
         const created = await postChecklist(payload).unwrap();
+
         const newId = created.data?.id ?? created.id;
+
         appToast.success(
-          "Checklistcreated",
+          "Checklist created",
           created?.message ?? "Your form has been saved as a draft.",
         );
-        navigate(`/workspace/checklist/builder/${newId}`, { replace: true });
+
+        navigate(`/workspace/checklist/builder/${newId}`, {
+          replace: true,
+        });
       } else {
         const updated = await updateChecklist({
           id: formId,
           ...payload,
         }).unwrap();
+
         appToast.success(
           "Checklist saved",
           updated?.message ?? "Your changes have been saved.",
@@ -220,6 +307,7 @@ const FormBuilder = () => {
       }
     } catch (err) {
       appToast.error("Error", err?.data?.message ?? "Failed to save form.");
+
       console.error(err);
     }
   };
@@ -244,6 +332,24 @@ const FormBuilder = () => {
   // 		)
   // 	}
   // }
+
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await archiveChecklist(formId).unwrap();
+      appToast.success(
+        "Checklist deleted",
+        response?.message ?? "Checklist has been deleted successfully.",
+      );
+      navigate("/workspace/checklist");
+    } catch (error) {
+      appToast.error(
+        "Error",
+        error?.message ?? "Failed to delete the checklist",
+      );
+    } finally {
+      setOpenDeleteConfirm(false);
+    }
+  };
 
   if (!isNew && (isFetching || !form)) {
     return (
@@ -277,22 +383,44 @@ const FormBuilder = () => {
         <div className="flex gap-2">
           <TooltipProvider>
             <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    onClick={handlePreview}
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span className="hidden sm:inline">Preview</span>
-                  </Button>
-                </TooltipTrigger>
-          
-                <TooltipContent className="sm:hidden">
-                  Preview
-                </TooltipContent>
-              </Tooltip>
-              
+              {!isNew && (
+                <div className="flex items-cneter gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        onClick={() => setOpenDeleteConfirm(true)}
+                        disabled={isSaving || isArchiving}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        {isArchiving ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                        <span className="hidden sm:inline">Delete</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="sm:hidden">
+                      Delete
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" onClick={handlePreview}>
+                        <Eye className="h-4 w-4" />
+                        <span className="hidden sm:inline">Preview</span>
+                      </Button>
+                    </TooltipTrigger>
+
+                    <TooltipContent className="sm:hidden">
+                      Preview
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              )}
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -308,7 +436,7 @@ const FormBuilder = () => {
                     <span className="hidden sm:inline">Save as Draft</span>
                   </Button>
                 </TooltipTrigger>
-          
+
                 <TooltipContent className="sm:hidden">
                   Save as Draft
                 </TooltipContent>
@@ -338,8 +466,8 @@ const FormBuilder = () => {
       <div
         className={`sticky top-0 z-10 flex items-center justify-between rounded-lg border px-4 py-2.5 text-sm shadow-sm ${
           isValidTotal
-            ? "border-green-200 bg-green-50 text-green-700"
-            : "border-amber-200 bg-amber-50 text-amber-700"
+          ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/70 dark:text-green-300"
+                : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/70 dark:text-amber-300"
         }`}
       >
         <span>Total section weight</span>
@@ -362,6 +490,13 @@ const FormBuilder = () => {
       >
         <Plus className="h-4 w-4" /> Add Section
       </Button>
+
+      <DeleteConfirm
+        open={openDeleteConfirm}
+        onClose={() => setOpenDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isArchiving}
+      />
     </div>
   );
 };

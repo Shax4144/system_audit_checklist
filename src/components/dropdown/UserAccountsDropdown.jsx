@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select"
 import { useFetchUserAccountsQuery } from "../../features/user-accounts/users.api"
 
-const UserAccountsDropdown = ({ value, onChange, open, triggerClassName }) => {
+const UserAccountsDropdown = ({ value, onChange, open, triggerClassName, disabledValues = [] }) => {
   const { data: userAccountResponse, isFetching } = useFetchUserAccountsQuery(
     { pagination: "none" },
     { skip: !open},
@@ -22,11 +22,18 @@ const UserAccountsDropdown = ({ value, onChange, open, triggerClassName }) => {
 				<SelectValue placeholder={isFetching ? "Loading..." : "User"} />
 			</SelectTrigger>
 			<SelectContent position="popper">
-				{userAccountData.map((user) => (
-					<SelectItem key={user.id} value={String(user.id)}>
-						{user.first_name} {user.last_name}
-					</SelectItem>
-				))}
+        {userAccountData.map((user) => {
+          const isDisabled = disabledValues.includes(String(user.id))
+          return (
+            <SelectItem
+              key={user.id}
+              value={String(user.id)}
+              disabled={isDisabled}
+            >
+              {user.first_name} {user.last_name}
+            </SelectItem>
+          )
+        })}
 			</SelectContent>
 		</Select>
 	)

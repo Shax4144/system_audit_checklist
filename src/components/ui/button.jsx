@@ -19,7 +19,7 @@ const buttonVariants = cva(
         grade_button:
           "aria-expanded:bg-muted aria-expanded:text-foreground",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-red-950/70 dark:text-red-300 dark:hover:bg-red-900/70 dark:focus-visible:border-red-500/50 dark:focus-visible:ring-red-500/30",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

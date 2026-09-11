@@ -176,7 +176,7 @@ const ChecklistResultsTab = ({ report }) => {
 
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-2">
-                    <Badge className="border border-slate-200">
+                    <Badge className="border border-slate-200 dark:bg-primary/10 dark:border-primary/20 dark:text-primary">
                       <h3>Assigned to:</h3>
                       <p>{section.assigned_user?.name}</p>
                     </Badge>

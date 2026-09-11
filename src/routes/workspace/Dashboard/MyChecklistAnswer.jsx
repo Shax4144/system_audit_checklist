@@ -443,13 +443,14 @@ const MyChecklistAnswer = () => {
                     key={section.originalIndex}
                     className={`
                       h-2 w-2 rounded-full
-                      ${status === "success"
-                        ? "bg-green-500"
-                        : status === "error"
-                          ? "bg-destructive"
-                          : i === currentStep
-                            ? "bg-primary"
-                            : "bg-muted"
+                      ${
+                        status === "success"
+                          ? "bg-green-500"
+                          : status === "error"
+                            ? "bg-destructive"
+                            : i === currentStep
+                              ? "bg-primary"
+                              : "bg-muted"
                       }
                     `}
                   />
@@ -477,7 +478,7 @@ const MyChecklistAnswer = () => {
           />
 
           <div className="flex justify-start gap-4 mt-4">
-              <Button
+            <Button
               className="shadow-sm"
               variant="outline"
               onClick={handlePrevious}
@@ -486,12 +487,9 @@ const MyChecklistAnswer = () => {
               Previous
             </Button>
             {!isLastStep ? (
-                <Button
-                  className="shadow-sm"
-                  onClick={handleNext}
-                >
-                  Next
-                </Button>
+              <Button className="shadow-sm" onClick={handleNext}>
+                Next
+              </Button>
             ) : failedSectionIndex !== null ? (
               <Button
                 className="shadow-sm"

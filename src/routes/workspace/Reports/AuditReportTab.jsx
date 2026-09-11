@@ -510,34 +510,41 @@ const AuditReportTab = ({ report }) => {
             // Creating a new finding
             <>
               <div className="flex flex-col gap-2">
-                {observers.map((userId, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 max-w-sm"
-                  >
-                    <span className="text-sm text-muted-foreground">
-                      Observer {index + 1}:
-                    </span>
+                {observers.map((userId, index) => {
+                  const selectedObserverIds = observers.filter(
+                    (id, i) => i !== index && id
+                  )
+
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 max-w-sm"
+                    >
+                      <span className="text-sm text-muted-foreground">
+                        Observer {index + 1}:
+                      </span>
         
-                    <UsersDropdown
-                      value={userId ?? ""}
-                      onChange={(val) => updateObserver(index, val)}
-                      open={true}
-                      triggerClassName="flex-1"
-                    />
+                      <UsersDropdown
+                        value={userId ?? ""}
+                        onChange={(val) => updateObserver(index, val)}
+                        open={true}
+                        triggerClassName="flex-1"
+                        disabledValues={selectedObserverIds.map(String)}
+                      />
         
-                    {observers.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeObserverSlot(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
+                      {observers.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeObserverSlot(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
         
               <Button

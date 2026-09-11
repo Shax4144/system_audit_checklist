@@ -91,7 +91,8 @@ const FormPreview = () => {
 					return (
 						<div key={sIndex} className="rounded-xl border bg-card p-5">
 							<h2 className="font-medium text-lg mb-1">
-								{sIndex + 1}. {section.section}
+                {/* {sIndex + 1}.*/}
+                {section.section}
 							</h2>
 
 							{hasSubsections ? (
@@ -99,7 +100,7 @@ const FormPreview = () => {
 									{section["sub-sections"].map((sub, subIndex) => (
 										<div key={subIndex} className="border-l-2 pl-4">
 											<h3 className="font-medium text-sm mb-3 text-muted-foreground">
-												{sIndex + 1}.{String.fromCharCode(97 + subIndex)}{" "}
+												{/* {sIndex + 1}.{String.fromCharCode(97 + subIndex)}{" "}*/}
 												{sub.item}
 											</h3>
 											<div className="flex flex-col gap-3">

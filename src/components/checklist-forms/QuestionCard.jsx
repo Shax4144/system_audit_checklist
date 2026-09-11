@@ -130,13 +130,13 @@ const QuestionCard = ({ question, onUpdate, onDelete }) => {
 						</div>
 					)}
 
-					<div className="flex items-center gap-2 mt-1">
+					{/* <div className="flex items-center gap-2 mt-1">
 						<Checkbox
 							checked={question.required}
 							onCheckedChange={(checked) => onUpdate({ required: checked })}
 						/>
 						<Label className="text-sm">Required</Label>
-					</div>
+					</div>*/}
 				</div>
 
 				<Button
