@@ -145,13 +145,13 @@ const SectionCard = ({ section, onUpdate, onDelete }) => {
 							className="font-medium"
 							placeholder="Section title"
 						/>
-						<Textarea
+						{/* <Textarea
 							value={section.description}
 							onChange={(e) => onUpdate({ description: e.target.value })}
 							placeholder="Section description (optional)"
 							className="resize-none text-sm"
 							rows={2}
-						/>
+						/>*/}
 					</div>
 
 					<div className="hidden sm:flex-1 sm:flex flex-col gap-2">
@@ -161,13 +161,13 @@ const SectionCard = ({ section, onUpdate, onDelete }) => {
 							className="font-medium"
 							placeholder="Section title"
 						/>
-						<Textarea
+						{/* <Textarea
 							value={section.description}
 							onChange={(e) => onUpdate({ description: e.target.value })}
 							placeholder="Section description (optional)"
 							className="resize-none text-sm"
 							rows={2}
-						/>
+						/>*/}
 					</div>
 
 					<div className="hidden sm:flex items-center gap-2">
@@ -198,9 +198,9 @@ const SectionCard = ({ section, onUpdate, onDelete }) => {
 					</CollapsibleTrigger>
 
 					<Button
-						variant="ghost"
+						variant="destructive"
 						size="icon"
-						className="text-destructive"
+						className="group h-8 w-8 hover:border hover:border-destructive"
 						onClick={onDelete}
 					>
 						<Trash2 className="h-4 w-4" />

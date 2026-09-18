@@ -23,7 +23,9 @@ const STATUS_STYLES = {
     "text-xs xl:text-sm lg:text-xs bg-amber-300 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-700",
 };
 
-const gradients = ["from-orange-500/95 to-amber-500/35"];
+const gradients = [
+  "from-orange-500/95 to-amber-500/35 dark:from-orange-600/90 dark:to-amber-800/60",
+];
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "—";

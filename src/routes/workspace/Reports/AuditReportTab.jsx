@@ -172,7 +172,7 @@ const AuditReportTab = ({ report }) => {
   const observersRef = useRef(null);
   const [submissionDate, setSubmissionDate] = useState(new Date());
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  // const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
   useEffect(() => {
@@ -268,20 +268,20 @@ const AuditReportTab = ({ report }) => {
       .map((id) => Number(id)),
   });
 
-  const handleSaveDraft = async () => {
-    setIsSavingDraft(true);
-    try {
-      const payload = buildAuditReportPayload();
-      console.log("Saving draft with payload:", payload);
-      // await saveAuditReportDraft({ id: report.id, ...payload }).unwrap()
-      appToast.success("Draft saved successfully.");
-    } catch (error) {
-      console.error("Error saving draft:", error);
-      appToast.error("Error", error?.data?.message ?? "Failed to save draft.");
-    } finally {
-      setIsSavingDraft(false);
-    }
-  };
+  // const handleSaveDraft = async () => {
+  //   setIsSavingDraft(true);
+  //   try {
+  //     const payload = buildAuditReportPayload();
+  //     console.log("Saving draft with payload:", payload);
+  //     // await saveAuditReportDraft({ id: report.id, ...payload }).unwrap()
+  //     appToast.success("Draft saved successfully.");
+  //   } catch (error) {
+  //     console.error("Error saving draft:", error);
+  //     appToast.error("Error", error?.data?.message ?? "Failed to save draft.");
+  //   } finally {
+  //     setIsSavingDraft(false);
+  //   }
+  // };
 
   const handleGenerateReport = () => {
     const missingField = getFirstMissingField()
@@ -289,7 +289,9 @@ const AuditReportTab = ({ report }) => {
     if (missingField) {
       appToast.warning(
         "Missing information",
-        `Please fill out "${missingField.label}" before generating the report.`
+        missingField.label === "Observers"
+          ? "Please choose at least one observer before generating the report."
+          : `Please fill out "${missingField.label}" before generating the report.`
       )
       scrollToField(missingField.ref)
       return
@@ -308,7 +310,7 @@ const AuditReportTab = ({ report }) => {
         "Report Generated",
         "The audit report has been generated successfully.",
       );
-      navigate("/workspace/reports");
+      navigate(-1);
     } catch (error) {
       appToast.error(
         "Error",
@@ -507,7 +509,7 @@ const AuditReportTab = ({ report }) => {
             </p>
           ))
         ) : (
-            // Creating a new finding
+            // Adding new observers
             <>
               <div className="flex flex-col gap-2">
                 {observers.map((userId, index) => {
@@ -575,7 +577,7 @@ const AuditReportTab = ({ report }) => {
         {/* Action Buttons */}
         {!hasFindings && (
           <div className="flex items-center gap-2">
-            <Button
+            {/* <Button
               variant="outline"
               onClick={handleSaveDraft}
               disabled={isSavingDraft || isGeneratingReport}
@@ -584,12 +586,14 @@ const AuditReportTab = ({ report }) => {
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
               )}
               Save as Draft
-            </Button>
+            </Button>*/}
         
             <Button
               variant="default"
               onClick={handleGenerateReport}
-              disabled={isSavingDraft || isGeneratingReport}
+              disabled={isGeneratingReport 
+                // || isSavingDraft
+              }
             >
               {isGeneratingReport && (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />

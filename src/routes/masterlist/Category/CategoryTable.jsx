@@ -12,57 +12,18 @@ import { useMemo } from "react"
 import StatusToggle from "../../../components/StatusToggle"
 import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
 
-// dummy data — replace with useQuery/fetch
-// const data = [
-// 	{
-// 		id: 1,
-// 		name: "Document",
-// 		status: "active",
-// 		created_at: "2026-03-18T01:59:34.000000Z",
-// 		updated_at: "2026-05-15T08:36:52.000000Z",
-// 		deleted_at: null,
-// 	},
-// 	{
-// 		id: 2,
-// 		name: "Structures",
-// 		status: "active",
-// 		created_at: "2026-03-18T01:59:34.000000Z",
-// 		updated_at: "2026-05-15T08:36:52.000000Z",
-// 		deleted_at: null,
-// 	},
-// 	{
-// 		id: 3,
-// 		name: "Process",
-// 		status: "active",
-// 		created_at: "2026-03-18T01:59:34.000000Z",
-// 		updated_at: "2026-05-15T08:36:52.000000Z",
-// 		deleted_at: null,
-// 	},
-// 	{
-// 		id: 3,
-// 		name: "Product",
-// 		status: "inactive",
-// 		created_at: "2026-03-18T01:59:34.000000Z",
-// 		updated_at: "2026-05-15T08:36:52.000000Z",
-// 		deleted_at: "2026-05-15T08:36:52.000000Z",
-// 	},
-// ]
-
-const tabs = [
-	{ label: "Active", value: "active" },
-	{ label: "Archived", value: "archived" },
-]
-
 const CategoryTable = ({
 	data,
 	isFetching,
 	isError,
-	error,
+  error,
+  status,
+	onStatusChange,
 	onArchive,
 	onRestore,
 	onEdit,
-	showArchived,
-	onToggleArchived,
+	// showArchived,
+	// onToggleArchived,
 	page,
 	onPageChange,
 	pageSize,
@@ -79,7 +40,8 @@ const CategoryTable = ({
 			{
 				accessorKey: "status",
 				header: "Status",
-				cell: ({ row }) => {
+        cell: () => {
+          const showArchived = status === "archived"
 					return (
 						<Badge
 							className={
@@ -106,7 +68,7 @@ const CategoryTable = ({
 						</DropdownMenuTrigger>
 						{/* content */}
 						<DropdownMenuContent align="end" className="w-40 rounded-xl">
-							{showArchived ? (
+							{status === "archived" ? (
 								<DropdownMenuItem
 									className="text-green-600 focus:text-green-700"
 									onSelect={() => {
@@ -136,7 +98,7 @@ const CategoryTable = ({
 				),
 			},
 		],
-		[onEdit, onArchive, onRestore],
+		[onEdit, onArchive, onRestore, status],
 	)
 
 	return (
@@ -156,8 +118,11 @@ const CategoryTable = ({
 			onPageSizeChange={onPageSizeChange}
 			filterSlot={
 				<StatusToggle
-					checked={showArchived}
-					onCheckedChange={onToggleArchived}
+					// checked={showArchived}
+					// onCheckedChange={onToggleArchived}
+          value={status}
+          onChange={onStatusChange}
+          options={["archived", "active"]}
 				/>
 			}
 		/>

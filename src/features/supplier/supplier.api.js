@@ -3,9 +3,9 @@ import { baseApi } from "../users/base.api"
 const BASE_ENDPOINT = "api/suppliers"
 
 export const suppliersApi = baseApi
-  .enhanceEndpoints({
-    addTagTypes: ["Suppliers"]
-  })
+  // .enhanceEndpoints({
+  //   addTagTypes: ["Suppliers"]
+  // })
   .injectEndpoints({
     endpoints: (builder) => ({
       fetchSuppliers: builder.query({

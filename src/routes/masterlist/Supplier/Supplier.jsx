@@ -16,7 +16,9 @@ import {
 import SupplierTable from "./SupplierTable";
 
 const Supplier = () => {
-  const [showArchived, setShowArchived] = useState(false);
+  // const [showArchived, setShowArchived] = useState(false);
+  const [status, setStatus] = useState("active");
+  const isArchived = status === "archived";
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
@@ -37,7 +39,7 @@ const Supplier = () => {
     error,
   } = useFetchSuppliersQuery(
     {
-      status: showArchived ? 0 : 1,
+      status: isArchived ? 0 : 1,
       page,
       per_page: pageSize,
       search: debouncedSearch || undefined,
@@ -58,6 +60,11 @@ const Supplier = () => {
   const [openRestore, setOpenRestore] = useState(false);
   const fileInputRef = useRef(null);
   const { selectedRow, setSelectedRow, clearSelectedRow } = useSelectedRow();
+
+  const handleStatusChange = (status) => {
+    setStatus(status);
+    setPage(1);
+  };
 
   const handleOpenCreate = () => {
     clearSelectedRow();
@@ -235,11 +242,13 @@ const Supplier = () => {
           isFetching={isFetching}
           isError={isError}
           error={error}
+          status={status}
+          onStatusChange={handleStatusChange}
           onEdit={handleOpenEdit}
           onArchive={handleOpenArchive}
           onRestore={handleOpenRestore}
-          showArchived={showArchived}
-          onToggleArchived={setShowArchived}
+          // showArchived={showArchived}
+          // onToggleArchived={setShowArchived}
           page={page}
           onPageChange={setPage}
           pageSize={pageSize}

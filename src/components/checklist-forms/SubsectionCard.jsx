@@ -80,13 +80,13 @@ const SubsectionCard = ({ subsection, onUpdate, onDelete }) => {
 							className="text-sm h-8"
 							placeholder="Subsection title"
 						/>
-						<Textarea
+						{/* <Textarea
 							value={subsection.description}
 							onChange={(e) => onUpdate({ description: e.target.value })}
 							placeholder="Subsection description (optional)"
 							className="resize-none text-xs"
 							rows={1}
-						/>
+						/>*/}
 					</div>
 
 					<CollapsibleTrigger asChild>
@@ -98,9 +98,9 @@ const SubsectionCard = ({ subsection, onUpdate, onDelete }) => {
 					</CollapsibleTrigger>
 
 					<Button
-						variant="ghost"
+						variant="destructive"
 						size="icon"
-						className="h-8 w-8 text-destructive"
+						className="group h-8 w-8 hover:border hover:border-destructive"
 						onClick={onDelete}
 					>
 						<Trash2 className="h-3.5 w-3.5" />

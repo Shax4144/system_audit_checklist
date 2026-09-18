@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSubmitSectionMutation } from "../../../features/checklist/submitSectionChecklist.api";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, Clock4, Loader2 } from "lucide-react";
@@ -43,7 +43,44 @@ const MyChecklistAnswer = () => {
 
   const checklistData = response?.data;
   // ?.find((c) => String(c.id) === String(id))
-
+  useEffect(() => {
+    if (!checklistData?.checklist) return;
+  
+    const initialAnswers = {};
+  
+    checklistData.checklist.forEach((section, sectionIndex) => {
+      const hasSubsections =
+        Array.isArray(section["sub-sections"]) &&
+        section["sub-sections"].length > 0;
+  
+      if (hasSubsections) {
+        section["sub-sections"].forEach((sub, subIdx) => {
+          (sub["sub-items"] ?? []).forEach((question, qIdx) => {
+            if (question.answer) {
+              initialAnswers[`${sectionIndex}-${subIdx}-${qIdx}`] = {
+                grade: question.answer.rating?.toString() ?? "",
+                note: question.answer.remarks ?? "",
+                photo: question.answer.images?.[0] ?? null,
+              };
+            }
+          });
+        });
+      } else {
+        (section.item ?? []).forEach((question, qIdx) => {
+          if (question.answer) {
+            initialAnswers[`${sectionIndex}-${qIdx}`] = {
+              grade: question.answer.rating?.toString() ?? "",
+              note: question.answer.remarks ?? "",
+              photo: question.answer.images?.[0] ?? null,
+            };
+          }
+        });
+      }
+    });
+  
+    setAllAnswers(initialAnswers);
+  }, [checklistData]);
+  
   const handleSectionAnswersChange = (sectionIndex) => (questionKey, value) => {
     setAllAnswers((prev) => ({
       ...prev,

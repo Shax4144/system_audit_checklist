@@ -13,7 +13,7 @@ const Layout = () => {
           <header className="shrink-0 border-b border-sidebar-border bg-sidebar/95 backdrop-blur-md pt-safe">
             <Navbar />
           </header>
-          <main className="min-h-0 flex-1 overflow-y-auto p-6 lg:p-8 lg:pb-safe pb-safe bg-background">
+          <main className="custom-scrollbar min-h-0 flex-1 overflow-y-auto p-6 lg:p-8 lg:pb-safe pb-safe bg-background">
             <Outlet />
           </main>
         </div>

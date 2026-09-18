@@ -9,7 +9,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { Plus, Eye, Save, Loader2, ChevronLeft, Trash2 } from "lucide-react";
+import {
+  Plus,
+  Eye,
+  Save,
+  Loader2,
+  ChevronLeft,
+  Trash2,
+  ArrowUp,
+} from "lucide-react";
 import {
   useFetchChecklistsQuery,
   usePostChecklistMutation,
@@ -59,6 +67,7 @@ const FormBuilder = () => {
   const [archiveChecklist, { isLoading: isArchiving }] =
     useArchiveChecklistMutation();
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const isSaving = isCreating || isUpdating;
 
@@ -123,6 +132,32 @@ const FormBuilder = () => {
       });
     }
   }, [checklistData, isNew]);
+
+  useEffect(() => {
+    const scrollContainer = document.querySelector("main");
+
+    if (!scrollContainer) return;
+    const handleScroll = () => {
+      setShowBackToTop(scrollContainer.scrollTop > 300);
+    };
+
+    handleScroll();
+
+    scrollContainer.addEventListener("scroll", handleScroll);
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const handleBackToTop = () => {
+    const scrollContainer = document.querySelector("main");
+
+    scrollContainer?.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   const handleFieldChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -388,10 +423,10 @@ const FormBuilder = () => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
-                        variant="outline"
+                        variant="destructive"
                         onClick={() => setOpenDeleteConfirm(true)}
                         disabled={isSaving || isArchiving}
-                        className="text-destructive hover:text-destructive"
+                        className="hover:border hover:border-destructive"
                       >
                         {isArchiving ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -466,8 +501,8 @@ const FormBuilder = () => {
       <div
         className={`sticky top-0 z-10 flex items-center justify-between rounded-lg border px-4 py-2.5 text-sm shadow-sm ${
           isValidTotal
-          ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/70 dark:text-green-300"
-                : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/70 dark:text-amber-300"
+            ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/70 dark:text-green-300"
+            : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/70 dark:text-amber-300"
         }`}
       >
         <span>Total section weight</span>
@@ -490,6 +525,37 @@ const FormBuilder = () => {
       >
         <Plus className="h-4 w-4" /> Add Section
       </Button>
+
+      {showBackToTop && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-lg"
+            onClick={handleBackToTop}
+            className="
+              group rounded-full
+              bg-primary dark:bg-primary
+              shadow-lg
+              hover:bg-[#0F4C81]
+              dark:hover:bg-[#0F4C81]
+              border border-background
+              transition-colors
+            "
+            title="Back to top"
+          >
+            <ArrowUp
+              className="
+                h-4 w-4
+                text-accent
+                dark:text-foreground
+                group-hover:text-white
+                transition-colors
+              "
+            />
+          </Button>
+        </div>
+      )}
 
       <DeleteConfirm
         open={openDeleteConfirm}

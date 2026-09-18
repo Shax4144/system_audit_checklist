@@ -68,66 +68,66 @@ const ChecklistResultsTab = ({ report }) => {
   const supplierInfoFields = [
     {
       label: "Supplier",
-      value: info.supplier
+      value: info.supplier,
     },
     {
       label: "Date of Audit",
       value: info.auditDate,
-      type: "date"
+      type: "date",
     },
     {
       label: "Address",
-      value: info.address
+      value: info.address,
     },
     {
       label: "TIN #",
-      value: info.tin_no
+      value: info.tin_no,
     },
     {
       label: "Contact Person",
-      value: info.contactPerson
+      value: info.contactPerson,
     },
     {
       label: "Contact Number",
-      value: info.contactNumber
+      value: info.contactNumber,
     },
     {
       label: "Email",
-      value: info.email
+      value: info.email,
     },
     {
       label: "Products",
-      value: info.products
+      value: info.products,
     },
     {
       label: "Remarks",
-      value: info.remarks
+      value: info.remarks,
     },
     {
       label: "Location",
-      value: info.location
+      value: info.location,
     },
   ];
 
   const auditInfoFields = [
     {
       label: "Audit Scope",
-      value: info.auditScope
+      value: info.auditScope,
     },
     {
       label: "Audit Language",
-      value: info.auditLanguage
+      value: info.auditLanguage,
     },
     {
       label: "Audit Objectives",
       value: info.auditObjectives,
-      full: true
+      full: true,
     },
     {
       label: "Audit Criteria",
       value: info.auditCriteria,
       type: "bullet",
-      full: true
+      full: true,
     },
   ];
 
@@ -166,7 +166,10 @@ const ChecklistResultsTab = ({ report }) => {
       {/* Per-section results */}
       <div className="flex flex-col gap-4">
         {sections.map((section, sIndex) => {
-          const hasSubsections = Boolean(section["sub-sections"]);
+          // const hasSubsections = Boolean(section["sub-sections"]);
+          const hasSubsections =
+            Array.isArray(section["sub-sections"]) &&
+            section["sub-sections"].length > 0;
           const isAnswered = section.is_answered === 1;
 
           return (
@@ -241,7 +244,7 @@ const ItemsTable = ({ items }) => {
                 <div className="flex gap-1.5 mt-1.5">
                   {answer.images.map((imageUrl, index) => (
                     <a
-                      key={i}
+                      key={index}
                       href={imageUrl}
                       target="_blank"
                       rel="noopener noreferrer"

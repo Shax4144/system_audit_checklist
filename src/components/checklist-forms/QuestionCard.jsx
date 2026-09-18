@@ -81,12 +81,12 @@ const QuestionCard = ({ question, onUpdate, onDelete }) => {
 						placeholder="Question label"
 					/>
 
-					<Input
+					{/* <Input
 						value={question.description}
 						onChange={(e) => onUpdate({ description: e.target.value })}
 						placeholder="Description (optional)"
 						className="text-sm"
-					/>
+					/>*/}
 
 					{["short_text", "long_text", "number", "email"].includes(
 						question.type,
@@ -140,9 +140,9 @@ const QuestionCard = ({ question, onUpdate, onDelete }) => {
 				</div>
 
 				<Button
-					variant="ghost"
+					variant="destructive"
 					size="icon"
-					className="text-destructive"
+					className="group h-8 w-8 hover:border hover:border-destructive"
 					onClick={onDelete}
 				>
 					<Trash2 className="h-4 w-4" />

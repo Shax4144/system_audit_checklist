@@ -2,9 +2,9 @@ import { baseApi } from "../users/base.api"
 
 const BASE_ENDPOINT = "api/findings"
 export const findingsApi = baseApi
-  .enhanceEndpoints({
-    addTagTypes: ["Findings"],
-  })
+  // .enhanceEndpoints({
+  //   addTagTypes: ["Findings"],
+  // })
   .injectEndpoints({
     endpoints: (builder) => ({
       postFinding: builder.mutation({
@@ -13,7 +13,7 @@ export const findingsApi = baseApi
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Findings"],
+        invalidatesTags: ["Findings", "Reports"],
       }),
     }),
   })

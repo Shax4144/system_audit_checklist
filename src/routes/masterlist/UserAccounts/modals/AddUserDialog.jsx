@@ -19,6 +19,7 @@ import RolesDropdown from "../../../../components/dropdown/RolesDropdown";
 import { useFetchRolesQuery } from "../../../../features/roles/roles.api";
 import { useSelectedRow } from "../../../../context/EditContext";
 import { appToast } from "../../../../components/Toast";
+import { passiveEventSupported } from "@tanstack/react-table";
 
 // const dummyRoleData = [
 // 	{
@@ -42,12 +43,13 @@ const initialForm = {
   username: "",
 };
 
-const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
+const AddUserDialog = ({ open, onClose, onConfirm, isLoading, mode }) => {
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedCharging, setSelectedCharging] = useState("");
   const [formData, setFormData] = useState(initialForm);
   const { selectedRow } = useSelectedRow();
-  const isEditMode = Boolean(selectedRow);
+  const isEditMode = mode === "edit";
+  const isPendingMode = mode === "pending";
 
   const { data: rolesResponse, isFetching: isRolesFetching } =
     useFetchRolesQuery(
@@ -69,7 +71,10 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
           lastName: selectedRow.last_name ?? "",
           suffix: selectedRow.suffix ?? "",
           position: selectedRow.position ?? "",
-          username: selectedRow.username ?? "",
+          username:
+            selectedRow?.id_prefix && selectedRow?.id_no
+              ? `${selectedRow.id_prefix}-${selectedRow.id_no}`
+              : (selectedRow.username ?? ""),
         });
         setSelectedRole(selectedRow.role ?? "");
         setSelectedCharging({
@@ -98,23 +103,15 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
   }, [open, selectedRow]);
 
   useEffect(() => {
-    if (formData.firstName && formData.lastName) {
-      const initials = formData.firstName
-        .trim()
-        .split(/\s+/)
-        .map((name) => name[0])
-        .join("");
-
-      const generated = (initials + formData.lastName)
-        .toLowerCase()
-        .replace(/\s+/g, "");
+    if (mode === "create" && formData.idPrefix && formData.idNumber) {
+      const generated = `${formData.idPrefix}-${formData.idNumber}`;
 
       setFormData((prev) => ({
         ...prev,
         username: generated,
       }));
     }
-  }, [formData.firstName, formData.lastName]);
+  }, [mode, formData.idPrefix, formData.idNumber]);
 
   // const handleSearch = () => {
   // 	return
@@ -138,6 +135,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
     }
 
     const matchedRole = rolesData.find((r) => r.name === selectedRole);
+    const username_employee_id = `${formData.idPrefix}-${formData.idNumber}`;
 
     const payload = {
       employee_id: `${formData.idPrefix} - ${formData.idNumber}`,
@@ -162,7 +160,8 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
       location_code: selectedCharging.location_code,
       location_name: selectedCharging.location_name,
 
-      username: formData.username,
+      username: username_employee_id,
+      password: selectedRow?.username ?? "",
       role_id: matchedRole?.id,
     };
 
@@ -205,7 +204,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
                   value={formData.idPrefix}
                   onChange={handleChange("idPrefix")}
                   required
-                  disabled={isLoading || isEditMode}
+                  disabled={isLoading || isEditMode || isPendingMode}
                 />
               </div>
 
@@ -219,7 +218,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
                   value={formData.idNumber}
                   onChange={handleChange("idNumber")}
                   required
-                  disabled={isLoading || isEditMode}
+                  disabled={isLoading || isEditMode || isPendingMode}
                 />
               </div>
 
@@ -245,7 +244,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
                   value={formData.firstName}
                   onChange={handleChange("firstName")}
                   required
-                  disabled={isLoading || isEditMode}
+                  disabled={isLoading || isEditMode || isPendingMode}
                 />
               </div>
 
@@ -255,7 +254,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
                   id="middleName"
                   value={formData.middleName}
                   onChange={handleChange("middleName")}
-                  disabled={isLoading || isEditMode}
+                  disabled={isLoading || isEditMode || isPendingMode}
                 />
               </div>
 
@@ -268,7 +267,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
                   value={formData.lastName}
                   onChange={handleChange("lastName")}
                   required
-                  disabled={isLoading || isEditMode}
+                  disabled={isLoading || isEditMode || isPendingMode}
                 />
               </div>
 
@@ -278,7 +277,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
                   id="suffix"
                   value={formData.suffix}
                   onChange={handleChange("suffix")}
-                  disabled={isLoading || isEditMode}
+                  disabled={isLoading || isEditMode || isPendingMode}
                 />
               </div>
             </div>
@@ -337,7 +336,7 @@ const AddUserDialog = ({ open, onClose, onConfirm, isLoading }) => {
                   id="username"
                   readOnly
                   value={formData.username}
-                  disabled={isLoading || isEditMode}
+                  disabled={isLoading || isEditMode || isPendingMode}
                 />
               </div>
 

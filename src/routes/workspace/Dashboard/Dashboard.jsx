@@ -77,7 +77,7 @@ const Dashboard = () => {
   ]
 	
 	return (
-		<div>
+		<div className="flex h-full min-h-0 flex-col">
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 				<div className="">
 					<h3 className="scroll-m-20 text-md xl:text-xl font-semibold tracking-tight">
@@ -190,7 +190,7 @@ const Dashboard = () => {
 				</div>*/}
 			</div>
 
-			<div className="py-4">
+			<div className="flex min-h-0 flex-1 flex-col py-4">
 				<DashboardTable
 					data={publishedResponse}
 					isFetching={isFetchingPublished}

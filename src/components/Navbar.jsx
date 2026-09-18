@@ -54,7 +54,8 @@ const Navbar = () => {
       await logout().unwrap();
     } catch (error) {
       console.log("Logout request failed: ", error);
-    } finally {
+    }
+    finally {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       

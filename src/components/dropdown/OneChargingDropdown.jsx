@@ -46,7 +46,7 @@ const OneChargingDropdown = ({ value, onChange, open, isLoading }) => {
 				<Command shouldFilter>
 					<CommandInput placeholder="Search charging..." />
 
-					<CommandList className="max-h-70 overflow-y-auto">
+					<CommandList className="custom-scrollbar max-h-70 overflow-y-auto">
 						<CommandEmpty>No charging found.</CommandEmpty>
 
 						<CommandGroup>

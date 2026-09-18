@@ -12,21 +12,18 @@ import { useMemo } from "react"
 import StatusToggle from "../../../components/StatusToggle"
 import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
 
-const tabs = [
-	{ label: "Active", value: "active" },
-	{ label: "Archived", value: "archived" },
-]
-
 const RolesTable = ({
 	data,
 	isFetching,
 	isError,
-	error,
+  error,
+  status,
+	onStatusChange,
 	onEdit,
 	onArchive,
 	onRestore,
-	showArchived,
-	onToggleArchived,
+	// showArchived,
+	// onToggleArchived,
 	page,
 	onPageChange,
 	pageSize,
@@ -63,7 +60,8 @@ const RolesTable = ({
 			{
 				accessorKey: "deleted_at",
 				header: "Status",
-				cell: ({ row }) => {
+        cell: () => {
+          const showArchived = status === "archived"
 					return (
 						<Badge
 							className={
@@ -90,7 +88,7 @@ const RolesTable = ({
 						</DropdownMenuTrigger>
 						{/* content */}
 						<DropdownMenuContent align="end" className="w-40 rounded-xl">
-							{showArchived ? (
+							{status === "archived" ? (
 								<DropdownMenuItem
 									className="text-green-600 focus:text-green-700"
 									onSelect={() => {
@@ -120,7 +118,7 @@ const RolesTable = ({
 				),
 			},
 		],
-		[onEdit, onArchive, onRestore, showArchived],
+		[onEdit, onArchive, onRestore, status],
 	)
 
 	return (
@@ -140,8 +138,11 @@ const RolesTable = ({
 			onPageSizeChange={onPageSizeChange}
 			filterSlot={
 				<StatusToggle
-					checked={showArchived}
-					onCheckedChange={onToggleArchived}
+					// checked={showArchived}
+					// onCheckedChange={onToggleArchived}
+          value={status}
+          onChange={onStatusChange}
+					options={["archived", "active"]}
 				/>
 			}
 		/>

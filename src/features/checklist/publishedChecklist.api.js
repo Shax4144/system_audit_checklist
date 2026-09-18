@@ -3,9 +3,9 @@ import { baseApi } from "../users/base.api"
 const BASE_ENDPOINT = "api/published-checklist/mine"
 
 export const publishedApi = baseApi
-	.enhanceEndpoints({
-		addTagTypes: ["Published"],
-	})
+	// .enhanceEndpoints({
+	// 	addTagTypes: ["Published"],
+	// })
 	.injectEndpoints({
 		endpoints: (builder) => ({
 			fetchPublished: builder.query({

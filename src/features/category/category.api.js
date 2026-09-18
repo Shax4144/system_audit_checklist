@@ -3,9 +3,9 @@ import { baseApi } from "../users/base.api"
 const BASE_ENDPOINT = "api/category-types"
 
 export const categoriesApi = baseApi
-	.enhanceEndpoints({
-		addTagTypes: ["Categories"],
-	})
+	// .enhanceEndpoints({
+	// 	addTagTypes: ["Categories"],
+	// })
 	.injectEndpoints({
 		endpoints: (builder) => ({
 			fetchCategories: builder.query({

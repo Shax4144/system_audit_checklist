@@ -108,7 +108,7 @@ const ChecklistInformation = ({ value, onChange }) => {
                 });
               }}
               isLoading={loadingSuppliers}
-              triggerClassName="w-full h-8"
+              triggerClassName="w-full h-8 rounded-md"
             />
           </div>
 
@@ -165,6 +165,7 @@ const ChecklistInformation = ({ value, onChange }) => {
               value={info.location}
               onChange={(val) => updateField("location", val)}
               triggerClassName="shadow-none w-full h-8"
+              disabled
             />
             {/* <Input
 							value={info.location}

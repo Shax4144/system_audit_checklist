@@ -3,9 +3,9 @@ import { baseApi } from "../users/base.api"
 const BASE_ENDPOINT = "api/count-checklists"
 
 export const dashboardCountApi = baseApi
-	.enhanceEndpoints({
-		addTagTypes: ["Counts"],
-	})
+	// .enhanceEndpoints({
+	// 	addTagTypes: ["Counts"],
+	// })
 	.injectEndpoints({
 		endpoints: (builder) => ({
 			fetchDashboardCount: builder.query({

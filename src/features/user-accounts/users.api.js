@@ -1,11 +1,11 @@
-import { baseApi } from "../users/base.api" 
+import { baseApi } from "../users/base.api";
 
-const BASE_ENDPOINT = "api/users"
+const BASE_ENDPOINT = "api/users";
 
 export const usersApi = baseApi
-  .enhanceEndpoints({
-    addTagTypes: ["Users"]
-  })
+  // .enhanceEndpoints({
+  //   addTagTypes: ["Users"],
+  // })
   .injectEndpoints({
     endpoints: (builder) => ({
       fetchUserAccounts: builder.query({
@@ -22,7 +22,7 @@ export const usersApi = baseApi
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Users"],
+        invalidatesTags: ["Users", "PendingUsers"],
       }),
       updateUserAccount: builder.mutation({
         query: ({ id, ...body }) => ({
@@ -39,8 +39,8 @@ export const usersApi = baseApi
         }),
         invalidatesTags: ["Users"],
       }),
-    })
-  })
+    }),
+  });
 
 export const {
   useFetchUserAccountsQuery,
@@ -48,4 +48,4 @@ export const {
   usePostUserAccountMutation,
   useUpdateUserAccountMutation,
   useArchiveUserAccountMutation,
-} = usersApi
+} = usersApi;

@@ -128,6 +128,7 @@ const FormDashboard = () => {
               variant="destructive"
               size="sm"
               onClick={() => setIsSelectMode(true)}
+              className="hover:border hover:border-destructive"
             >
               <Trash2 className="h-4 w-4 mr-1.5" />
               <span className="hidden sm:inline">Select</span>
@@ -138,6 +139,9 @@ const FormDashboard = () => {
                 selectedChecklists.length > 0 ? "destructive" : "outline"
               }
               size="sm"
+              className={
+                selectedChecklists.length > 0 ? "hover:border hover:border-destructive" : ""
+              }
               onClick={toggleSelectMode}
               disabled={isBulkDeleting}
             >
@@ -267,8 +271,8 @@ const FormDashboard = () => {
                   <Checkbox
                     checked={isSelected}
                     onCheckedChange={() => toggleItemSelected(item.id)}
-                    className="absolute top-3 left-3 z-10 shadow-sm 
-                    data-checked:bg-blue-400 
+                    className="absolute top-3 left-3 z-10 shadow-sm
+                    data-checked:bg-blue-400
                     data-checked:border-blue-400
                     dark:data-checked:bg-blue-600
                     dark:data-checked:border-blue-600

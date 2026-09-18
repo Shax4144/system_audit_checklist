@@ -10,6 +10,8 @@ import ChecklistResultsTab from "./ChecklistResultsTab";
 const isChecklistFullyAnswered = (sections = []) =>
   sections.length > 0 && sections.every((s) => s.is_answered === 1);
 
+const isChecklistClosed = (report) => report?.is_closed === true;
+
 const ReportDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -127,6 +129,7 @@ const ReportDetail = () => {
 
   const info = report.information ?? {};
   const allAnswered = isChecklistFullyAnswered(report.checklist);
+  const isClosed = isChecklistClosed(report);
 
   return (
     <div className="flex flex-col gap-6 max-w-5xl mx-auto pb-20">
@@ -161,7 +164,7 @@ const ReportDetail = () => {
               Checklist Results
             </TabsTrigger>
             <TabsTrigger
-              disabled={!allAnswered}
+              disabled={!allAnswered || isClosed}
               value="audit-report"
               className="
                   data-[state=active]:bg-primary

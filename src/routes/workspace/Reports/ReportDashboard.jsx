@@ -6,6 +6,7 @@ import DashboardTableWrapper from "../../../components/tables/DashboardTableWrap
 import {
   useFetchReportsQuery,
   useLazyFetchReportByIdQuery,
+  useCloseReportByIdMutation,
 } from "../../../features/report/checklistSummaryReport.api";
 // import PdfPreviewModal from "../../../components/PdfPreviewModal"
 import ReportPdfContent from "../../../components/ReportPdfContent";
@@ -16,12 +17,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Eye, Printer, MoreHorizontal } from "lucide-react";
+import { Eye, Printer, MoreHorizontal, X } from "lucide-react";
 import { appToast } from "../../../components/Toast";
+import CloseConfirm from "../../../components/CloseConfirm";
+
 
 const TABS = [
+  { value: "ongoing", label: "Ongoing" },
   { value: "consolidated", label: "Consolidated" },
   { value: "generated", label: "Generated" },
+  { value: "closed", label: "Closed" },
 ];
 
 // The browser owns pagination; @page margins reserve a safe content area for
@@ -42,14 +47,17 @@ const ReportsDashboard = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   // const [activeTab, setActiveTab] = useState("consolidated");
-  const activeTab = searchParams.get("tab") || "consolidated";
+  const activeTab = searchParams.get("tab") || "ongoing";
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [reportToPrint, setReportToPrint] = useState(null);
   const printContentRef = useRef(null);
+  const [closeReportId, setCloseReportId] = useState(null);
 
   const [fetchReportById, { isLoading: isFetchingReportById }] =
     useLazyFetchReportByIdQuery();
+
+  const [closeReportById, { isLoading: isClosingReportById }] = useCloseReportByIdMutation();
 
   const printReport = useReactToPrint({
     contentRef: printContentRef,
@@ -71,6 +79,33 @@ const ReportsDashboard = () => {
     page,
     per_page: pageSize,
   });
+
+  const handleCloseReport = useCallback((reportId) => {
+    setCloseReportId(reportId);
+  }, []);
+
+  const handleConfirmClose = useCallback(async () => {
+    if (!closeReportId) return;
+    try {
+
+      //close mutation
+      const response = await closeReportById(closeReportId).unwrap();
+
+      appToast.success(
+        "Checklist closed!",
+        response?.message ?? "The checklist has beenclosed successfully."
+      )
+      setCloseReportId(null);
+      
+    } catch (error) {
+      console.log("Failed to close report", error);
+
+      appToast.error(
+        "Error",
+        error?.message ?? "Failed to close checklist.",
+      )
+    }
+  }, [closeReportId, closeReportById]);
 
   const handleOpenDetail = useCallback(
     (reportId) => navigate(`/workspace/reports/${reportId}`),
@@ -183,50 +218,89 @@ const ReportsDashboard = () => {
         cell: ({ row }) => {
           const report = row.original;
 
-          if (activeTab === "generated") {
-            return (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
+          switch (activeTab) {
+            case "closed":
+              return (
+                <Button size="sm" onClick={() => handleOpenDetail(report.id)}>
+                  View
+                </Button>
+              );
 
-                <DropdownMenuContent align="end" className="w-40 rounded-xl">
-                  <DropdownMenuItem
-                    onSelect={() => handleOpenDetail(report.id)}
-                  >
-                    <Eye className="h-4 w-4" />
-                    View
-                  </DropdownMenuItem>
+            case "ongoing":
+              return (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
 
-                  <DropdownMenuSeparator />
+                  <DropdownMenuContent align="end" className="w-40 rounded-xl">
+                    <DropdownMenuItem
+                      onSelect={() => handleOpenDetail(report.id)}
+                    >
+                      <Eye className="h-4 w-4" />
+                      View
+                    </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    disabled={isFetchingReportById}
-                    onSelect={() => handlePrintPdf(report.id)}
-                  >
-                    <Printer className="h-4 w-4" />
-                    Print
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            );
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onSelect={() => handleCloseReport(report.id)}
+                    >
+                      <X className="h-4 w-4" />
+                      Close
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              );
+
+            case "generated":
+              return (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="end" className="w-40 rounded-xl">
+                    <DropdownMenuItem
+                      onSelect={() => handleOpenDetail(report.id)}
+                    >
+                      <Eye className="h-4 w-4" />
+                      View
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                      disabled={isFetchingReportById}
+                      onSelect={() => handlePrintPdf(report.id)}
+                    >
+                      <Printer className="h-4 w-4" />
+                      Print
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              );
+
+            default:
+              return (
+                <Button size="sm" onClick={() => handleOpenDetail(report.id)}>
+                  Open
+                </Button>
+              );
           }
-
-          return (
-            <Button size="sm" onClick={() => handleOpenDetail(report.id)}>
-              Open
-            </Button>
-          );
         },
       },
     ],
-    [activeTab, handleOpenDetail, handlePrintPdf, isFetchingReportById],
+    [activeTab, handleOpenDetail, handlePrintPdf, isFetchingReportById, handleCloseReport],
   );
 
   return (
-    <div className="flex flex-col gap-0 h-full">
+    <div className="flex flex-col gap-5 h-full">
       <div>
         <h1 className="text-2xl font-semibold">Reports</h1>
         <p className="text-sm text-muted-foreground">
@@ -259,6 +333,13 @@ const ReportsDashboard = () => {
           />
         </div>
       )}
+
+      <CloseConfirm
+        open={Boolean(closeReportId)}
+        onClose={() => setCloseReportId(null)}
+        onConfirm={handleConfirmClose}
+        isLoading={isClosingReportById}
+      />
     </div>
   );
 };

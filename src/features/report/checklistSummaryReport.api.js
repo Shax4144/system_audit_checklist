@@ -4,9 +4,9 @@ import { baseApi } from "../users/base.api"
 const BASE_ENDPOINT = "api/publish-checklists"
 
 export const reportsApi = baseApi
-	.enhanceEndpoints({
-		addTagTypes: ["Reports"],
-	})
+	// .enhanceEndpoints({
+	// 	addTagTypes: ["Reports"],
+	// })
 	.injectEndpoints({
 		endpoints: (builder) => ({
 			fetchReports: builder.query({
@@ -24,6 +24,13 @@ export const reportsApi = baseApi
 					method: "GET",
 				}),
 				providesTags: (result, error, id) => [{ type: "Reports", id }],
+      }),
+			closeReportById: builder.mutation({
+				query: (id) => ({
+					url: `${BASE_ENDPOINT}/close/${id}`,
+					method: "DELETE",
+				}),
+				invalidatesTags: ["Reports"],
 			}),
 		}),
 	})
@@ -31,5 +38,6 @@ export const reportsApi = baseApi
 export const {
   useFetchReportsQuery,
   useFetchReportByIdQuery,
-  useLazyFetchReportByIdQuery
+  useLazyFetchReportByIdQuery,
+  useCloseReportByIdMutation,
 } = reportsApi

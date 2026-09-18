@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite --host --port 0808",
     "build": "vite build",
+    "build:pretest": "vite build --mode pretest",
+    "build:production": "vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview"
   },

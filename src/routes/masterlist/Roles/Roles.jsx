@@ -15,7 +15,9 @@ import {
 import RolesTable from "./RolesTable"
 
 const Roles = () => {
-	const [showArchived, setShowArchived] = useState(false)
+	// const [showArchived, setShowArchived] = useState(false)
+	const [status, setStatus] = useState("active")
+	const isArchived = status === "archived"
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState(10)
 	const [search, setSearch] = useState("")
@@ -36,7 +38,7 @@ const Roles = () => {
 		error,
 	} = useFetchRolesQuery(
 		{
-			status: showArchived ? 0 : 1,
+			status: isArchived ? 0 : 1,
 			page,
 			per_page: pageSize,
 			search: debouncedSearch || undefined,
@@ -50,7 +52,12 @@ const Roles = () => {
 	const [openAddRoleDialog, setOpenAddRoleDialog] = useState(false)
 	const [openArchiveDialog, setOpenArchiveDialog] = useState(false)
 	const [openRestoreDialog, setOpenRestoreDialog] = useState(false)
-	const { selectedRow, setSelectedRow, clearSelectedRow } = useSelectedRow()
+  const { selectedRow, setSelectedRow, clearSelectedRow } = useSelectedRow()
+
+	const handleStatusChange = (status) => {
+    setStatus(status)
+		setPage(1)
+	}
 
 	const handleOpenRoleDialog = () => {
 		clearSelectedRow()
@@ -162,11 +169,13 @@ const Roles = () => {
 					isFetching={isFetching}
 					isError={isError}
 					error={error}
+					status={status}
+					onStatusChange={handleStatusChange}
 					onEdit={handleOpenEdit}
 					onArchive={handleOpenArchive}
 					onRestore={handleOpenRestore}
-					showArchived={showArchived}
-					onToggleArchived={setShowArchived}
+					// showArchived={showArchived}
+					// onToggleArchived={setShowArchived}
 					page={page}
 					onPageChange={setPage}
 					pageSize={pageSize}

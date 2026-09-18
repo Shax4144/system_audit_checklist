@@ -12,21 +12,18 @@ import { useMemo } from "react"
 import StatusToggle from "../../../components/StatusToggle"
 import MasterlistTableWrapper from "../../../components/tables/MasterlistTableWrapper"
 
-const tabs = [
-	{ label: "Active", value: "active" },
-	{ label: "Archived", value: "archived" },
-]
-
 const SupplierTable = ({
 	data,
 	isFetching,
 	isError,
-	error,
+  error,
+  status,
+	onStatusChange,
 	onArchive,
 	onRestore,
 	onEdit,
-	showArchived,
-	onToggleArchived,
+	// showArchived,
+	// onToggleArchived,
 	page,
 	onPageChange,
 	pageSize,
@@ -95,7 +92,8 @@ const SupplierTable = ({
 			{
 				accessorKey: "status",
 				header: "Status",
-				cell: ({ row }) => {
+        cell: () => {
+          const showArchived = status === "archived"
 					return (
 						<Badge
 							className={
@@ -122,7 +120,7 @@ const SupplierTable = ({
 						</DropdownMenuTrigger>
 						{/* content */}
 						<DropdownMenuContent align="end" className="w-40 rounded-xl">
-							{showArchived ? (
+							{status === "archived" ? (
 								<DropdownMenuItem
 									className="text-green-600 focus:text-green-700"
 									onSelect={() => {
@@ -152,7 +150,7 @@ const SupplierTable = ({
 				),
 			},
 		],
-		[onEdit, onArchive, onRestore],
+		[onEdit, onArchive, onRestore, status],
 	)
 
 	return (
@@ -172,8 +170,11 @@ const SupplierTable = ({
 			onPageSizeChange={onPageSizeChange}
 			filterSlot={
 				<StatusToggle
-					checked={showArchived}
-					onCheckedChange={onToggleArchived}
+					// checked={showArchived}
+					// onCheckedChange={onToggleArchived}
+					value={status}
+          onChange={onStatusChange}
+					options={["archived", "active"]}
 				/>
 			}
 		/>
