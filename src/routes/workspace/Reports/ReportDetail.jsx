@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, OctagonAlert } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFetchReportByIdQuery } from "../../../features/report/checklistSummaryReport.api";
 import AuditReportTab from "./AuditReportTab";
@@ -143,6 +144,11 @@ const ReportDetail = () => {
           <p className="text-sm text-muted-foreground">
             Reference Number: {info.reference_no}
           </p>
+          {isClosed && (
+            <Badge className="bg-red-100  text-red-700  dark:bg-red-900  dark:text-red-300">
+              <OctagonAlert /> <p className="text-sm">Closed</p>
+            </Badge>
+          )}
         </div>
       </div>
 

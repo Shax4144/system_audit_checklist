@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useSubmitSectionMutation } from "../../../features/checklist/submitSectionChecklist.api";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, Clock4, Loader2 } from "lucide-react";
+import { ChevronLeft, Clock4, Loader2, OctagonAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 // import { useSelector } from "react-redux"
@@ -45,14 +45,14 @@ const MyChecklistAnswer = () => {
   // ?.find((c) => String(c.id) === String(id))
   useEffect(() => {
     if (!checklistData?.checklist) return;
-  
+
     const initialAnswers = {};
-  
+
     checklistData.checklist.forEach((section, sectionIndex) => {
       const hasSubsections =
         Array.isArray(section["sub-sections"]) &&
         section["sub-sections"].length > 0;
-  
+
       if (hasSubsections) {
         section["sub-sections"].forEach((sub, subIdx) => {
           (sub["sub-items"] ?? []).forEach((question, qIdx) => {
@@ -77,10 +77,10 @@ const MyChecklistAnswer = () => {
         });
       }
     });
-  
+
     setAllAnswers(initialAnswers);
   }, [checklistData]);
-  
+
   const handleSectionAnswersChange = (sectionIndex) => (questionKey, value) => {
     setAllAnswers((prev) => ({
       ...prev,
@@ -413,6 +413,11 @@ const MyChecklistAnswer = () => {
         section.is_answered === "1",
     );
 
+  const isChecklistClosed =
+    checklistData?.is_closed === 1 ||
+    checklistData?.is_closed === true ||
+    checklistData?.is_closed === "1";
+
   return (
     <div className="flex flex-col gap-6 max-w-3xl mx-auto pb-20">
       <div className="flex items-center w-full gap-2">
@@ -435,10 +440,17 @@ const MyChecklistAnswer = () => {
                 Supplier: {info.supplier}
               </p>
             </div>
-            <div>
+            <div className="flex flex-col items-end gap-2">
               <p className="text-xl text-muted-foreground">
                 {checklistData?.information?.reference_no}
               </p>
+              {isChecklistClosed && (
+                <div>
+                  <Badge className="bg-red-100 text-red-700  dark:bg-red-900 dark:text-red-300">
+                    <OctagonAlert /> <p className="text-sm">Closed</p>
+                  </Badge>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -512,6 +524,7 @@ const MyChecklistAnswer = () => {
               currentSection.originalIndex,
             )}
             answers={currentSectionAnswers}
+            isClosed={isChecklistClosed}
           />
 
           <div className="flex justify-start gap-4 mt-4">
@@ -531,7 +544,7 @@ const MyChecklistAnswer = () => {
               <Button
                 className="shadow-sm"
                 onClick={handleRetryFromFailed}
-                disabled={isSubmittingAll}
+                disabled={isSubmittingAll || isChecklistClosed}
                 variant="destructive"
               >
                 {isSubmittingAll && (
@@ -540,7 +553,8 @@ const MyChecklistAnswer = () => {
                 {isSubmittingAll ? "Retrying..." : "Retry Submission"}
               </Button>
             ) : (
-              !allAnswered && (
+              !allAnswered &&
+              !isChecklistClosed && (
                 <Button
                   onClick={handleSubmitAll}
                   disabled={!allSectionsGraded || isSubmittingAll}

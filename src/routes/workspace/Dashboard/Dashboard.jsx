@@ -21,7 +21,15 @@ const Dashboard = () => {
 	const [location, setLocation] = useState("")
   // const [category, setCategory] = useState("")
 
-  
+  const handleTabChange = (tab) => {
+    setActiveTab(tab)
+    setPage(1)
+  }
+
+  const handleLocationChange = (location) => {
+    setLocation(location)
+    setPage(1)
+  }
 	
 	useEffect(() => {
 		const timeout = setTimeout(() => {
@@ -31,7 +39,32 @@ const Dashboard = () => {
 		return () => clearTimeout(timeout)
 	}, [search])
 
-	const isAnsweredParam = activeTab === "pending" ? 0 : 1;
+	// const isAnsweredParam = activeTab === "pending" ? 0 : 1;
+	const getTabFilters = (tab) => {
+		switch (tab) {
+			case "pending":
+				return {
+					is_answered: 0,
+					is_closed: 0,
+				};
+	
+			case "for_consolidate":
+				return {
+					is_answered: 1,
+					is_closed: 0,
+				};
+	
+			case "closed":
+				return {
+					is_closed: 1,
+				};
+	
+			default:
+				return {};
+		}
+  };
+
+	const tabFilters = getTabFilters(activeTab);
 
 	const { data: publishedResponse,
 		isFetching: isFetchingPublished,
@@ -44,7 +77,8 @@ const Dashboard = () => {
 			search: debouncedSearch,
 			location: location, 
 			// category: category,
-			is_answered: isAnsweredParam,
+			// is_answered: isAnsweredParam,
+			...tabFilters,
 		},
 		{
 			refetchOnMountOrArgChange: true,
@@ -165,7 +199,7 @@ const Dashboard = () => {
 							placeholder="Search supplier's name or business address etc.,"
 							value={search}
 							onChange={
-								(e) => setSearch?.(e.target.value)
+								(e) => setSearch(e.target.value)
 							}
 							className="pl-9 shadow-sm py-6 rounded-xl"
 						/>
@@ -176,7 +210,7 @@ const Dashboard = () => {
 					<LocationDropdown
 						triggerClassName="w-full h-13 rounded-xl shadow-lg"
 						value={location}
-						onChange={setLocation}
+						onChange={handleLocationChange}
 					/>
 				</div>
 
@@ -197,10 +231,11 @@ const Dashboard = () => {
 					isError={isError}
 					error={error}
 					page={page}
+					onPageChange={setPage}
 					pageSize={pageSize}
 					onPageSizeChange={setPageSize}
 					activeTab={activeTab}
-					onTabChange={setActiveTab}
+					onTabChange={handleTabChange}
 				/>
 			</div>
 		</div>
