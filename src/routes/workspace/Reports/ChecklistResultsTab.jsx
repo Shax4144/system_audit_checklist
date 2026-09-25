@@ -1,5 +1,34 @@
 import { Badge } from "@/components/ui/badge";
 
+const toRoman = (num) => {
+  const roman = [
+    [1000, "M"],
+    [900, "CM"],
+    [500, "D"],
+    [400, "CD"],
+    [100, "C"],
+    [90, "XC"],
+    [50, "L"],
+    [40, "XL"],
+    [10, "X"],
+    [9, "IX"],
+    [5, "V"],
+    [4, "IV"],
+    [1, "I"],
+  ];
+
+  let result = "";
+
+  for (const [value, symbol] of roman) {
+    while (num >= value) {
+      result += symbol;
+      num -= value;
+    }
+  }
+
+  return result;
+};
+
 const RATING_STYLES = {
   5: "bg-green-100 text-green-700 border border-green-200",
   4: "bg-blue-100 text-blue-700 border border-blue-200",
@@ -175,7 +204,12 @@ const ChecklistResultsTab = ({ report }) => {
           return (
             <div key={sIndex} className="rounded-xl border bg-card p-5">
               <div className="flex items-center justify-between gap-4 mb-4">
-                <h2 className="font-medium text-lg">{section.section}</h2>
+                <h2 className="font-medium text-lg">
+                  <span className="mr-2 font-semibold text-primary">
+                    {toRoman(sIndex + 1)}.
+                  </span>
+                  {section.section}
+                </h2>
 
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-2">
@@ -200,13 +234,29 @@ const ChecklistResultsTab = ({ report }) => {
               </div>
 
               {hasSubsections ? (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col">
                   {section["sub-sections"].map((sub, subIdx) => (
-                    <div key={subIdx} className="border-l-2 pl-4">
-                      <h3 className="font-medium text-sm mb-2 text-muted-foreground">
-                        {sub.item}
-                      </h3>
-                      <ItemsTable items={sub["sub-items"] ?? []} />
+                    <div
+                      key={subIdx}
+                      className={`py-5 ${
+                        subIdx > 0 ? "border-t border-border/70" : ""
+                      }`}
+                    >
+                      {/* Sub-section header */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="shrink-0 text-sm font-semibold text-primary">
+                          {sIndex + 1}.{String.fromCharCode(97 + subIdx)}
+                        </span>
+
+                        <h3 className="text-sm font-semibold text-foreground">
+                          {sub.item}
+                        </h3>
+                      </div>
+
+                      {/* Questions */}
+                      <div className="pl-6">
+                        <ItemsTable items={sub["sub-items"] ?? []} />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -232,7 +282,12 @@ const ItemsTable = ({ items }) => {
             className="flex items-center justify-between gap-4 py-2 border-b last:border-0 text-sm"
           >
             <div className="flex-1">
-              <p>{item.name}</p>
+              <p>
+                <span className="mr-2 font-semibold text-primary">
+                  {i + 1}.
+                </span>
+                {item.name}
+              </p>
 
               {answer?.remarks && (
                 <span className="text-xs text-muted-foreground whitespace-normal wrap-break-words">

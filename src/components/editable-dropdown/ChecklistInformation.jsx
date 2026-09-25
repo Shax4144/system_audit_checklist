@@ -33,6 +33,28 @@ const initialChecklistInfo = {
   auditLanguage: "English and Filipino",
 };
 
+const getAuditScopeFromRemarks = (remarks) => {
+  const normalized = String(remarks ?? "")
+    .trim()
+    .toLowerCase();
+
+  if (normalized === "manufacturer" || normalized === "manufacturing") {
+    return (
+      auditScope.find((item) => item.key === "Manufacturing of Raw Materials")
+        ?.value ?? ""
+    );
+  }
+
+  if (normalized === "warehousing") {
+    return (
+      auditScope.find((item) => item.key === "Warehousing of Raw Materials")
+        ?.value ?? ""
+    );
+  }
+
+  return "";
+};
+
 const ChecklistInformation = ({ value, onChange }) => {
   const info = value ?? initialChecklistInfo;
 
@@ -92,6 +114,8 @@ const ChecklistInformation = ({ value, onChange }) => {
                 // 	"selectedSupplier.location:",
                 // 	selectedSupplier?.location,
                 // )
+                const remarks = selectedSupplier?.remarks ?? "";
+                const autoAuditScope = getAuditScopeFromRemarks(remarks);
                 onChange({
                   ...info,
                   supplier: name,
@@ -104,7 +128,8 @@ const ChecklistInformation = ({ value, onChange }) => {
                   email: selectedSupplier?.email ?? "",
                   location: selectedSupplier?.location ?? info.location,
                   products: selectedSupplier?.products_offered ?? info.products,
-                  remarks: selectedSupplier?.remarks ?? "",
+                  remarks,
+                  auditScope: autoAuditScope,
                 });
               }}
               isLoading={loadingSuppliers}
@@ -186,7 +211,7 @@ const ChecklistInformation = ({ value, onChange }) => {
               onChange={(val) => updateField("auditScope", val)}
               options={scopeOptions}
               isLoading={false}
-              placeholder="Select or type audit scope"
+              placeholder="Auto-filled from chosen supplier"
               readOnly
             />
           </div>

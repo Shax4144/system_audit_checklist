@@ -30,7 +30,7 @@ export const reportsApi = baseApi
 					url: `${BASE_ENDPOINT}/close/${id}`,
 					method: "DELETE",
 				}),
-				invalidatesTags: ["Reports"],
+				invalidatesTags: ["Reports", "ReportCounts", "Counts"],
 			}),
 		}),
 	})

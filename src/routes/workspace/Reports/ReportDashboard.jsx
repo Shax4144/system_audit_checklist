@@ -8,6 +8,9 @@ import {
   useLazyFetchReportByIdQuery,
   useCloseReportByIdMutation,
 } from "../../../features/report/checklistSummaryReport.api";
+import {
+  useFetchReportCountQuery,
+} from "../../../features/count/reportCount.api";
 // import PdfPreviewModal from "../../../components/PdfPreviewModal"
 import ReportPdfContent from "../../../components/ReportPdfContent";
 import {
@@ -59,6 +62,19 @@ const ReportsDashboard = () => {
 
   const [closeReportById, { isLoading: isClosingReportById }] = useCloseReportByIdMutation();
 
+  const { data: reportCountResponse,
+     // isFetching: isFetchingReportCount,
+     // isError: isErrorReportCount,
+     // error: errorReportCount,
+  } = useFetchReportCountQuery({ refetchOnMountOrArgChange: true })
+
+  const reportTabCounts = {
+    ongoing: reportCountResponse?.badge?.ongoing ?? 0,
+    consolidated: reportCountResponse?.badge?.consolidated ?? 0,
+    generated: reportCountResponse?.badge?.generated ?? 0,
+    closed: reportCountResponse?.badge?.closed ?? 0,
+  }
+
   const printReport = useReactToPrint({
     contentRef: printContentRef,
     pageStyle: PRINT_PAGE_STYLE,
@@ -96,7 +112,7 @@ const ReportsDashboard = () => {
         response?.message ?? "The checklist has beenclosed successfully."
       )
       setCloseReportId(null);
-      
+
     } catch (error) {
       console.log("Failed to close report", error);
 
@@ -107,9 +123,14 @@ const ReportsDashboard = () => {
     }
   }, [closeReportId, closeReportById]);
 
+  // const handleOpenDetail = useCallback(
+  //   (reportId) => navigate(`/workspace/reports/${reportId}`),
+  //   [navigate],
+  // );
   const handleOpenDetail = useCallback(
-    (reportId) => navigate(`/workspace/reports/${reportId}`),
-    [navigate],
+    (reportId) =>
+      navigate(`/workspace/reports/${reportId}?tab=${activeTab}`),
+    [navigate, activeTab],
   );
 
   const handlePrintPdf = useCallback(
@@ -323,6 +344,7 @@ const ReportsDashboard = () => {
         activeTab={activeTab}
         onTabChange={handleTabChange}
         tabs={TABS}
+        tabCounts={reportTabCounts}
       />
 
       {reportToPrint && (

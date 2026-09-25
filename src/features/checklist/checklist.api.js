@@ -45,7 +45,7 @@ export const checklistsApi = baseApi
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Checklists", "Reports"],
+        invalidatesTags: ["Checklists", "Reports", "Counts", "ReportCounts"],
       }),
       multipleArchiveChecklists: builder.mutation({
         query: (ids) => ({

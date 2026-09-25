@@ -8,8 +8,10 @@ const Toaster = ({
   const { theme = "system" } = useTheme()
 
   return (
-		<Sonner
-			richColors
+    <Sonner
+      {...props}
+      richColors
+      closeButton
 			theme={theme}
 			className="toaster group"
 			icons={{
@@ -37,10 +39,9 @@ const Toaster = ({
 					warning: "cn-toast-warning",
 					info: "cn-toast-info",
 				},
-			}}
-			{...props}
-		/>
-	)
+      }}
+    />
+  )
 }
 
 export { Toaster }

@@ -5,25 +5,38 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select"
-import { useFetchUserAccountsQuery } from "../../features/user-accounts/users.api"
+} from "@/components/ui/select";
+import { useFetchUserAccountsQuery } from "../../features/user-accounts/users.api";
 
-const UserAccountsDropdown = ({ value, onChange, open, triggerClassName, disabledValues = [] }) => {
+const UserAccountsDropdown = ({
+  value,
+  onChange,
+  open,
+  triggerClassName,
+  disabledValues = [],
+}) => {
   const { data: userAccountResponse, isFetching } = useFetchUserAccountsQuery(
     { pagination: "none" },
-    { skip: !open},
-  )
+    { skip: !open },
+  );
 
-  const userAccountData = userAccountResponse?.data ?? []
+  const userAccountData = userAccountResponse?.data ?? [];
 
   return (
-		<Select value={value} onValueChange={onChange} disabled={isFetching}>
-			<SelectTrigger className={triggerClassName}>
-				<SelectValue placeholder={isFetching ? "Loading..." : "User"} />
-			</SelectTrigger>
-			<SelectContent position="popper">
+    <Select value={value} onValueChange={onChange} disabled={isFetching}>
+      <SelectTrigger
+        className={`
+          ${triggerClassName ?? ""}
+          [&>svg]:transition-transform
+          [&>svg]:duration-200
+          data-[state=open]:[&>svg]:rotate-180
+        `}
+      >
+        <SelectValue placeholder={isFetching ? "Loading..." : "User"} />
+      </SelectTrigger>
+      <SelectContent position="popper">
         {userAccountData.map((user) => {
-          const isDisabled = disabledValues.includes(String(user.id))
+          const isDisabled = disabledValues.includes(String(user.id));
           return (
             <SelectItem
               key={user.id}
@@ -32,11 +45,11 @@ const UserAccountsDropdown = ({ value, onChange, open, triggerClassName, disable
             >
               {user.first_name} {user.last_name}
             </SelectItem>
-          )
+          );
         })}
-			</SelectContent>
-		</Select>
-	)
-}
+      </SelectContent>
+    </Select>
+  );
+};
 
-export default UserAccountsDropdown
+export default UserAccountsDropdown;

@@ -10,6 +10,7 @@ import {
 	PopoverContent,
 } from "@/components/ui/popover"
 import { ChevronDown, X } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 const MultipleEditableDropdownField = ({
 	label,
@@ -69,7 +70,11 @@ const MultipleEditableDropdownField = ({
 								</span>
 							)}
 						</div>
-						<ChevronDown className="h-4 w-4 shrink-0 opacity-50 ml-2" />
+            <ChevronDown className={
+              cn(
+                "h-4 w-4 shrink-0 opacity-50 ml-2 transition-transform duration-200",
+                open && "rotate-180",
+              )} />
 					</Button>
 				</PopoverTrigger>
 

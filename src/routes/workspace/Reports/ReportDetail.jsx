@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, OctagonAlert } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { ChevronLeft, OctagonAlert, FilePlus2 } from "lucide-react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useFetchReportByIdQuery } from "../../../features/report/checklistSummaryReport.api";
 import AuditReportTab from "./AuditReportTab";
 import ChecklistResultsTab from "./ChecklistResultsTab";
@@ -16,7 +17,14 @@ const isChecklistClosed = (report) => report?.is_closed === true;
 const ReportDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
+  const reportTab = searchParams.get("tab") ?? "ongoing";
+
+  const isConsolidated = reportTab === "consolidated";
+  const isGenerated = reportTab === "generated";
+
+  const [reportDetailTab, setReportDetailTab] = useState("results");
   const { data: response, isFetching, isError } = useFetchReportByIdQuery(id);
   const report = response?.data;
 
@@ -24,11 +32,7 @@ const ReportDetail = () => {
     return (
       <div className="flex flex-col gap-6 max-w-5xl mx-auto pb-20">
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="xl"
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="ghost" size="xl" onClick={() => navigate(-1)}>
             <ChevronLeft className="size-xl" />
           </Button>
           <div className="w-full">
@@ -37,7 +41,7 @@ const ReportDetail = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="results">
+        <Tabs value={reportDetailTab} onValueChange={setReportDetailTab}>
           <div className="flex sticky top-0 z-10 bg-transparent pb-2 justify-end items-center">
             <TabsList className="gap-1">
               <TabsTrigger disabled value="results">
@@ -152,39 +156,92 @@ const ReportDetail = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="results">
+      <Tabs value={reportDetailTab} onValueChange={setReportDetailTab}>
         <div className="flex flex-col sticky top-0 z-10 bg-transparent pb-2 items-end">
-          <TabsList className="gap-1">
-            <TabsTrigger
-              value="results"
-              className="
+          <div className="flex items-center justify-between gap-3">
+            <TabsList className="gap-1">
+              <TabsTrigger
+                value="results"
+                className="
+                  border
+                  border-border
+                  transition-colors
+
                   data-[state=active]:bg-primary
-                  dark:data-[state=active]:bg-primary
                   data-[state=active]:text-primary-foreground
+                  data-[state=active]:border-primary
+
                   data-[state=inactive]:bg-transparent
                   data-[state=inactive]:text-muted-foreground
-                  border
-                  data-[state=inactive]:border-border
-                  data-[state=active]:border-primary"
-            >
-              Checklist Results
-            </TabsTrigger>
-            <TabsTrigger
-              disabled={!allAnswered || isClosed}
-              value="audit-report"
-              className="
-                  data-[state=active]:bg-primary
-                  dark:data-[state=active]:bg-primary
-                  data-[state=active]:text-primary-foreground
-                  data-[state=inactive]:bg-transparent
-                  data-[state=inactive]:text-muted-foreground
-                  border
-                  data-[state=inactive]:border-border
-                  data-[state=active]:border-primary"
-            >
-              Audit Report
-            </TabsTrigger>
-          </TabsList>
+
+                  data-[state=inactive]:hover:bg-muted
+                  data-[state=inactive]:hover:text-foreground
+                  data-[state=inactive]:hover:border-primary/50
+
+                  dark:data-[state=inactive]:hover:bg-muted/60
+                  dark:data-[state=inactive]:hover:text-foreground
+                  dark:data-[state=inactive]:hover:border-primary/60
+                "
+              >
+                Checklist Results
+              </TabsTrigger>
+
+              {isGenerated && (
+                <TabsTrigger
+                  disabled={!allAnswered || isClosed}
+                  value="audit-report"
+                  className="
+                    border
+                    border-border
+                    transition-colors
+                  
+                    data-[state=active]:bg-primary
+                    data-[state=active]:text-primary-foreground
+                    data-[state=active]:border-primary
+                  
+                    data-[state=inactive]:bg-transparent
+                    data-[state=inactive]:text-muted-foreground
+                  
+                    data-[state=inactive]:hover:bg-muted
+                    data-[state=inactive]:hover:text-foreground
+                    data-[state=inactive]:hover:border-primary/50
+                  
+                    dark:data-[state=inactive]:hover:bg-muted/60
+                    dark:data-[state=inactive]:hover:text-foreground
+                    dark:data-[state=inactive]:hover:border-primary/60
+                  "
+                >
+                  Audit Report
+                </TabsTrigger>
+              )}
+            </TabsList>
+
+            {isConsolidated && (
+              <Button
+                disabled={!allAnswered || isClosed}
+                onClick={() => setReportDetailTab("audit-report")}
+                className={
+                  reportDetailTab === "audit-report"
+                    ? `
+                        bg-primary
+                        text-primary-foreground
+                        border-primary
+                        hover:bg-primary/90
+                      `
+                    : `
+                        bg-transparent
+                        text-muted-foreground
+                        border-border
+                        hover:bg-muted
+                        hover:text-foreground
+                      `
+                }
+              >
+                <FilePlus2 className="h-4 w-4" />
+                Create Report
+              </Button>
+            )}
+          </div>
           {!allAnswered && (
             <p className="text-xs text-muted-foreground mt-2">
               All sections must be submitted before the Audit Report can be
@@ -206,7 +263,7 @@ const ReportDetail = () => {
           value="audit-report"
           forceMount
         >
-          <AuditReportTab report={report} />
+          <AuditReportTab report={report} mode={reportTab} />
         </TabsContent>
       </Tabs>
     </div>

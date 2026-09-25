@@ -42,6 +42,7 @@ export const baseApi = createApi({
     "PendingUsers",
     "Published",
     "Reports",
+    "ReportCounts",
     "Roles",
     "Submit",
     "Suppliers",

@@ -34,6 +34,7 @@ const DashboardTable = ({
   onPageSizeChange,
   activeTab,
   onTabChange,
+  tabCounts,
 }) => {
   const navigate = useNavigate();
 
@@ -186,6 +187,7 @@ const DashboardTable = ({
         activeTab={activeTab}
         onTabChange={onTabChange}
         tabs={tabs}
+        tabCounts={tabCounts}
       />
     </div>
   );

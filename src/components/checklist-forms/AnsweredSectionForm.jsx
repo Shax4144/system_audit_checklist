@@ -226,8 +226,8 @@ const AnsweredSectionForm = forwardRef(
     }));
 
     return (
-      <div className="rounded-xl border bg-card p-5 shadow-sm">
-        <div className="flex items-center justify-between gap-4 mb-4">
+      <div className="rounded-xl border bg-card pr-5 pl-5 shadow-sm">
+        {/* <div className="flex items-center justify-between gap-4 mb-4">
           <h2 className="font-medium text-lg">{section.section}</h2>
           <div className="flex items-center gap-2">
             {isAnswered && (
@@ -237,20 +237,34 @@ const AnsweredSectionForm = forwardRef(
               </Badge>
             )}
           </div>
-        </div>
+        </div>*/}
 
         {hasSubsections ? (
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col">
             {section["sub-sections"].map((sub, subIdx) => (
-              <div key={subIdx} className="border-l-2 pl-4">
-                <h3 className="font-medium text-sm mb-2 text-muted-foreground">
-                  {sub.item}
-                </h3>
-                <div className="flex flex-col">
+              <div
+                key={subIdx}
+                className={`
+                  py-5
+                  ${subIdx > 0 ? "border-t border-border/70" : ""}
+                `}
+              >
+                {/* Sub-section header */}
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="h-5 w-1 rounded-full bg-primary shrink-0" />
+          
+                  <h3 className="text-sm font-semibold text-foreground">
+                    {sub.item}
+                  </h3>
+                </div>
+          
+                {/* Questions */}
+                <div className="pl-3 flex flex-col">
                   {(sub["sub-items"] ?? []).map((q, qIdx) => (
                     <QuestionAnswer
                       key={`${subIdx}-${qIdx}`}
                       question={q}
+                      questionNumber={qIdx + 1}
                       value={answers[`${subIdx}-${qIdx}`]}
                       onChange={handleAnswerChange(`${subIdx}-${qIdx}`)}
                       disabled={isAnswered || isClosed}
@@ -266,6 +280,7 @@ const AnsweredSectionForm = forwardRef(
               <QuestionAnswer
                 key={qIdx}
                 question={q}
+                questionNumber={qIdx + 1}
                 value={answers[`${qIdx}`]}
                 onChange={handleAnswerChange(`${qIdx}`)}
                 disabled={isAnswered || isClosed}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -40,9 +40,20 @@ const FormBuilder = () => {
   const { id: formId } = useParams();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  
   const isNew = !formId;
+  const restoredForm = location.state?.restoredForm ?? null;
 
-  const [form, setForm] = useState(isNew ? initialFormState : null);
+  // const [form, setForm] = useState(isNew ? initialFormState : null);
+
+  const [form, setForm] = useState(() => {
+    if (isNew) {
+      return initialFormState;
+    }
+  
+    return restoredForm ?? null;
+  });
 
   // fetch the whole list (no single-item endpoint yet), skip entirely when creating new
   const { data: checklistsResponse, isFetching } = useFetchChecklistsQuery(
@@ -72,7 +83,7 @@ const FormBuilder = () => {
   const isSaving = isCreating || isUpdating;
 
   useEffect(() => {
-    if (!isNew && checklistData) {
+    if (!isNew && checklistData && !restoredForm) {
       const sections = (checklistData.checklist ?? []).map((s, sIndex) => {
         const hasSubsections = Boolean(s["sub-sections"]);
 
@@ -131,7 +142,7 @@ const FormBuilder = () => {
         sections,
       });
     }
-  }, [checklistData, isNew]);
+  }, [checklistData, isNew, restoredForm]);
 
   useEffect(() => {
     const scrollContainer = document.querySelector("main");
@@ -251,8 +262,12 @@ const FormBuilder = () => {
   };
 
   const handlePreview = () => {
+    const previewChecklist = buildPayload();
     navigate(`/workspace/checklist/builder/${formId}/preview`, {
-      replace: true,
+      state: {
+        checklist: previewChecklist,
+        builderForm: form,
+      },
     });
   };
 
@@ -268,12 +283,89 @@ const FormBuilder = () => {
     );
   };
 
+  //checker for duplicate title section
   const hasDuplicateSections = () => {
     const titles = form.sections
       .map((section) => section.title?.trim().toLowerCase())
       .filter(Boolean);
 
     return new Set(titles).size !== titles.length;
+  };
+
+  // checker for section/sub-section without question
+  const getEmptySections = () => {
+    const emptySections = [];
+
+    form.sections.forEach((section) => {
+      // Section has subsections
+      if (section.subsections?.length > 0) {
+        section.subsections.forEach((subsection) => {
+          const hasQuestions = (subsection.questions?.length || 0) > 0;
+
+          if (!hasQuestions) {
+            emptySections.push({
+              type: "subsection",
+              sectionTitle: section.title?.trim() || "Untitled Section",
+              subsectionTitle:
+                subsection.title?.trim() || "Untitled Subsection",
+            });
+          }
+        });
+
+        return;
+      }
+
+      // Section without subsections
+      const hasQuestions = (section.questions?.length || 0) > 0;
+
+      if (!hasQuestions) {
+        emptySections.push({
+          type: "section",
+          sectionTitle: section.title?.trim() || "Untitled Section",
+        });
+      }
+    });
+
+    return emptySections;
+  };
+
+  // checker for questions without a selected category
+  const getQuestionsWithoutCategory = () => {
+    const invalidQuestions = [];
+
+    form.sections.forEach((section) => {
+      // Normal section questions
+      if (section.subsections?.length === 0) {
+        section.questions?.forEach((question, questionIndex) => {
+          if (!question.category?.trim()) {
+            invalidQuestions.push({
+              sectionTitle: section.title || "Untitled Section",
+              questionLabel:
+                question.label?.trim() || `Question ${questionIndex + 1}`,
+            });
+          }
+        });
+
+        return;
+      }
+
+      // Questions inside subsections
+      section.subsections?.forEach((subsection, subsectionIndex) => {
+        subsection.questions?.forEach((question, questionIndex) => {
+          if (!question.category?.trim()) {
+            invalidQuestions.push({
+              sectionTitle: section.title || "Untitled Section",
+              subsectionTitle:
+                subsection.title || `Subsection ${subsectionIndex + 1}`,
+              questionLabel:
+                question.label?.trim() || `Question ${questionIndex + 1}`,
+            });
+          }
+        });
+      });
+    });
+
+    return invalidQuestions;
   };
 
   // const handleSave = async () => {
@@ -311,6 +403,55 @@ const FormBuilder = () => {
         "Each section must have a unique name.",
       );
       return;
+    }
+
+    if (hasZeroWeightSection) {
+      appToast.warning(
+        "Missing section weight",
+        "Every section must have a weight greater than 0%.",
+      );
+    }
+
+    const emptySections = getEmptySections();
+
+    if (emptySections.length > 0) {
+      const names = emptySections
+        .map((item) => {
+          if (item.type === "subsection") {
+            return `Subsection "${item.subsectionTitle}" in Section "${item.sectionTitle}"`;
+          }
+
+          return `Section "${item.sectionTitle}"`;
+        })
+        .join(", ");
+
+      appToast.warning(
+        "Empty section",
+        `${names} ${emptySections.length === 1 ? "has" : "have"} no questions. Please add at least one question.`,
+      );
+
+      return;
+    }
+
+    const questionsWithoutCategory = getQuestionsWithoutCategory();
+
+    if (questionsWithoutCategory.length > 0) {
+      const names = questionsWithoutCategory
+        .map((item) => {
+          if (item.subsectionTitle) {
+            return `${item.sectionTitle} > ${item.subsectionTitle} > ${item.questionLabel}`;
+          }
+
+          return `${item.sectionTitle} > ${item.questionLabel}`;
+        })
+        .join(", ");
+
+      appToast.warning(
+        "Missing question category",
+        `Please select a category for the following question(s): ${names}.`,
+      );
+
+      return; // IMPORTANT: prevent saving
     }
 
     try {
@@ -400,6 +541,10 @@ const FormBuilder = () => {
   );
   const isValidTotal = totalPercentage === 100;
 
+  const hasZeroWeightSection = form.sections.some(
+    (s) => Number(s.percentage) === 0,
+  );
+
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto pb-20">
       <div className="flex items-center justify-between">
@@ -461,7 +606,7 @@ const FormBuilder = () => {
                   <Button
                     variant="outline"
                     onClick={handleSave}
-                    disabled={isSaving || !isValidTotal}
+                    disabled={isSaving || !isValidTotal || hasZeroWeightSection}
                   >
                     {isSaving ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -500,7 +645,7 @@ const FormBuilder = () => {
 
       <div
         className={`sticky top-0 z-10 flex items-center justify-between rounded-lg border px-4 py-2.5 text-sm shadow-sm ${
-          isValidTotal
+          isValidTotal && !hasZeroWeightSection
             ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/70 dark:text-green-300"
             : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/70 dark:text-amber-300"
         }`}
@@ -508,6 +653,9 @@ const FormBuilder = () => {
         <span>Total section weight</span>
         <span className="font-semibold">
           {totalPercentage}%{!isValidTotal && " (should total 100%)"}
+          {isValidTotal &&
+            hasZeroWeightSection &&
+            " (one or more section(s) have 0% weight)"}
         </span>
       </div>
 

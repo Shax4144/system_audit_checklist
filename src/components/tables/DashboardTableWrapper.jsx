@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
 const DashboardTableWrapper = ({
   columns,
@@ -40,6 +41,7 @@ const DashboardTableWrapper = ({
   activeTab,
   onTabChange,
   tabs,
+  tabCounts,
 }) => {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -119,21 +121,89 @@ const DashboardTableWrapper = ({
                 key={tab.value}
                 value={tab.value}
                 className="
-									rounded-b-xs
-									px-8 py-6
-									text-sm
-									font-bold
-									border
-									data-[state=active]:bg-primary
-									dark:data-[state=active]:bg-primary
-									data-[state=active]:text-primary-foreground
-									data-[state=active]:border-primary
-									data-[state=inactive]:bg-transparent
-									data-[state=inactive]:text-muted-foreground
-									data-[state=inactive]:border-border
-								"
+                  group
+                  rounded-b-xs
+                  px-8 py-6
+                  text-sm
+                  font-bold
+                  border
+                  transition-colors
+
+                  data-[state=active]:bg-primary
+                  dark:data-[state=active]:bg-primary/70
+                  data-[state=active]:text-primary-foreground
+                  data-[state=active]:border-primary
+
+                  data-[state=inactive]:bg-transparent
+                  data-[state=inactive]:text-muted-foreground
+                  data-[state=inactive]:border-border
+
+                  data-[state=inactive]:hover:bg-muted
+                  dark:data-[state=inactive]:hover:bg-muted/60
+                "
               >
-                {tab.label}
+                <span className="flex items-center gap-2">
+                  {tab.label}
+
+                  {(() => {
+                    const countMap = {
+                      // dashboard
+                      pending: tabCounts.pending,
+                      for_consolidate: tabCounts.for_consolidate,
+                      
+
+                      //reports
+                      ongoing: tabCounts.ongoing,
+                      consolidated: tabCounts.consolidated,
+                      generated: tabCounts.generated,
+
+                      // both
+                      closed: tabCounts.closed,
+                    };
+
+                    const count = countMap[tab.value] ?? 0;
+
+                    return (
+                      <Badge
+                        variant="outline"
+                        className="
+                          flex
+                          h-5
+                          min-w-5
+                          items-center
+                          justify-center
+                          rounded-full
+                          border
+                          px-1.5
+                          text-[10px]
+                          font-bold
+                          leading-none
+                          transition-all
+                          durat
+                          /* Inactive */
+                          border-blue-200
+                          bg-blue-50
+                          text-b
+                          group-hover:data-[state=inactive]:border-b
+                          /* Active */
+                          group-data-[state=active]:border-primary-foreground/20
+                          group-data-[state=active]:bg-primary-foreground/15
+                          group-data-[state=active]:text-primary-foreground
+                          group-data-[state=active]:shadow-[inset_0_0_0_1px_rgba(255,255,255
+                          /* Dark mode */
+                          dark:border-blue-800/60
+                          dark:bg-blue-950/50
+                          dark:text-b
+                          dark:group-data-[state=active]:border-primary-foreground/20
+                          dark:group-data-[state=active]:bg-primary-foreground/10
+                          dark:group-data-[state=active]:text-primary-foreground
+                        "
+                      >
+                        {count}
+                      </Badge>
+                    );
+                  })()}
+                </span>
               </TabsTrigger>
             ))}
           </TabsList>

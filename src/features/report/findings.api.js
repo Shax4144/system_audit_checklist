@@ -13,7 +13,7 @@ export const findingsApi = baseApi
           method: "POST",
           body,
         }),
-        invalidatesTags: ["Findings", "Reports"],
+        invalidatesTags: ["Findings", "Reports", "ReportCounts"],
       }),
     }),
   })
