@@ -8,6 +8,8 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useFetchReportByIdQuery } from "../../../features/report/checklistSummaryReport.api";
 import AuditReportTab from "./AuditReportTab";
 import ChecklistResultsTab from "./ChecklistResultsTab";
+import ChecklistTabLoading from "../../../components/TabSwitchLoading";
+
 
 const isChecklistFullyAnswered = (sections = []) =>
   sections.length > 0 && sections.every((s) => s.is_answered === 1);
@@ -25,8 +27,16 @@ const ReportDetail = () => {
   const isGenerated = reportTab === "generated";
 
   const [reportDetailTab, setReportDetailTab] = useState("results");
+  const [isTabSwitching, setIsTabSwitching] = useState(false);
   const { data: response, isFetching, isError } = useFetchReportByIdQuery(id);
   const report = response?.data;
+
+  const handleTabChange = (tab) => {
+    setIsTabSwitching(true);
+    setReportDetailTab(tab);
+
+    setTimeout(() => setIsTabSwitching(false), 600);
+  } 
 
   if (isFetching || !report) {
     return (
@@ -156,7 +166,7 @@ const ReportDetail = () => {
         </div>
       </div>
 
-      <Tabs value={reportDetailTab} onValueChange={setReportDetailTab}>
+      <Tabs value={reportDetailTab} onValueChange={handleTabChange}>
         <div className="flex flex-col sticky top-0 z-10 bg-transparent pb-2 items-end">
           <div className="flex items-center justify-between gap-3">
             <TabsList className="gap-1">
@@ -219,7 +229,7 @@ const ReportDetail = () => {
             {isConsolidated && (
               <Button
                 disabled={!allAnswered || isClosed}
-                onClick={() => setReportDetailTab("audit-report")}
+                onClick={() => handleTabChange("audit-report")}
                 className={
                   reportDetailTab === "audit-report"
                     ? `
@@ -255,7 +265,14 @@ const ReportDetail = () => {
           value="results"
           forceMount
         >
-          <ChecklistResultsTab report={report} />
+          {isTabSwitching ? (
+            <ChecklistTabLoading
+              title="Loading Checklist Results"
+              description="Preparing the checklist results and audit findings..."
+            />
+          ) : (
+            <ChecklistResultsTab report={report} />
+          )}
         </TabsContent>
 
         <TabsContent
@@ -263,7 +280,14 @@ const ReportDetail = () => {
           value="audit-report"
           forceMount
         >
-          <AuditReportTab report={report} mode={reportTab} />
+          {isTabSwitching ? (
+              <ChecklistTabLoading
+                title="Preparing Audit Report"
+                description="Loading the audit report workspace based on the checklist results..."
+              />
+            ) : (
+              <AuditReportTab report={report} mode={reportTab} />
+            )}
         </TabsContent>
       </Tabs>
     </div>

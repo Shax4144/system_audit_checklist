@@ -181,7 +181,7 @@ const MyChecklistAnswer = () => {
    * isCompleted = true  → Submit
    */
   const buildSectionPayload = (section, isCompleted) => {
-    const sectionIndex = section.originalIndex;
+    // const sectionIndex = section.originalIndex;
     const questions = getSectionQuestions(section);
 
     const content = questions.map((question) => {

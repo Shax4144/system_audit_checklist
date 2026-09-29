@@ -29,7 +29,7 @@ const TABS = [
   { value: "ongoing", label: "Ongoing" },
   { value: "consolidated", label: "Consolidated" },
   { value: "generated", label: "Generated" },
-  { value: "closed", label: "Closed" },
+  { value: "closed", label: "Cancelled" },
 ];
 
 // The browser owns pagination; @page margins reserve a safe content area for
@@ -271,7 +271,7 @@ const ReportsDashboard = () => {
                       onSelect={() => handleCloseReport(report.id)}
                     >
                       <X className="h-4 w-4" />
-                      Close
+                      Cancel
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

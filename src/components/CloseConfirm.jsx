@@ -56,11 +56,11 @@ const CloseConfirm = ({
           </AlertDialogMedia>
 
           <AlertDialogTitle>
-            Close this checklist?
+            Cancel this checklist?
           </AlertDialogTitle>
 
           <AlertDialogDescription>
-            Closing this checklist will prevent further answers or changes to its responses. To continue, type{" "}
+            Cancelling this checklist will prevent further answers or changes to its responses. To continue, type{" "}
             <span className="font-semibold text-foreground">
               {CONFIRM_TEXT}
             </span>{" "}
@@ -97,7 +97,7 @@ const CloseConfirm = ({
             onClick={handleClose}
             disabled={isLoading}
           >
-            Cancel
+            Back
           </AlertDialogCancel>
 
           <AlertDialogAction
@@ -112,7 +112,7 @@ const CloseConfirm = ({
                 Closing...
               </>
             ) : (
-              "Close Checklist"
+              "Cancel Checklist"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

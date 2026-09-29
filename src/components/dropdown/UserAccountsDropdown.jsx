@@ -32,7 +32,7 @@ const UserAccountsDropdown = ({
           data-[state=open]:[&>svg]:rotate-180
         `}
       >
-        <SelectValue placeholder={isFetching ? "Loading..." : "User"} />
+        <SelectValue placeholder={isFetching ? "Loading..." : "Select"} />
       </SelectTrigger>
       <SelectContent position="popper">
         {userAccountData.map((user) => {

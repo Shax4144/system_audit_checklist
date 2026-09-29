@@ -12,7 +12,7 @@ const STATUS_STYLES = {
     "bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-900/40 dark:text-slate-300 dark:border-slate-700",
 
   done: "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700",
-  closed:
+  cancelled:
     "bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700",
 };
 
@@ -20,7 +20,7 @@ const STATUS_LABELS = {
   pending: "Pending",
   ongoing: "On going",
   done: "Done",
-  closed: "Closed",
+  cancelled: "Cancelled",
 };
 
 const DashboardTable = ({
@@ -64,7 +64,7 @@ const DashboardTable = ({
 
   const deriveStatus = (checklist) => {
     if (checklist?.deleted_at) {
-      return "closed";
+      return "cancelled";
     }
 
     const checklistSections = checklist?.checklist ?? [];
@@ -150,7 +150,7 @@ const DashboardTable = ({
           const status = deriveStatus(row.original);
           const id = row.original.id;
 
-          return ["done", "ongoing", "closed"].includes(status) ? (
+          return ["done", "ongoing", "cancelled"].includes(status) ? (
             <Button onClick={() => navigate(`/dashboard/my-checklist/${id}`)}>
               Show
             </Button>
@@ -168,7 +168,7 @@ const DashboardTable = ({
   const tabs = [
     { value: "pending", label: "Pending" },
     { value: "for_consolidate", label: "For Consolidate" },
-    { value: "closed", label: "Closed" },
+    { value: "closed", label: "Cancelled" },
   ];
 
   return (
