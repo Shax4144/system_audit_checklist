@@ -244,6 +244,7 @@ const ChecklistResultsTab = ({ report }) => {
                     >
                       {/* Sub-section header */}
                       <div className="flex items-center gap-2 mb-4">
+                        <span className="h-5 w-1 shrink-0 rounded-full bg-primary" />
                         <span className="shrink-0 text-sm font-semibold text-primary">
                           {sIndex + 1}.{String.fromCharCode(97 + subIdx)}
                         </span>

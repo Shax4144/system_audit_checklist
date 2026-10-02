@@ -17,12 +17,13 @@ import {
   ChevronLeft,
   Trash2,
   ArrowUp,
+  AlertCircle,
+  RefreshCw,
 } from "lucide-react";
 import {
-  useFetchChecklistsQuery,
+  useFetchChecklistByIdQuery,
   usePostChecklistMutation,
   useUpdateChecklistMutation,
-  // usePublishChecklistMutation,
   useArchiveChecklistMutation,
 } from "../../features/checklist/checklist.api";
 import { createEmptySection } from "../../features/checklist/formBuilder.helpers";
@@ -56,18 +57,22 @@ const FormBuilder = () => {
   });
 
   // fetch the whole list (no single-item endpoint yet), skip entirely when creating new
-  const { data: checklistsResponse, isFetching } = useFetchChecklistsQuery(
-    { pagination: "none" },
-    { skip: isNew },
-  );
+  const {
+    data: checklistResponse,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useFetchChecklistByIdQuery(formId, {
+    skip: isNew || Boolean(restoredForm),
+  });
 
   // console.log("formId from URL:", formId)
   // console.log("checklistsResponse:", checklistsResponse)
 
   // find the matching checklist by id from the fetched list
-  const checklistData = checklistsResponse?.data?.find(
-    (c) => String(c.id) === String(formId),
-  );
+  const checklistData = checklistResponse?.data
+    // ?.find((c) => String(c.id) === String(formId));
 
   // console.log("checklistData found:", checklistData)
 
@@ -488,27 +493,6 @@ const FormBuilder = () => {
     }
   };
 
-  // const handlePublish = async () => {
-  // 	try {
-  // 		const payload = buildPayload()
-  // 		const response = await publishChecklist({ id: formId, ...payload }).unwrap()
-  // 		const for_publishing = response.data?.id
-  // 		const data = response.data
-  // 		appToast.success(
-  // 			"Checklist successfully published.",
-  // 			response?.message ?? "Your checklist has been published, go to Checklist Assignment to assign and add due date."
-  // 		)
-  // 		console.log("id: ", for_publishing);
-  // 		console.log("payload: ", data);
-
-  // 	} catch (err) {
-  // 		appToast.error(
-  // 			"Error",
-  // 			err?.data?.message ?? "Failed to publish the checklist"
-  // 		)
-  // 	}
-  // }
-
   const handleConfirmDelete = async () => {
     try {
       const response = await archiveChecklist(formId).unwrap();
@@ -526,12 +510,96 @@ const FormBuilder = () => {
       setOpenDeleteConfirm(false);
     }
   };
-
-  if (!isNew && (isFetching || !form)) {
+  
+  if (!isNew && isFetching && !checklistData) {
     return (
-      <p className="text-sm text-muted-foreground py-10 text-center">
-        Loading form...
-      </p>
+      <div className="mx-auto flex min-h-100 max-w-4xl items-center justify-center px-4">
+        <div className="flex flex-col items-center text-center">
+          <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Loader2 className="size-6 animate-spin" />
+          </div>
+  
+          <h2 className="text-sm font-semibold">
+            Loading form
+          </h2>
+  
+          <p className="mt-1 text-sm text-muted-foreground">
+            Preparing the checklist builder...
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!isNew && isError && !checklistData) {
+    const isNotFound = error?.status === 404;
+  
+    return (
+      <div className="mx-auto flex min-h-100 max-w-4xl items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-xl border bg-card p-6 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <AlertCircle className="size-6" />
+          </div>
+  
+          <h2 className="text-base font-semibold">
+            {isNotFound
+              ? "Checklist not found"
+              : "Unable to load checklist"}
+          </h2>
+  
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {isNotFound
+              ? "The checklist you are trying to edit may have been deleted or is no longer available."
+              : error?.data?.message ??
+                "Something went wrong while loading the checklist. Please try again."}
+          </p>
+  
+          <div className="mt-6 flex justify-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+            >
+              <ChevronLeft className="mr-1 size-4" />
+              Go Back
+            </Button>
+  
+            {!isNotFound && (
+              <Button
+                onClick={refetch}
+                disabled={isFetching}
+              >
+                {isFetching ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="mr-2 size-4" />
+                )}
+                Retry
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // API succeeded but useEffect hasn't initialized the builder form yet
+  if (!isNew && checklistData && !form) {
+    return (
+      <div className="mx-auto flex min-h-100 max-w-4xl items-center justify-center px-4">
+        <div className="flex flex-col items-center text-center">
+          <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Loader2 className="size-6 animate-spin" />
+          </div>
+  
+          <h2 className="text-sm font-semibold">
+            Preparing form
+          </h2>
+  
+          <p className="mt-1 text-sm text-muted-foreground">
+            Setting up the checklist builder...
+          </p>
+        </div>
+      </div>
     );
   }
 

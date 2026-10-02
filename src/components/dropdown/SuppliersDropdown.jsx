@@ -64,7 +64,16 @@ const SuppliersDropdown = ({
         align="start"
         className="w-(--radix-popover-trigger-width) p-0"
       >
-        <Command>
+        <Command
+          filter={(value, search) => {
+            const supplierName = value.toLowerCase();
+            const searchValue = search.toLowerCase().trim();
+
+            if (!searchValue) return 1;
+
+            return supplierName.includes(searchValue) ? 1 : 0;
+          }}
+        >
           <CommandInput placeholder="Search supplier..." />
 
           <CommandList className="custom-scrollbar mt-1">
@@ -87,8 +96,16 @@ const SuppliersDropdown = ({
                         isSelected ? "opacity-100" : "opacity-0",
                       )}
                     />
-
-                    {supplier.name}
+                    <span>
+                      <p className="font-semibold">{supplier.name}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{`${supplier.location} - ${supplier.remarks}`}</p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {supplier.products_offered?.join(", ") || "—"}
+                      </p>
+                    </span>
+                   
+                    
+                    
                   </CommandItem>
                 );
               })}

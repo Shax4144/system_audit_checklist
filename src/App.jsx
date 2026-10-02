@@ -14,7 +14,7 @@ const MyChecklistAnswer = lazy(
 );
 
 //OneRDF INTEGRATION
-import ExternalRedirect from "./ExternalRedirect";
+// import ExternalRedirect from "./ExternalRedirect";
 import Redirect from "./Redirect";
 
 import { Toaster } from "@/components/ui/sonner";

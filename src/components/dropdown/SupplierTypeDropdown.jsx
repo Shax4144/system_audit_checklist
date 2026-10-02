@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select"
 import { supplierTypes } from "../../constant/supplier-type"
 
-const SupplierDropdown = ({ value, onChange, open, triggerClassName, disabled }) => {
+const SupplierDropdown = ({ value, onChange, triggerClassName, disabled }) => {
 
   return (
 		<Select value={value} onValueChange={onChange} disabled={disabled}>

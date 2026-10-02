@@ -213,6 +213,7 @@ const ChecklistInformation = ({ value, onChange }) => {
               isLoading={false}
               placeholder="Auto-filled from chosen supplier"
               readOnly
+              removeDropdown
             />
           </div>
 

@@ -1,7 +1,12 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Loader2, ArrowUp } from "lucide-react";
+import {
+  ChevronLeft,
+  Loader2,
+  ArrowUp,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -10,7 +15,7 @@ import ChecklistInformation from "../../../components/editable-dropdown/Checklis
 import { appToast } from "../../../components/Toast";
 
 import {
-  useFetchChecklistsQuery,
+  useFetchChecklistByIdQuery,
   usePublishChecklistMutation,
 } from "../../../features/checklist/checklist.api";
 
@@ -51,14 +56,16 @@ const ChecklistAssignmentDetail = () => {
   const [sectionAssignments, setSectionAssignments] = useState({});
   const [checklistInfo, setChecklistInfo] = useState(null);
 
-  const { data: checklistsResponse, isFetching } =
-    useFetchChecklistsQuery({
-      pagination: "none",
-    });
+  const {
+    data: checklistsResponse,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useFetchChecklistByIdQuery(id);
 
-  const checklistData = checklistsResponse?.data?.find(
-    (c) => String(c.id) === String(id),
-  );
+  const checklistData = checklistsResponse?.data;
+  // ?.find((c) => String(c.id) === String(id));
 
   const [publishAssignment, { isLoading: isPublishing }] =
     usePublishChecklistMutation();
@@ -135,12 +142,9 @@ const ChecklistAssignmentDetail = () => {
   const allSectionsAssigned =
     checklistData &&
     checklistData.checklist.length > 0 &&
-    checklistData.checklist.every(
-      (_, index) => sectionAssignments[index],
-    );
+    checklistData.checklist.every((_, index) => sectionAssignments[index]);
 
-  const canPublish =
-    allRequiredChecklistInfoFilled && allSectionsAssigned;
+  const canPublish = allRequiredChecklistInfoFilled && allSectionsAssigned;
 
   /*
    * Build assignment payload
@@ -187,8 +191,7 @@ const ChecklistAssignmentDetail = () => {
 
       appToast.success(
         "Checklist published",
-        response?.message ??
-          "Assignments have been created for each section.",
+        response?.message ?? "Assignments have been created for each section.",
       );
 
       navigate("/workspace/checklist-assignment");
@@ -205,11 +208,80 @@ const ChecklistAssignmentDetail = () => {
   /*
    * Loading
    */
-  if (isFetching || !checklistData) {
+
+  if (isFetching) {
     return (
-      <p className="py-10 text-center text-sm text-muted-foreground">
-        Loading checklist...
-      </p>
+      <div className="mx-auto flex max-w-3xl min-h-100 items-center justify-center">
+        <div className="flex flex-col items-center text-center">
+          <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Loader2 className="size-6 animate-spin" />
+          </div>
+
+          <h2 className="text-sm font-semibold">Loading checklist</h2>
+
+          <p className="mt-1 text-sm text-muted-foreground">
+            Preparing the checklist for assignment...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    const isNotFound = error?.status === 404;
+
+    return (
+      <div className="mx-auto flex max-w-3xl min-h-100 items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-xl border bg-card p-6 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <AlertCircle className="size-6" />
+          </div>
+
+          <h2 className="text-base font-semibold">
+            {isNotFound ? "Checklist not found" : "Unable to load checklist"}
+          </h2>
+
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {isNotFound
+              ? "The checklist you are trying to access may have been deleted or is no longer available."
+              : (error?.data?.message ??
+                "Something went wrong while loading this checklist. Please try again.")}
+          </p>
+
+          <div className="mt-6 flex justify-center gap-2">
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              <ChevronLeft className="mr-1 size-4" />
+              Go Back
+            </Button>
+
+            {!isNotFound && (
+              <Button onClick={refetch}>
+                <RefreshCw className="mr-2 size-4" />
+                Retry
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!checklistData) {
+    return (
+      <div className="mx-auto flex max-w-3xl min-h-100 items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-sm font-medium">Checklist data is unavailable.</p>
+
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => navigate(-1)}
+          >
+            <ChevronLeft className="mr-1 size-4" />
+            Go Back
+          </Button>
+        </div>
+      </div>
     );
   }
 
@@ -217,11 +289,7 @@ const ChecklistAssignmentDetail = () => {
     <div className="mx-auto flex max-w-3xl flex-col gap-6 pb-20">
       {/* Header */}
       <div className="flex w-full items-center gap-3">
-        <Button
-          variant="ghost"
-          size="xl"
-          onClick={() => navigate(-1)}
-        >
+        <Button variant="ghost" size="xl" onClick={() => navigate(-1)}>
           <ChevronLeft className="size-full" />
         </Button>
 
@@ -253,63 +321,59 @@ const ChecklistAssignmentDetail = () => {
 
       {/* Mobile publish */}
       <div className="flex justify-end sm:hidden">
-        <Button
-          onClick={handlePublish}
-          disabled={!canPublish || isPublishing}
-        >
-          {isPublishing && (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          )}
+        <Button onClick={handlePublish} disabled={!canPublish || isPublishing}>
+          {isPublishing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Publish
         </Button>
       </div>
 
       {/* Checklist information */}
-      <ChecklistInformation
-        value={checklistInfo}
-        onChange={setChecklistInfo}
-      />
+      <ChecklistInformation value={checklistInfo} onChange={setChecklistInfo} />
 
       {/* Sections */}
       <div className="flex flex-col gap-5">
-        {(checklistData.checklist ?? []).map(
-          (section, sIndex) => {
-            const hasSubsections =
-              Array.isArray(section["sub-sections"]) &&
-              section["sub-sections"].length > 0;
+        {(checklistData.checklist ?? []).map((section, sIndex) => {
+          const hasSubsections =
+            Array.isArray(section["sub-sections"]) &&
+            section["sub-sections"].length > 0;
 
-            const sectionNumber = sIndex + 1;
+          const sectionNumber = sIndex + 1;
 
-            return (
-              <div
-                key={sIndex}
-                className="rounded-xl border bg-card p-5 shadow-sm"
-              >
-                {/* Section title */}
-                <div className="flex items-center justify-between gap-4">
-                  <h2 className="text-lg font-semibold">
-                    <span className="mr-2 font-bold text-primary">
-                      {toRoman(sectionNumber)}.
-                    </span>
+          return (
+            <div
+              key={sIndex}
+              className="rounded-xl border bg-card p-5 shadow-sm"
+            >
+              {/* Section title */}
+              <div className="flex items-center justify-between gap-4">
+                <h2 className="text-lg font-semibold">
+                  <span className="mr-2 font-bold text-primary">
+                    {toRoman(sectionNumber)}.
+                  </span>
 
-                    {section.section}
-                  </h2>
+                  {section.section}
+                </h2>
 
+                <div className="flex flex-col items-end gap-1">
                   {sectionAssignments[sIndex] && (
                     <Badge className="flex shrink-0 items-center gap-1 bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
                       Assigned
                     </Badge>
                   )}
+                  <span className="flex gap-2 items-center">
+                    <p className="text-muted-foreground text-xs">Weight:</p>
+                    <p className="text-sm text-primary font-semibold">{section.percentage}%</p>
+                  </span>
                 </div>
+              </div>
 
-                {/* Checklist content */}
-                {hasSubsections ? (
-                  <div className="mt-4 flex flex-col gap-4">
-                    {section["sub-sections"].map(
-                      (sub, subIndex) => (
-                        <div
-                          key={subIndex}
-                          className="
+              {/* Checklist content */}
+              {hasSubsections ? (
+                <div className="mt-4 flex flex-col gap-4">
+                  {section["sub-sections"].map((sub, subIndex) => (
+                    <div
+                      key={subIndex}
+                      className="
                             rounded-lg
                             border
                             border-border
@@ -317,44 +381,38 @@ const ChecklistAssignmentDetail = () => {
                             p-4
                             shadow-sm
                           "
-                        >
-                          {/* Sub-section title */}
-                          <div className="mb-4 flex items-center gap-2">
-                            <span className="h-5 w-1 shrink-0 rounded-full bg-primary" />
+                    >
+                      {/* Sub-section title */}
+                      <div className="mb-4 flex items-center gap-2">
+                        <span className="h-5 w-1 shrink-0 rounded-full bg-primary" />
 
-                            <span className="text-sm font-semibold text-primary">
-                              {toRoman(sectionNumber)}
-                              .
-                              {String.fromCharCode(
-                                97 + subIndex,
-                              )}
-                            </span>
+                        <span className="text-sm font-semibold text-primary">
+                          {sIndex + 1}.
+                          {String.fromCharCode(97 + subIndex)}
+                        </span>
 
-                            <h3 className="text-sm font-semibold text-foreground">
-                              {sub.item}
-                            </h3>
-                          </div>
+                        <h3 className="text-sm font-semibold text-foreground">
+                          {sub.item}
+                        </h3>
+                      </div>
 
-                          {/* Questions */}
-                          <div className="pl-3">
-                            {(sub["sub-items"] ?? []).map(
-                              (question, qIndex) => (
-                                <PreviewQuestion
-                                  key={qIndex}
-                                  question={question}
-                                  questionNumber={qIndex + 1}
-                                />
-                              ),
-                            )}
-                          </div>
-                        </div>
-                      ),
-                    )}
-                  </div>
-                ) : (
-                  /* Questions without subsection */
-                  <div
-                    className="
+                      {/* Questions */}
+                      <div className="pl-3">
+                        {(sub["sub-items"] ?? []).map((question, qIndex) => (
+                          <PreviewQuestion
+                            key={qIndex}
+                            question={question}
+                            questionNumber={qIndex + 1}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                /* Questions without subsection */
+                <div
+                  className="
                       mt-4
                       rounded-lg
                       border
@@ -363,50 +421,43 @@ const ChecklistAssignmentDetail = () => {
                       p-4
                       shadow-sm
                     "
-                  >
-                    <div className="flex flex-col">
-                      {(section.item ?? []).map(
-                        (question, qIndex) => (
-                          <PreviewQuestion
-                            key={qIndex}
-                            question={question}
-                            questionNumber={qIndex + 1}
-                          />
-                        ),
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Assignment control */}
-                <div className="mt-5 border-t pt-4">
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-medium">
-                        Assigned User
-                      </label>
-
-                      {sectionAssignments[sIndex] && (
-                        <span className="text-xs text-muted-foreground">
-                          Ready to publish
-                        </span>
-                      )}
-                    </div>
-
-                    <UsersDropdown
-                      value={sectionAssignments[sIndex] ?? ""}
-                      onChange={(value) =>
-                        handleAssignUser(sIndex, value)
-                      }
-                      open={true}
-                      triggerClassName="w-full"
-                    />
+                >
+                  <div className="flex flex-col">
+                    {(section.item ?? []).map((question, qIndex) => (
+                      <PreviewQuestion
+                        key={qIndex}
+                        question={question}
+                        questionNumber={qIndex + 1}
+                      />
+                    ))}
                   </div>
                 </div>
+              )}
+
+              {/* Assignment control */}
+              <div className="mt-5 border-t pt-4">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">Assigned User</label>
+
+                    {sectionAssignments[sIndex] && (
+                      <span className="text-xs text-muted-foreground">
+                        Ready to publish
+                      </span>
+                    )}
+                  </div>
+
+                  <UsersDropdown
+                    value={sectionAssignments[sIndex] ?? ""}
+                    onChange={(value) => handleAssignUser(sIndex, value)}
+                    open={true}
+                    triggerClassName="w-full"
+                  />
+                </div>
               </div>
-            );
-          },
-        )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Back to top */}
@@ -446,13 +497,8 @@ const ChecklistAssignmentDetail = () => {
 
       {/* Bottom publish */}
       <div className="flex justify-end border-t pt-4">
-        <Button
-          onClick={handlePublish}
-          disabled={!canPublish || isPublishing}
-        >
-          {isPublishing && (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          )}
+        <Button onClick={handlePublish} disabled={!canPublish || isPublishing}>
+          {isPublishing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Publish
         </Button>
       </div>
@@ -469,10 +515,7 @@ const ChecklistAssignmentDetail = () => {
  * - File upload
  * - Answer selection
  */
-const PreviewQuestion = ({
-  question,
-  questionNumber,
-}) => {
+const PreviewQuestion = ({ question, questionNumber }) => {
   const gradeOptions = ["1", "2", "3", "4", "5", "N/A"];
 
   return (
@@ -485,18 +528,13 @@ const PreviewQuestion = ({
             {questionNumber}.
           </span>
 
-          <p className="text-sm font-medium leading-relaxed">
-            {question.name}
-          </p>
+          <p className="text-sm font-medium leading-relaxed">{question.name}</p>
         </div>
 
         {/* Category + ratings */}
         <div className="hidden shrink-0 items-center gap-2 md:flex">
           {question.category && (
-            <Badge
-              variant="outline"
-              className="text-xs"
-            >
+            <Badge variant="outline" className="text-xs">
               {question.category}
             </Badge>
           )}
@@ -530,10 +568,7 @@ const PreviewQuestion = ({
       {/* Mobile category + rating */}
       <div className="flex items-center justify-end gap-2 md:hidden">
         {question.category && (
-          <Badge
-            variant="outline"
-            className="text-xs"
-          >
+          <Badge variant="outline" className="text-xs">
             {question.category}
           </Badge>
         )}

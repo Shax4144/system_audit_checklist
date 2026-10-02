@@ -20,7 +20,8 @@ const EditableDropdownField = ({
 	isLoading,
 	onSelectOption, 
 	placeholder,
-	readOnly = false,
+  readOnly = false,
+	removeDropdown = false,
 }) => {
 	const [open, setOpen] = useState(false)
 
@@ -46,7 +47,8 @@ const EditableDropdownField = ({
 					readOnly={readOnly}
 				/>
 
-				<Popover open={open} onOpenChange={setOpen}>
+        {!removeDropdown && (
+          <Popover open={open} onOpenChange={setOpen}>
 					<PopoverTrigger asChild>
 						<Button
 							variant="outline"
@@ -54,15 +56,15 @@ const EditableDropdownField = ({
 							type="button"
 							disabled={isLoading}
 						>
-              <ChevronDown
-                className={cn(
-                  "h-4 w-4 transition-transform duration-200",
-                  open && "rotate-180"
-                )}
-              />
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        open && "rotate-180"
+                      )}
+                    />
 						</Button>
 					</PopoverTrigger>
-
+      
 					<PopoverContent
 						className="w-64 p-1 max-h-60 overflow-y-auto"
 						align="end"
@@ -90,6 +92,7 @@ const EditableDropdownField = ({
 						)}
 					</PopoverContent>
 				</Popover>
+				)}
 			</div>
 		</div>
 	)

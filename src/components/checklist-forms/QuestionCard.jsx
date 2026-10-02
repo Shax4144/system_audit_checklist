@@ -4,7 +4,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { GripVertical, Trash2, Plus, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+// import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { QUESTION_TYPES, generateId } from "../../features/checklist/formBuilder.helpers"
 

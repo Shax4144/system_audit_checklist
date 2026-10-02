@@ -16,6 +16,13 @@ export const checklistsApi = baseApi
         }),
         providesTags: ["Checklists"],
       }),
+      fetchChecklistById: builder.query({
+        query: (id) => ({
+          url: `${BASE_ENDPOINT}/${id}`,
+          method: "GET",
+        }),
+        providesTags: ["Checklists"],
+      }),
       postChecklist: builder.mutation({
         query: (body) => ({
           url: BASE_ENDPOINT,
@@ -61,6 +68,7 @@ export const checklistsApi = baseApi
 export const {
   useFetchChecklistsQuery,
   useLazyFetchChecklistsQuery,
+  useFetchChecklistByIdQuery,
   usePostChecklistMutation,
   useUpdateChecklistMutation,
   useArchiveChecklistMutation,

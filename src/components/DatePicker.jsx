@@ -26,7 +26,7 @@ const DatePicker = ({value, onChange, placeholder, disabled}) => {
 						{value ? format(value, "PPP") : <span className='text-muted-foreground'>{placeholder}</span>}
 					</Button>
 				</PopoverTrigger>
-				<PopoverContent className="w-auto p-0" align="start">
+				<PopoverContent className="w-auto p-0" align="middle">
 					<Calendar
 						mode="single"
 						selected={value}
