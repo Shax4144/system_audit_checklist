@@ -628,7 +628,7 @@ const AuditReportTab = ({ report }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="fixed bottom-1 right-10 z-50 bg-transparent p-6">
+        <div className="fixed bottom-1 right-10 z-10 bg-transparent p-6">
           {!hasFindings ? (
             <Button
               variant="default"
