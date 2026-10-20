@@ -12,7 +12,13 @@ import {
 
 
 
-const DatePicker = ({value, onChange, placeholder, disabled}) => {
+const DatePicker = ({ value, onChange, placeholder, disabled, minDate, maxDate }) => {
+
+  const disabledDates = [
+    ...(minDate ? [{ before: minDate }] : []),
+    ...(maxDate ? [{ after: maxDate }] : [])
+  ];
+  
   return (
 		<Field className="mx-auto">
 			<Popover>
@@ -28,10 +34,13 @@ const DatePicker = ({value, onChange, placeholder, disabled}) => {
 				</PopoverTrigger>
 				<PopoverContent className="w-auto p-0" align="middle">
 					<Calendar
-						mode="single"
-						selected={value}
-						onSelect={onChange}
-						defaultMonth={value}
+            mode="single"
+            selected={value}
+            onSelect={onChange}
+            defaultMonth={value}
+            disabled={disabledDates}
+            startMonth={minDate}
+            endMonth={maxDate}
 					/>
 				</PopoverContent>
 			</Popover>

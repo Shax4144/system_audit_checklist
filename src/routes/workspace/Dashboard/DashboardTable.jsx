@@ -98,10 +98,10 @@ const DashboardTable = ({
         accessorKey: "supplier",
         header: "Supplier's Name",
       },
-      {
-        accessorKey: "address",
-        header: "Business address",
-      },
+      // {
+      //   accessorKey: "address",
+      //   header: "Business address",
+      // },
       // {
       // 	accessorKey: "tin_no",
       // 	header: "TIN #",

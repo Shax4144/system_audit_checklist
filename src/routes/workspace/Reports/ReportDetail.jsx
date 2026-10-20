@@ -10,7 +10,6 @@ import AuditReportTab from "./AuditReportTab";
 import ChecklistResultsTab from "./ChecklistResultsTab";
 import ChecklistTabLoading from "../../../components/TabSwitchLoading";
 
-
 const isChecklistFullyAnswered = (sections = []) =>
   sections.length > 0 && sections.every((s) => s.is_answered === 1);
 
@@ -36,9 +35,9 @@ const ReportDetail = () => {
     setReportDetailTab(tab);
 
     setTimeout(() => setIsTabSwitching(false), 600);
-  } 
+  };
 
-  if (isFetching || !report) {
+  if (isFetching && !report) {
     return (
       <div className="flex flex-col gap-6 max-w-5xl mx-auto pb-20">
         <div className="flex items-center gap-3">
@@ -58,7 +57,14 @@ const ReportDetail = () => {
                 Checklist Results
               </TabsTrigger>
               <TabsTrigger disabled value="audit-report">
-                Audit Report
+                {isGenerated ? (
+                  "Audit Report"
+                ) : (
+                  <div className="flex gap-2 items-center ">
+                    <FilePlus2 className="h-4 w-4" />
+                    Create Report
+                  </div>
+                )}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -176,6 +182,7 @@ const ReportDetail = () => {
                   border
                   border-border
                   transition-colors
+                  cursor-pointer
 
                   data-[state=active]:bg-primary
                   data-[state=active]:text-primary-foreground
@@ -196,50 +203,60 @@ const ReportDetail = () => {
                 Checklist Results
               </TabsTrigger>
 
-              {isGenerated && (
-                <TabsTrigger
-                  disabled={!allAnswered || isClosed}
-                  value="audit-report"
-                  className="
+              {/* {isGenerated && (*/}
+              <TabsTrigger
+                disabled={!allAnswered || isClosed}
+                value="audit-report"
+                className="
                     border
                     border-border
                     transition-colors
-                  
+                    cursor-pointer
+
                     data-[state=active]:bg-primary
                     data-[state=active]:text-primary-foreground
                     data-[state=active]:border-primary
-                  
+
                     data-[state=inactive]:bg-transparent
                     data-[state=inactive]:text-muted-foreground
-                  
+
                     data-[state=inactive]:hover:bg-muted
                     data-[state=inactive]:hover:text-foreground
                     data-[state=inactive]:hover:border-primary/50
-                  
+
                     dark:data-[state=inactive]:hover:bg-muted/60
                     dark:data-[state=inactive]:hover:text-foreground
                     dark:data-[state=inactive]:hover:border-primary/60
                   "
-                >
-                  Audit Report
-                </TabsTrigger>
-              )}
+              >
+                {isConsolidated ? (
+                  <div className="flex gap-2 items-center ">
+                    <FilePlus2 className="h-4 w-4" />
+                    Create Report
+                  </div>
+                ) : (
+                  "Audit Report"
+                )}
+              </TabsTrigger>
+              {/* )}*/}
             </TabsList>
 
-            {isConsolidated && (
+            {/* {isConsolidated && (
               <Button
-                disabled={!allAnswered || isClosed}
+                disabled={!allAnswered || isClosed || reportDetailTab === "audit-report"}
                 onClick={() => handleTabChange("audit-report")}
                 className={
                   reportDetailTab === "audit-report"
                     ? `
                         bg-primary
+                        cursor-pointer
                         text-primary-foreground
                         border-primary
                         hover:bg-primary/90
                       `
                     : `
                         bg-transparent
+                        cursor-pointer
                         text-muted-foreground
                         border-border
                         hover:bg-muted
@@ -250,7 +267,7 @@ const ReportDetail = () => {
                 <FilePlus2 className="h-4 w-4" />
                 Create Report
               </Button>
-            )}
+            )}*/}
           </div>
           {!allAnswered && (
             <p className="text-xs text-muted-foreground mt-2">
@@ -261,33 +278,41 @@ const ReportDetail = () => {
         </div>
 
         <TabsContent
-          className="data-[state=inactive]:hidden"
+          className="relative data-[state=inactive]:hidden"
           value="results"
           forceMount
         >
-          {isTabSwitching ? (
-            <ChecklistTabLoading
-              title="Loading Checklist Results"
-              description="Preparing the checklist results and audit findings..."
-            />
-          ) : (
-            <ChecklistResultsTab report={report} />
+          <ChecklistResultsTab report={report} />
+
+          {isTabSwitching && (
+            <div className="fixed inset-0 z-20 flex items-center justify-center bg-background/95 backdrop-blur-sm">
+              <div className="w-full max-w-lg px-4">
+                <ChecklistTabLoading
+                  title="Loading Checklist Results"
+                  description="Preparing the checklist results and audit findings..."
+                />
+              </div>
+            </div>
           )}
         </TabsContent>
 
         <TabsContent
-          className="data-[state=inactive]:hidden"
+          className="relative data-[state=inactive]:hidden"
           value="audit-report"
           forceMount
         >
-          {isTabSwitching ? (
-              <ChecklistTabLoading
-                title="Preparing Audit Report"
-                description="Loading the audit report workspace based on the checklist results..."
-              />
-            ) : (
-              <AuditReportTab report={report} mode={reportTab} />
-            )}
+          <AuditReportTab report={report} mode={reportTab} />
+
+          {isTabSwitching && (
+            <div className="fixed inset-0 z-20 flex items-center justify-center bg-background/95 backdrop-blur-sm">
+              <div className="w-full max-w-lg px-4">
+                <ChecklistTabLoading
+                  title="Preparing Audit Report"
+                  description="Loading the audit report workspace based on the checklist results..."
+                />
+              </div>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

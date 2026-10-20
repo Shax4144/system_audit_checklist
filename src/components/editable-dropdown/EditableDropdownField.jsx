@@ -21,7 +21,8 @@ const EditableDropdownField = ({
 	onSelectOption, 
 	placeholder,
   readOnly = false,
-	removeDropdown = false,
+  removeDropdown = false,
+	disabled = false,
 }) => {
 	const [open, setOpen] = useState(false)
 
@@ -42,9 +43,9 @@ const EditableDropdownField = ({
 					value={value}
 					onChange={(e) => onChange(e.target.value)}
 					placeholder={isLoading ? "Loading..." : placeholder}
-					disabled={isLoading}
+					disabled={isLoading || disabled}
 					className="flex-1"
-					readOnly={readOnly}
+          readOnly={readOnly}
 				/>
 
         {!removeDropdown && (

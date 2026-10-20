@@ -607,6 +607,7 @@ const FormBuilder = () => {
     (sum, s) => sum + (Number(s.percentage) || 0),
     0,
   );
+  
   const isValidTotal = totalPercentage === 100;
 
   const hasZeroWeightSection = form.sections.some(
@@ -720,7 +721,7 @@ const FormBuilder = () => {
       >
         <span>Total section weight</span>
         <span className="font-semibold">
-          {totalPercentage}%{!isValidTotal && " (should total 100%)"}
+          {totalPercentage.toFixed(2)}%{!isValidTotal && " (should total 100%)"}
           {isValidTotal &&
             hasZeroWeightSection &&
             " (one or more section(s) have 0% weight)"}

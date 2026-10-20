@@ -93,3 +93,16 @@ export const appendFormData = (formData, data, parentKey) => {
 
 	formData.append(parentKey, data)
 }
+
+export const sanitizePercentage = (raw) => {
+  if (raw === "" || raw == null) return ""
+
+  // keep digits and at most one dot, max 2 decimal places
+  const match = String(raw).match(/^\d*\.?\d{0,2}/)
+  const cleaned = match ? match[0] : ""
+
+  // clamp to 100
+  if (Number(cleaned) > 100) return "100"
+
+  return cleaned
+}

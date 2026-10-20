@@ -23,7 +23,7 @@ const SidebarWrapper = () => {
 	}
 
 	return (
-		<div className="hidden lg:block">
+		<div className="hidden xl:block">
 			<Sidebar>
 				<SidebarHeader className="flex flex-row items-center h-16 px-4">
 					<img src={logo} alt="System Audit Checklist" className="h-10 w-auto" />

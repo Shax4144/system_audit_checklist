@@ -102,6 +102,8 @@ const MyChecklistAnswer = () => {
 
   const [submitSection] = useSubmitSectionMutation();
 
+  const [isSubmittingAll, setIsSubmittingAll] = useState(false);
+
   const {
     data: response,
     isFetching,
@@ -166,13 +168,12 @@ const MyChecklistAnswer = () => {
     }));
   }, [checklistData]);
 
-  const handleSectionAnswersChange =
-    (sectionIndex) => (questionKey, value) => {
-      setAllAnswers((prev) => ({
-        ...prev,
-        [`${sectionIndex}-${questionKey}`]: value,
-      }));
-    };
+  const handleSectionAnswersChange = (sectionIndex) => (questionKey, value) => {
+    setAllAnswers((prev) => ({
+      ...prev,
+      [`${sectionIndex}-${questionKey}`]: value,
+    }));
+  };
 
   /*
    * Build the payload for one section.
@@ -244,20 +245,20 @@ const MyChecklistAnswer = () => {
       })
     );
   };
-  
+
   const isSectionRemarksValid = (section, answers) => {
     const questions = getSectionQuestions(section);
-  
+
     return questions.every((question) => {
       const answer = answers[question.answerKey];
       const grade = answer?.grade;
       const remarks = answer?.note?.trim() ?? "";
-  
+
       // Ratings 1–4 require remarks
       if (["1", "2", "3", "4"].includes(String(grade))) {
         return remarks.length > 0;
       }
-  
+
       // Rating 5 and N/A do not require remarks
       return true;
     });
@@ -303,8 +304,7 @@ const MyChecklistAnswer = () => {
 
       appToast.error(
         "Save failed",
-        error?.data?.message ??
-          `Failed to save ${section.section} as a draft.`,
+        error?.data?.message ?? `Failed to save ${section.section} as a draft.`,
       );
     }
   };
@@ -314,70 +314,69 @@ const MyChecklistAnswer = () => {
    *
    * The section must be completely graded before submission.
    */
-  const handleSubmitSection = async (section) => {
-    const sectionIndex = section.originalIndex;
+  // const handleSubmitSection = async (section) => {
+  //   const sectionIndex = section.originalIndex;
 
-    // Check all questions are graded first
-    if (!isSectionFullyGraded(section)) {
-      appToast.warning(
-        "Incomplete section",
-        "Please answer all items in this section before submitting.",
-      );
-      return;
-    }
+  //   // Check all questions are graded first
+  //   if (!isSectionFullyGraded(section)) {
+  //     appToast.warning(
+  //       "Incomplete section",
+  //       "Please answer all items in this section before submitting.",
+  //     );
+  //     return;
+  //   }
 
-    // Ratings 1 - 4 require remarks
-    if (!isSectionRemarksValid(section, allAnswers)) {
-      appToast.warning(
-        "Remarks required",
-        "Please add remarks for all questions rated 4 or below before submitting this section.",
-      );
-      return;
-    }
+  //   // Ratings 1 - 4 require remarks
+  //   if (!isSectionRemarksValid(section, allAnswers)) {
+  //     appToast.warning(
+  //       "Remarks required",
+  //       "Please add remarks for all questions rated 4 or below before submitting this section.",
+  //     );
+  //     return;
+  //   }
 
-    setSectionActionState((prev) => ({
-      ...prev,
-      [sectionIndex]: "submitting",
-    }));
+  //   setSectionActionState((prev) => ({
+  //     ...prev,
+  //     [sectionIndex]: "submitting",
+  //   }));
 
-    try {
-      const payload = buildSectionPayload(section, true);
+  //   try {
+  //     const payload = buildSectionPayload(section, true);
 
-      const formData = new FormData();
-      appendFormData(formData, payload);
+  //     const formData = new FormData();
+  //     appendFormData(formData, payload);
 
-      const response = await submitSection(formData).unwrap();
+  //     const response = await submitSection(formData).unwrap();
 
-      setSectionActionState((prev) => ({
-        ...prev,
-        [sectionIndex]: "submitted",
-      }));
+  //     setSectionActionState((prev) => ({
+  //       ...prev,
+  //       [sectionIndex]: "submitted",
+  //     }));
 
-      appToast.success(
-        "Section submitted",
-        response?.message ?? `${section.section} has been submitted.`,
-      );
+  //     appToast.success(
+  //       "Section submitted",
+  //       response?.message ?? `${section.section} has been submitted.`,
+  //     );
 
-      /*
-       * Refetch so:
-       * - is_answered updates from the backend
-       * - the submitted state is reflected by the server
-       * - other sections remain intact because allAnswers is merged
-       */
-      await refetch();
-    } catch (error) {
-      setSectionActionState((prev) => ({
-        ...prev,
-        [sectionIndex]: "error",
-      }));
+  //     /*
+  //      * Refetch so:
+  //      * - is_answered updates from the backend
+  //      * - the submitted state is reflected by the server
+  //      * - other sections remain intact because allAnswers is merged
+  //      */
+  //     await refetch();
+  //   } catch (error) {
+  //     setSectionActionState((prev) => ({
+  //       ...prev,
+  //       [sectionIndex]: "error",
+  //     }));
 
-      appToast.error(
-        "Submission failed",
-        error?.data?.message ??
-          `Failed to submit ${section.section}.`,
-      );
-    }
-  };
+  //     appToast.error(
+  //       "Submission failed",
+  //       error?.data?.message ?? `Failed to submit ${section.section}.`,
+  //     );
+  //   }
+  // };
 
   /*
    * Loading state
@@ -387,11 +386,7 @@ const MyChecklistAnswer = () => {
       <div className="flex flex-col gap-6 max-w-3xl mx-auto pb-20">
         {/* Header */}
         <div className="flex items-center w-full">
-          <Button
-            variant="ghost"
-            size="xl"
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="ghost" size="xl" onClick={() => navigate(-1)}>
             <ChevronLeft className="size-full" />
           </Button>
 
@@ -429,10 +424,7 @@ const MyChecklistAnswer = () => {
         {/* Section skeletons */}
         <div className="flex flex-col gap-5">
           {[0, 1, 2].map((sectionIndex) => (
-            <div
-              key={sectionIndex}
-              className="rounded-xl border bg-card p-5"
-            >
+            <div key={sectionIndex} className="rounded-xl border bg-card p-5">
               <div className="flex items-center justify-between gap-4 mb-6">
                 <Skeleton className="h-7 w-64" />
                 <Skeleton className="h-6 w-24 rounded-full" />
@@ -440,10 +432,7 @@ const MyChecklistAnswer = () => {
 
               <div className="flex flex-col gap-5">
                 {[0, 1, 2].map((questionIndex) => (
-                  <div
-                    key={questionIndex}
-                    className="border-l-2 pl-4"
-                  >
+                  <div key={questionIndex} className="border-l-2 pl-4">
                     <Skeleton className="h-5 w-4/5 mb-3" />
 
                     <div className="flex flex-col gap-2">
@@ -486,10 +475,7 @@ const MyChecklistAnswer = () => {
       ...section,
       originalIndex: index,
     }))
-    .filter(
-      (section) =>
-        String(section.user_id) === String(currentUser.id),
-    );
+    .filter((section) => String(section.user_id) === String(currentUser.id));
 
   /*
    * Questions for score/progress calculation.
@@ -527,15 +513,102 @@ const MyChecklistAnswer = () => {
 
   const checklistClosed = isChecklistClosed(checklistData);
 
+  const scrollToSection = (sectionIndex) => {
+    document
+      .getElementById(`section-${sectionIndex}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const pendingSections = mySections.filter((s) => !isSectionSubmitted(s));
+
+  const allPendingReady = pendingSections.every((s) => isSectionFullyGraded(s));
+
+  const hasFailedSection = pendingSections.some(
+    (s) => sectionActionState[s.originalIndex] === "error",
+  );
+
+  const handleSubmitAll = async () => {
+    if (pendingSections.length === 0) return;
+
+    // 1. Validate ALL pending sections before sending anything,
+    //    so a validation problem never leaves you half-submitted.
+    for (const section of pendingSections) {
+      if (!isSectionFullyGraded(section)) {
+        appToast.warning(
+          "Incomplete section",
+          `Please answer all items in "${section.section}" before submitting.`,
+        );
+        scrollToSection(section.originalIndex);
+        return;
+      }
+
+      if (!isSectionRemarksValid(section, allAnswers)) {
+        appToast.warning(
+          "Remarks required",
+          `Please add remarks for all questions rated 4 or below in "${section.section}".`,
+        );
+        scrollToSection(section.originalIndex);
+        return;
+      }
+    }
+
+    // 2. Submit sequentially, stop on the first failure
+    setIsSubmittingAll(true);
+    let failedIndex = null;
+
+    for (const section of pendingSections) {
+      const idx = section.originalIndex;
+
+      setSectionActionState((prev) => ({ ...prev, [idx]: "submitting" }));
+
+      try {
+        const payload = buildSectionPayload(section, true);
+        const formData = new FormData();
+        appendFormData(formData, payload);
+
+        await submitSection(formData).unwrap();
+
+        setSectionActionState((prev) => ({ ...prev, [idx]: "submitted" }));
+      } catch (error) {
+        setSectionActionState((prev) => ({ ...prev, [idx]: "error" }));
+
+        appToast.error(
+          "Submission failed",
+          `${section.section}: ${
+            error?.data?.message ?? "Failed to submit."
+          } Sections after this one were not submitted. You can retry.`,
+        );
+
+        failedIndex = idx;
+        break;
+      }
+    }
+
+    if (failedIndex === null) {
+      appToast.success(
+        "Checklist submitted",
+        "All assigned sections have been submitted successfully.",
+      );
+    }
+
+    setIsSubmittingAll(false);
+
+    // 3. Refetch ONCE after the loop (not after every section).
+    //    Your merge effect keeps local answers, so nothing disappears.
+    try {
+      await refetch();
+    } finally {
+      if (failedIndex !== null) {
+        setTimeout(() => scrollToSection(failedIndex), 150);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6 max-w-3xl mx-auto pb-20">
       {/* Header */}
       <div className="flex items-center w-full gap-2">
-        <Button
-          variant="ghost"
-          size="xl"
-          onClick={() => navigate(-1)}
-        >
+        <Button variant="ghost" size="xl" onClick={() => navigate(-1)}>
           <ChevronLeft className="size-full" />
         </Button>
 
@@ -556,21 +629,12 @@ const MyChecklistAnswer = () => {
           </div>  */}
 
           <div className="flex flex-row justify-between gap-4">
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-semibold">
-                {checklistData.title}
-              </h1>
+            <h1 className="text-2xl font-semibold">{checklistData.title}</h1>
 
-              <p className="text-sm text-muted-foreground capitalize">
-                Supplier: {info.supplier}
-              </p>
-            </div>
-
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-end">
               <p className="text-xl text-muted-foreground">
                 {info.reference_no}
               </p>
-
               {checklistClosed && (
                 <Badge className="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
                   <OctagonAlert />
@@ -579,6 +643,40 @@ const MyChecklistAnswer = () => {
               )}
             </div>
           </div>
+          <div className="flex flex-col mt-2">
+            <p className="text-md font-semibold text-muted-foreground capitalize">
+              {info.supplier}
+            </p>
+
+            <div className="flex gap-1 items-center">
+              {Boolean(info.contactNumber) && (
+                <p className="text-sm text-muted-foreground capitalize">
+                  {info.contactNumber.join("/")}
+                </p>
+              )}
+
+              {Boolean(info.email) && (
+                <p className="text-sm text-muted-foreground">
+                  • {info.email.toLowerCase()}
+                </p>
+              )}
+            </div>
+
+            {Boolean(info.address) && (
+              <p className="text-xs leading-relaxed text-muted-foreground capitalize wrap-break-word">
+                {info.address}
+              </p>
+            )}
+          </div>
+          
+          <p className="flex items-center text-sm leading-relaxed text-muted-foreground capitalize wrap-break-word">
+            {info.location ? info.location : null } - {info.remarks ? info.remarks : null }
+          </p>
+
+          <p className="text-sm leading-relaxed text-muted-foreground capitalize wrap-break-word">
+            {info.products.join(", ")}
+          </p>
+
         </div>
       </div>
 
@@ -596,9 +694,7 @@ const MyChecklistAnswer = () => {
               </p>
             </div>
 
-            <p className="text-lg font-semibold">
-              {averageScore}/5
-            </p>
+            <p className="text-lg font-semibold">{averageScore}/5</p>
           </div>
 
           <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
@@ -624,8 +720,7 @@ const MyChecklistAnswer = () => {
           {mySections.map((section) => {
             const sectionIndex = section.originalIndex;
 
-            const actionState =
-              sectionActionState[sectionIndex];
+            const actionState = sectionActionState[sectionIndex];
 
             const submitted = isSectionSubmitted(section);
 
@@ -648,9 +743,7 @@ const MyChecklistAnswer = () => {
              */
             const sectionAnswers = Object.fromEntries(
               Object.entries(allAnswers)
-                .filter(([key]) =>
-                  key.startsWith(`${sectionIndex}-`),
-                )
+                .filter(([key]) => key.startsWith(`${sectionIndex}-`))
                 .map(([key, value]) => [
                   key.replace(`${sectionIndex}-`, ""),
                   value,
@@ -660,6 +753,7 @@ const MyChecklistAnswer = () => {
             return (
               <div
                 key={sectionIndex}
+                id={`section-${sectionIndex}`}
                 className="rounded-xl border bg-card p-5 shadow-sm"
               >
                 {/* Section header */}
@@ -677,10 +771,16 @@ const MyChecklistAnswer = () => {
                         <Check className="h-3 w-3" />
                         Submitted
                       </Badge>
-                    ) : actionState === "saved" ? (
-                      <Badge variant="outline">
-                        Draft Saved
+                    ) : actionState === "submitting" ? (
+                      <Badge
+                        variant="outline"
+                        className="flex items-center gap-1"
+                      >
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Submitting
                       </Badge>
+                    ) : actionState === "saved" ? (
+                      <Badge variant="outline">Draft Saved</Badge>
                     ) : (
                       <Badge
                         variant="outline"
@@ -697,9 +797,7 @@ const MyChecklistAnswer = () => {
                   checklistId={checklistData.id}
                   section={section}
                   sectionIndex={sectionIndex}
-                  onAnswersChange={handleSectionAnswersChange(
-                    sectionIndex,
-                  )}
+                  onAnswersChange={handleSectionAnswersChange(sectionIndex)}
                   answers={sectionAnswers}
                   isClosed={checklistClosed || submitted}
                 />
@@ -732,8 +830,8 @@ const MyChecklistAnswer = () => {
                         )}
                       </Button>
 
-                      {/* Submit */}
-                      <Button
+                      {/* Submit per section */}
+                      {/* <Button
                         type="button"
                         onClick={() => handleSubmitSection(section)}
                         disabled={
@@ -754,22 +852,18 @@ const MyChecklistAnswer = () => {
                             Submit
                           </>
                         )}
-                      </Button>
+                      </Button>*/}
                     </div>
 
                     {!fullyGraded && (
                       <p className="text-xs text-muted-foreground text-right mt-2">
-                        Complete all items in this section before
-                        submitting.
+                        Complete all items in this section before submitting.
                       </p>
                     )}
                   </>
                 ) : (
                   <div className="flex justify-end mt-6 pt-4 border-t">
-                    <Badge
-                      variant="outline"
-                      className="px-3 py-2"
-                    >
+                    <Badge variant="outline" className="px-3 py-2">
                       Section submitted
                     </Badge>
                   </div>
@@ -777,6 +871,39 @@ const MyChecklistAnswer = () => {
               </div>
             );
           })}
+        </div>
+      )}
+      {pendingSections.length > 0 && (
+        <div className="rounded-xl border bg-card p-5 shadow-sm flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col">
+            <p className="text-sm font-medium">
+              {pendingSections.length} section
+              {pendingSections.length > 1 ? "s" : ""} ready to submit
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {allPendingReady
+                ? "All sections are complete. Submitting will send them one by one."
+                : "Complete all items in every section assigned to you before submitting."}
+            </p>
+          </div>
+
+          <Button
+            type="button"
+            onClick={handleSubmitAll}
+            disabled={checklistClosed || !allPendingReady || isSubmittingAll}
+          >
+            {isSubmittingAll ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <Send className="mr-2 h-4 w-4" />
+                {hasFailedSection ? "Retry submission" : "Submit"}
+              </>
+            )}
+          </Button>
         </div>
       )}
     </div>

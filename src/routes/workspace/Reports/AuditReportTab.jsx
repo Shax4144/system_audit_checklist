@@ -1,14 +1,15 @@
-import { useState, useRef, useEffect} from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus, X, Printer } from "lucide-react";
 import DatePicker from "../../../components/DatePicker";
 import UsersDropdown from "../../../components/dropdown/UserAccountsDropdown";
 import Confirm from "../../../components/Confirm";
 import { appToast } from "../../../components/Toast";
+import ReportPdfContent from "../../../components/ReportPdfContent";
 import {
   stripSectionNumbering,
   buildFindingsByRating,
@@ -16,7 +17,7 @@ import {
   getAssignedAuditors,
 } from "../../../features/report/reportHelper";
 import { usePostFindingMutation } from "../../../features/report/findings.api";
-
+import { useReactToPrint } from "react-to-print";
 
 const RATING_LABELS = {
   5: "Fully Compliant, Demonstrate Best Practices",
@@ -28,6 +29,18 @@ const RATING_LABELS = {
 
 const DEFAULT_CORRECTIVE_ACTION_TEXT =
   "Kindly submit corrective action report to those deficiencies mentioned above 15 days after receiving the final report.";
+
+const PRINT_PAGE_STYLE = `
+  @page {
+    size: letter;
+    margin: 1.35in 0.75in 0.75in;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+`;
 
 const displayValue = (value, type = "text") => {
   if (value == null || value === "") return "-";
@@ -82,10 +95,9 @@ const AuditReportTab = ({ report }) => {
 
   const findings = Array.isArray(report?.findings) ? report.findings : [];
   const hasFindings =
-    Array.isArray(report?.findings) &&
-    report.findings.length > 0;
+    Array.isArray(report?.findings) && report.findings.length > 0;
   const existingFinding = findings[0];
-  
+
   const [postFinding] = usePostFindingMutation();
   const navigate = useNavigate();
 
@@ -175,36 +187,33 @@ const AuditReportTab = ({ report }) => {
   // const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
+  const checklistPrintRef = useRef(null);
+
   useEffect(() => {
-      if (!hasFindings || !existingFinding) return;
-  
-      const context = existingFinding.context ?? {};
-  
-      setConductedThrough(context.conducted_through ?? "");
-      setAuditSummary(context.audit_summary ?? "");
-      setConclusion(context.conclusion ?? "");
-  
-      setCorrectiveActions(
-        context.corrective_actions ??
-          DEFAULT_CORRECTIVE_ACTION_TEXT
-      );
-  
-      setFollowUpAudit(context.follow_up_audit ?? "");
-  
-      setObservers(
-        Array.isArray(existingFinding.observers)
-          ? existingFinding.observers.map(
-              (observer) => observer.id
-            )
-          : []
-      );
-  
-      if (context.submission_date) {
-        setSubmissionDate(
-          new Date(context.submission_date)
-        );
-      }
-    }, [hasFindings, existingFinding]);
+    if (!hasFindings || !existingFinding) return;
+
+    const context = existingFinding.context ?? {};
+
+    setConductedThrough(context.conducted_through ?? "");
+    setAuditSummary(context.audit_summary ?? "");
+    setConclusion(context.conclusion ?? "");
+
+    setCorrectiveActions(
+      context.corrective_actions ?? DEFAULT_CORRECTIVE_ACTION_TEXT,
+    );
+
+    setFollowUpAudit(context.follow_up_audit ?? "");
+
+    setObservers(
+      Array.isArray(existingFinding.observers)
+        ? existingFinding.observers.map((observer) => observer.id)
+        : [],
+    );
+
+    if (context.submission_date) {
+      setSubmissionDate(new Date(context.submission_date));
+    }
+  }, [hasFindings, existingFinding]);
 
   // ── Derived / auto-filled data ──
   const overallPercentage = computeOverallPercentage(sections);
@@ -223,35 +232,48 @@ const AuditReportTab = ({ report }) => {
     setObservers((prev) => prev.filter((_, i) => i !== index));
   };
 
-  
-
   const getFirstMissingField = () => {
     const fields = [
-      { value: conductedThrough, label: "The audit was conducted through", ref: conductedThroughRef },
+      {
+        value: conductedThrough,
+        label: "The audit was conducted through",
+        ref: conductedThroughRef,
+      },
       { value: auditSummary, label: "Audit Summary", ref: auditSummaryRef },
       { value: conclusion, label: "Conclusion", ref: conclusionRef },
-      { value: correctiveActions, label: "Supplier's Corrective Actions", ref: correctiveActionsRef },
-      { value: followUpAudit, label: "Follow up Audit", ref: followUpAuditRef },
-      { value: submissionDate, label: "Audit Report Submission Date", ref: null },
       {
-        value: observers.some((id) => id != null && id !== "") ? "has-observer/s" : "",
+        value: correctiveActions,
+        label: "Supplier's Corrective Actions",
+        ref: correctiveActionsRef,
+      },
+      { value: followUpAudit, label: "Follow up Audit", ref: followUpAuditRef },
+      {
+        value: submissionDate,
+        label: "Audit Report Submission Date",
+        ref: null,
+      },
+      {
+        value: observers.some((id) => id != null && id !== "")
+          ? "has-observer/s"
+          : "",
         label: "Observers",
         ref: observersRef,
-      }
-    ]
-  
+      },
+    ];
+
     return fields.find((field) => {
-      if (field.value == null) return true
-      if (typeof field.value === "string" && field.value.trim() === "") return true
-      return false
-    })
-  }
-  
+      if (field.value == null) return true;
+      if (typeof field.value === "string" && field.value.trim() === "")
+        return true;
+      return false;
+    });
+  };
+
   const scrollToField = (ref) => {
-    if (!ref?.current) return
-    ref.current.scrollIntoView({ behavior: "smooth", block: "center" })
-    ref.current.focus()
-  }
+    if (!ref?.current) return;
+    ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    ref.current.focus();
+  };
 
   const buildAuditReportPayload = () => ({
     copy_id: report.id,
@@ -284,19 +306,19 @@ const AuditReportTab = ({ report }) => {
   // };
 
   const handleGenerateReport = () => {
-    const missingField = getFirstMissingField()
-    
+    const missingField = getFirstMissingField();
+
     if (missingField) {
       appToast.warning(
         "Missing information",
         missingField.label === "Observers"
           ? "Please choose at least one observer before generating the report."
-          : `Please fill out "${missingField.label}" before generating the report.`
-      )
-      scrollToField(missingField.ref)
-      return
+          : `Please fill out "${missingField.label}" before generating the report.`,
+      );
+      scrollToField(missingField.ref);
+      return;
     }
-    
+
     setOpenConfirm(true);
   };
 
@@ -305,7 +327,7 @@ const AuditReportTab = ({ report }) => {
     try {
       const payload = buildAuditReportPayload();
       console.log("generate report payload:", payload);
-      await postFinding({...payload }).unwrap()
+      await postFinding({ ...payload }).unwrap();
       appToast.success(
         "Report Generated",
         "The audit report has been generated successfully.",
@@ -321,6 +343,36 @@ const AuditReportTab = ({ report }) => {
       setOpenConfirm(false);
     }
   };
+
+  const printChecklist = useReactToPrint({
+    contentRef: checklistPrintRef,
+    pageStyle: PRINT_PAGE_STYLE,
+    documentTitle: `Audit_Report_${report?.information?.reference_no ?? "report"}`,
+    onPrintError: (_errorLocation, printError) => {
+      appToast.error(
+        "Print error",
+        printError.message ?? "Failed to print checklist.",
+      );
+    },
+  });
+
+  const handlePrintChecklist = useCallback(async () => {
+    // console.log("Report data:", report);
+    // console.log("Checklist:", report?.checklist);
+
+    try {
+      await document.fonts?.ready;
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+
+      printChecklist();
+    } catch (printError) {
+      appToast.error(
+        "Print error",
+        printError.message ?? "Failed to print checklist.",
+      );
+    }
+  }, [printChecklist]);
 
   return (
     <div className="flex flex-col gap-6 pt-4">
@@ -479,7 +531,10 @@ const AuditReportTab = ({ report }) => {
       </div>
 
       {/* ── Auditors / Observers ── */}
-      <div ref={observersRef} className="rounded-xl border bg-card p-5 flex flex-col gap-4">
+      <div
+        ref={observersRef}
+        className="rounded-xl border bg-card p-5 flex flex-col gap-4"
+      >
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Auditors / Observers
         </p>
@@ -509,57 +564,54 @@ const AuditReportTab = ({ report }) => {
             </p>
           ))
         ) : (
-            // Adding new observers
-            <>
-              <div className="flex flex-col gap-2">
-                {observers.map((userId, index) => {
-                  const selectedObserverIds = observers.filter(
-                    (id, i) => i !== index && id
-                  )
+          // Adding new observers
+          <>
+            <div className="flex flex-col gap-2">
+              {observers.map((userId, index) => {
+                const selectedObserverIds = observers.filter(
+                  (id, i) => i !== index && id,
+                );
 
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-center gap-2 max-w-sm"
-                    >
-                      <span className="text-sm text-muted-foreground">
-                        Observer {index + 1}:
-                      </span>
-        
-                      <UsersDropdown
-                        value={userId ?? ""}
-                        onChange={(val) => updateObserver(index, val)}
-                        open={true}
-                        triggerClassName="flex-1"
-                        disabledValues={selectedObserverIds.map(String)}
-                      />
-        
-                      {observers.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeObserverSlot(index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-        
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addObserverSlot}
-                className="self-start mt-1"
-              >
-                <Plus className="h-4 w-4" /> Add Observer
-              </Button>
-            </>
-          )}
+                return (
+                  <div key={index} className="flex items-center gap-2 max-w-sm">
+                    <span className="text-sm text-muted-foreground">
+                      Observer {index + 1}:
+                    </span>
+
+                    <UsersDropdown
+                      value={userId ?? ""}
+                      onChange={(val) => updateObserver(index, val)}
+                      open={true}
+                      triggerClassName="flex-1"
+                      disabledValues={selectedObserverIds.map(String)}
+                    />
+
+                    {observers.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeObserverSlot(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addObserverSlot}
+              className="self-start mt-1"
+            >
+              <Plus className="h-4 w-4" /> Add Observer
+            </Button>
+          </>
+        )}
       </div>
 
       {/* ── Submission Date ── */}
@@ -571,38 +623,40 @@ const AuditReportTab = ({ report }) => {
             onChange={setSubmissionDate}
             placeholder="Pick a date"
             disabled={hasFindings}
+            maxDate={new Date()}
           />
         </div>
 
         {/* Action Buttons */}
-        {!hasFindings && (
-          <div className="flex items-center gap-2">
-            {/* <Button
-              variant="outline"
-              onClick={handleSaveDraft}
-              disabled={isSavingDraft || isGeneratingReport}
-            >
-              {isSavingDraft && (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              )}
-              Save as Draft
-            </Button>*/}
-        
+        <div className="fixed bottom-1 right-10 z-50 bg-transparent p-6">
+          {!hasFindings ? (
             <Button
               variant="default"
               onClick={handleGenerateReport}
-              disabled={isGeneratingReport 
-                // || isSavingDraft
-              }
+              disabled={isGeneratingReport}
             >
               {isGeneratingReport && (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Generate Report
             </Button>
-          </div>
-        )}
+          ) : (
+            <Button variant="outline" onClick={handlePrintChecklist}>
+              <Printer className="mr-2 h-4 w-4" />
+              Print
+            </Button>
+          )}
+        </div>
       </div>
+
+      {report && (
+        <div className="print-area hidden print:block" ref={checklistPrintRef}>
+          <ReportPdfContent
+            report={report}
+            isCopy={(report?.print_count ?? 0) >= 1}
+          />
+        </div>
+      )}
 
       <Confirm
         open={openConfirm}

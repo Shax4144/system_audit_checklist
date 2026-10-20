@@ -212,7 +212,7 @@ const ChecklistInformation = ({ value, onChange }) => {
               options={scopeOptions}
               isLoading={false}
               placeholder="Auto-filled from chosen supplier"
-              readOnly
+              disabled
               removeDropdown
             />
           </div>
