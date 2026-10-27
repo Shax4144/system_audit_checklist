@@ -3,7 +3,7 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { GripVertical, Trash2, Plus, ChevronDown } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+// import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import {
 	Select,
@@ -120,7 +120,7 @@ const SubsectionCard = ({ subsection, onUpdate, onDelete }) => {
 							<SelectTrigger className="w-44 h-8 text-sm">
 								<SelectValue />
 							</SelectTrigger>
-							<SelectContent>
+							<SelectContent position="popper">
 								{QUESTION_TYPES.map((t) => (
 									<SelectItem key={t.value} value={t.value}>
 										{t.label}

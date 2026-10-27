@@ -10,7 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, LogOutIcon, LockIcon } from "lucide-react";
+import {
+  // Bell,
+  LogOutIcon,
+  LockIcon
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import PopupSidebarWrapper from "./sidebar/PopupSidebarWrapper";

@@ -6,9 +6,9 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 // import { Button } from "@/components/ui/button"
-import { Check, X } from "lucide-react";
+// import { Check, X } from "lucide-react";
 import QuestionAnswer from "./QuestionAnswer";
 // import { useSubmitSectionMutation } from "../../features/checklist/submitSectionChecklist.api"
 // import { appToast } from "../Toast"

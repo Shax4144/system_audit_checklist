@@ -14,7 +14,7 @@ import { setUserDetails } from "./features/users/users.slice"
 import { useLoginMutation } from "./api/authApi"
 import { Loader2 } from "lucide-react"
 import vert_logo from "../src/assets/vertical.png"
-import horiz_logo from "../src/assets/horizontal.png"
+// import horiz_logo from "../src/assets/horizontal.png"
 import mis_logo from "../src/assets/MIS_logo.png"
 
 export function Landing() {
